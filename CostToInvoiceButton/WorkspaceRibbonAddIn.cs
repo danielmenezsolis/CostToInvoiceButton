@@ -74,19 +74,15 @@ namespace CostToInvoiceButton
             {
                 bool result = false;
                 EndpointAddress endPointAddr = new EndpointAddress(global.GetInterfaceServiceUrl(ConnectServiceType.Soap));
-                // Minimum required
                 BasicHttpBinding binding = new BasicHttpBinding(BasicHttpSecurityMode.TransportWithMessageCredential);
                 binding.Security.Message.ClientCredentialType = BasicHttpMessageCredentialType.UserName;
                 binding.ReceiveTimeout = new TimeSpan(0, 10, 0);
                 binding.MaxReceivedMessageSize = 1048576; //1MB
                 binding.SendTimeout = new TimeSpan(0, 10, 0);
-                // Create client proxy class
                 clientORN = new RightNowSyncPortClient(binding, endPointAddr);
-                // Ask the client to not send the timestamp
                 BindingElementCollection elements = clientORN.Endpoint.Binding.CreateBindingElements();
                 elements.Find<SecurityBindingElement>().IncludeTimestamp = false;
                 clientORN.Endpoint.Binding = new CustomBinding(elements);
-                // Ask the Add-In framework the handle the session logic
                 global.PrepareConnectSession(clientORN.ChannelFactory);
                 if (clientORN != null)
                 {
@@ -175,17 +171,15 @@ namespace CostToInvoiceButton
             {
                 RequestFormat = DataFormat.Json
             };
-            //request.AddParameter("application/json", body, ParameterType.RequestBody);
-            // easily add HTTP Headers
             request.AddHeader("Authorization", "Basic ZW9saXZhczpTaW5lcmd5KjIwMTg=");
             request.AddHeader("X-HTTP-Method-Override", "DELETE");
             request.AddHeader("OSvC-CREST-Application-Context", "Delete Service");
-            // execute the request
+
             IRestResponse response = client.Execute(request);
-            var content = response.Content; // raw content as string
+            var content = response.Content;
             if (String.IsNullOrEmpty(content))
             {
-                MessageBox.Show(content);
+                //MessageBox.Show(content);
             }
         }
         public void CreateChildComponents()
@@ -266,30 +260,21 @@ namespace CostToInvoiceButton
                  "</soapenv:Body>" +
                  "</soapenv:Envelope>";
                 byte[] byteArray = Encoding.UTF8.GetBytes(envelope);
-
-                // Construct the base 64 encoded string used as credentials for the service call
                 byte[] toEncodeAsBytes = System.Text.ASCIIEncoding.ASCII.GetBytes("itotal" + ":" + "Oracle123");
                 string credentials = System.Convert.ToBase64String(toEncodeAsBytes);
-                // Create HttpWebRequest connection to the service
                 HttpWebRequest request =
                  (HttpWebRequest)WebRequest.Create("https://egqy-test.fa.us6.oraclecloud.com:443/fscmService/StructureServiceV2");
-                // Configure the request content type to be xml, HTTP method to be POST, and set the content length
                 request.Method = "POST";
                 request.ContentType = "text/xml;charset=UTF-8";
                 request.ContentLength = byteArray.Length;
-                // Configure the request to use basic authentication, with base64 encoded user name and password, to invoke the service.
                 request.Headers.Add("Authorization", "Basic " + credentials);
-                // Set the SOAP action to be invoked; while the call works without this, the value is expected to be set based as per standards
                 request.Headers.Add("SOAPAction", "http://xmlns.oracle.com/apps/scm/productModel/items/structures/structureServiceV2/findStructure");
-                // Write the xml payload to the request
                 Stream dataStream = request.GetRequestStream();
                 dataStream.Write(byteArray, 0, byteArray.Length);
                 dataStream.Close();
-                // Write the xml payload to the request
                 XDocument doc;
                 XmlDocument docu = new XmlDocument();
                 string result = "";
-                // Get the response and process it; In this example, we simply print out the response XDocument doc;
                 List<ComponentChild> components = new List<ComponentChild>();
                 using (WebResponse responseComponent = request.GetResponse())
                 {
@@ -407,29 +392,21 @@ namespace CostToInvoiceButton
                                    "</soapenv:Body>" +
                                    "</soapenv:Envelope>";
             byte[] byteArray = Encoding.UTF8.GetBytes(envelope);
-            // Construct the base 64 encoded string used as credentials for the service call
             byte[] toEncodeAsBytes = System.Text.ASCIIEncoding.ASCII.GetBytes("itotal" + ":" + "Oracle123");
             string credentials = System.Convert.ToBase64String(toEncodeAsBytes);
-            // Create HttpWebRequest connection to the service
             HttpWebRequest request =
              (HttpWebRequest)WebRequest.Create("https://egqy-test.fa.us6.oraclecloud.com:443/fscmService/ItemServiceV2");
-            // Configure the request content type to be xml, HTTP method to be POST, and set the content length
             request.Method = "POST";
             request.ContentType = "text/xml;charset=UTF-8";
             request.ContentLength = byteArray.Length;
-            // Configure the request to use basic authentication, with base64 encoded user name and password, to invoke the service.
             request.Headers.Add("Authorization", "Basic " + credentials);
-            // Set the SOAP action to be invoked; while the call works without this, the value is expected to be set based as per standards
             request.Headers.Add("SOAPAction", "http://xmlns.oracle.com/apps/scm/productModel/items/itemServiceV2/findItem");
-            // Write the xml payload to the request
             Stream dataStream = request.GetRequestStream();
             dataStream.Write(byteArray, 0, byteArray.Length);
             dataStream.Close();
-            // Write the xml payload to the request
             XDocument doc;
             XmlDocument docu = new XmlDocument();
             string result = "";
-            // Get the response and process it; In this example, we simply print out the response XDocument doc;
             using (WebResponse responseComponentGet = request.GetResponse())
             {
                 using (Stream stream = responseComponentGet.GetResponseStream())
@@ -519,7 +496,6 @@ namespace CostToInvoiceButton
                     RequestFormat = DataFormat.Json
                 };
                 string body = "{";
-                // Información de precios costos
                 body += "\"Airport\":\"" + component.Airport + "\",";
                 body += "\"ParentPaxId\":\"" + component.ParentPaxId + "\",";
                 if (String.IsNullOrEmpty(component.CategoriaRoyalty))
@@ -555,7 +531,7 @@ namespace CostToInvoiceButton
                 body += "\"Informativo\":\"" + component.Informativo + "\"," +
                  "\"ItemDescription\":\"" + component.ItemDescription + "\"," +
                  "\"ItemNumber\":\"" + component.ItemNumber + "\",";
-                MessageBox.Show(component.Itinerary.ToString());
+
                 if (component.Itinerary != 0)
                 {
                     body += "\"Itinerary\":";
@@ -589,21 +565,18 @@ namespace CostToInvoiceButton
                     body += "\"Precio\":\"" + component.Precio + "\"";
                 }
                 body += "}";
-               
                 request.AddParameter("application/json", body, ParameterType.RequestBody);
-                // easily add HTTP Headers
                 request.AddHeader("Authorization", "Basic ZW9saXZhczpTaW5lcmd5KjIwMTg=");
                 request.AddHeader("X-HTTP-Method-Override", "POST");
                 request.AddHeader("OSvC-CREST-Application-Context", "Create Service");
-                // execute the request
                 IRestResponse response = client.Execute(request);
-                var content = response.Content; // raw content as string
+                var content = response.Content;
                 if (response.StatusCode == HttpStatusCode.Created)
                 {
                     RootObject rootObject = JsonConvert.DeserializeObject<RootObject>(response.Content);
-                    if(component.Paquete == "1")
+                    if (component.Paquete == "1")
                     {
-                        component.ID = rootObject.id; 
+                        component.ID = rootObject.id;
                         GetComponents(component);
                     }
                 }
@@ -611,7 +584,7 @@ namespace CostToInvoiceButton
                 {
                     MessageBox.Show(content);
                 }
-               
+
             }
             catch (Exception ex)
             {

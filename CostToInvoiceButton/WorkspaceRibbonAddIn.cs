@@ -58,6 +58,12 @@ namespace CostToInvoiceButton
                     DgvServicios.DataSource = servicios;
                     DgvServicios.Columns[2].Visible = false;
                     DgvServicios.Columns[3].Visible = false;
+                    DgvServicios.Columns[4].Visible = false;
+                    DgvServicios.Columns[5].Visible = false;
+                    DgvServicios.Columns[6].Visible = false;
+                    DgvServicios.Columns[7].Visible = false;
+                    DgvServicios.Columns[8].Visible = false;
+
                     DgvServicios.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
                     doubleScreen.ShowDialog();
                     //((TextBox)doubleScreen.Controls["txtResult"]).Text
@@ -106,7 +112,8 @@ namespace CostToInvoiceButton
                 ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
                 APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
                 clientInfoHeader.AppID = "Query Example";
-                String queryString = "SELECT ItemNumber,ItemDescription,Airport,ID,IDProveedor,Costo,Precio,InternalInvoice FROM CO.Services WHERE Incident = " + IncidentID;
+                String queryString = "SELECT ItemNumber,ItemDescription,Airport,ID,IDProveedor,Costo,Precio,InternalInvoice,Itinerary,Paquete,Componente,Informativo,ParentPaxID FROM CO.Services WHERE Incident =" + IncidentID + " ORDER BY ID ASC, ParentPaxId ASC";
+
                 clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 10000, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
                 foreach (CSVTable table in queryCSV.CSVTables)
                 {
@@ -116,14 +123,20 @@ namespace CostToInvoiceButton
                         Services service = new Services();
                         Char delimiter = '|';
                         string[] substrings = data.Split(delimiter);
+                        MessageBox.Show(substrings.Length.ToString());
                         service.ItemNumber = substrings[0];
                         service.Description = substrings[1].Replace('"', ' ').Trim();
-                        service.Airport = substrings[2].Replace('"', ' ').Trim();
-                        service.ServiceID = substrings[3].Replace('"', ' ').Trim();
+                        service.Airport = substrings[2];
+                        service.ServiceID = substrings[3];
                         service.Supplier = substrings[4].Replace('"', ' ').Trim();
-                        service.Cost = substrings[5].Replace('"', ' ').Trim();
-                        service.Price = substrings[6].Replace('"', ' ').Trim();
-                        service.InvoiceInternal = substrings[7].Replace('"', ' ').Trim();
+                        service.Cost = substrings[5];
+                        service.Price = substrings[6];
+                        service.InvoiceInternal = substrings[7];
+                        service.Itinerary = substrings[8];
+                        service.Pax = substrings[9] == "1" ? "Yes" : "No";
+                        service.Task = substrings[10] == "1" ? "Yes" : "No";
+                        service.Informative = substrings[11] == "1" ? "Yes" : "No";
+                        service.ParentPax = substrings[12];
                         services.Add(service);
                     }
                 }
@@ -132,12 +145,11 @@ namespace CostToInvoiceButton
             catch (Exception ex)
             {
 
-                MessageBox.Show("Error en GetServices: " + ex.Message);
-                global.LogMessage(ex.Message);
+                MessageBox.Show("Error en GetServices: " + ex.StackTrace);
+
                 return null;
             }
         }
-
         public void GetDeleteComponents()
         {
             try
@@ -592,83 +604,7 @@ namespace CostToInvoiceButton
             }
 
         }
-        public class ComponentChild
-        {
-            public string Airport
-            {
-                get;
-                set;
-            }
-            public string CategoriaRoyalty
-            {
-                get;
-                set;
-            }
-            public string ClasificacionPagos
-            { get; set; }
-            public string Componente
-            {
-                get; set;
-            }
-            public string Costo
-            {
-                get;
-                set;
-            }
-            public string CuentaGasto
-            {
-                get;
-                set;
-            }
-            public int Incident
-            {
-                get;
-                set;
-            }
-            public string Informativo
-            {
-                get;
-                set;
-            }
-            public string ItemDescription
-            {
-                get;
-                set;
-            }
-            public string ItemNumber
-            {
-                get;
-                set;
-            }
-            public int Itinerary
-            {
-                get;
-                set;
-            }
-            public string Pagos
-            {
-                get;
-                set;
-            }
-            public string Paquete
-            {
-                get;
-                set;
-            }
-            public string ParticipacionCobro
-            {
-                get;
-                set;
-            }
-            public string Precio
-            {
-                get;
-                set;
-            }
-            public int ID { get; set; }
-            public int ParentPaxId { get; set; }
-        }
-
+     
     }
 
 

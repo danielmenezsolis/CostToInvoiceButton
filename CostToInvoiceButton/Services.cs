@@ -14,76 +14,88 @@ namespace CostToInvoiceButton
         public string Cost { get; set; }
         public string Price { get; set; }
         public string InvoiceInternal { get; set; }
+        public string Itinerary { get; set; }
+        public string Pax { get; set; }
+        public string Task { get; set; }
+        public string Informative { get; set; }
+        public string ParentPax { get; set; }
     }
-
-
+    public class ComponentChild
+    {
+        public string Airport { get; set; }
+        public string CategoriaRoyalty { get; set; }
+        public string ClasificacionPagos { get; set; }
+        public string Componente { get; set; }
+        public string Costo { get; set; }
+        public string CuentaGasto { get; set; }
+        public int Incident { get; set; }
+        public string Informativo { get; set; }
+        public string ItemDescription { get; set; }
+        public string ItemNumber { get; set; }
+        public int Itinerary { get; set; }
+        public string Pagos { get; set; }
+        public string Paquete { get; set; }
+        public string ParticipacionCobro { get; set; }
+        public string Precio { get; set; }
+        public int ID { get; set; }
+        public int ParentPaxId { get; set; }
+    }
     public class Link
     {
         public string rel { get; set; }
         public string href { get; set; }
         public string mediaType { get; set; }
     }
-
     public class CreatedByAccount
     {
         public List<Link> links { get; set; }
     }
-
     public class Link2
     {
         public string rel { get; set; }
         public string href { get; set; }
         public string mediaType { get; set; }
     }
-
     public class UpdatedByAccount
     {
         public List<Link2> links { get; set; }
     }
-
     public class Link3
     {
         public string rel { get; set; }
         public string href { get; set; }
         public string mediaType { get; set; }
     }
-
     public class Incident
     {
         public List<Link3> links { get; set; }
     }
-
     public class Link4
     {
         public string rel { get; set; }
         public string href { get; set; }
         public string mediaType { get; set; }
     }
-
     public class Itinerary
     {
         public List<Link4> links { get; set; }
     }
-
     public class Link5
     {
         public string rel { get; set; }
         public string href { get; set; }
         public bool? templated { get; set; }
     }
-
     public class Notes
     {
         public List<Link5> links { get; set; }
     }
-
     public class Link6
     {
         public string rel { get; set; }
         public string href { get; set; }
         public string mediaType { get; set; }
     }
-
     public class RootObject
     {
         public int id { get; set; }
@@ -116,6 +128,4 @@ namespace CostToInvoiceButton
         public object UUID { get; set; }
         public List<Link6> links { get; set; }
     }
-
-
 }

@@ -165,6 +165,7 @@
             this.dataGridSuppliers.Size = new System.Drawing.Size(744, 87);
             this.dataGridSuppliers.TabIndex = 5;
             this.dataGridSuppliers.TabStop = false;
+            this.dataGridSuppliers.Visible = false;
             this.dataGridSuppliers.CellContentDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridSuppliers_CellContentDoubleClick);
             // 
             // dataGridServicios

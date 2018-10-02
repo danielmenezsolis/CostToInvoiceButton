@@ -78,6 +78,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Reference.svcmap</DependentUpon>
     </Compile>
+    <Compile Include="DATA_DS.cs" />
     <Compile Include="DoubleScreen.cs">
       <SubType>Form</SubType>
     </Compile>

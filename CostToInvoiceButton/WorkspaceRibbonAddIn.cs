@@ -317,6 +317,7 @@ namespace CostToInvoiceButton
                                     {
                                         if (nodeValue.LocalName == "ComponentItemNumber")
                                         {
+                                            componentchild.ParentPaxId = component.ID;
                                             componentchild.Airport = component.Airport;
                                             componentchild.Incident = IncidentID;
                                             componentchild.Componente = "1";
@@ -520,6 +521,7 @@ namespace CostToInvoiceButton
                 string body = "{";
                 // Información de precios costos
                 body += "\"Airport\":\"" + component.Airport + "\",";
+                body += "\"ParentPaxId\":\"" + component.ParentPaxId + "\",";
                 if (String.IsNullOrEmpty(component.CategoriaRoyalty))
                 {
                     body += "\"CategoriaRoyalty\":null,";
@@ -587,12 +589,7 @@ namespace CostToInvoiceButton
                     body += "\"Precio\":\"" + component.Precio + "\"";
                 }
                 body += "}";
-                MessageBox.Show(body);
-                if (component.Paquete == "1")
-                {
-                    GetComponents(component);
-                }
-                /*
+               
                 request.AddParameter("application/json", body, ParameterType.RequestBody);
                 // easily add HTTP Headers
                 request.AddHeader("Authorization", "Basic ZW9saXZhczpTaW5lcmd5KjIwMTg=");
@@ -606,6 +603,7 @@ namespace CostToInvoiceButton
                     RootObject rootObject = JsonConvert.DeserializeObject<RootObject>(response.Content);
                     if(component.Paquete == "1")
                     {
+                        component.ID = rootObject.id; 
                         GetComponents(component);
                     }
                 }
@@ -613,7 +611,7 @@ namespace CostToInvoiceButton
                 {
                     MessageBox.Show(content);
                 }
-                */
+               
             }
             catch (Exception ex)
             {
@@ -695,6 +693,7 @@ namespace CostToInvoiceButton
                 set;
             }
             public int ID { get; set; }
+            public int ParentPaxId { get; set; }
         }
 
     }

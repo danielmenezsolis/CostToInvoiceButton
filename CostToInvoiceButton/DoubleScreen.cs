@@ -14,6 +14,9 @@ using System.Windows.Forms;
 using System.Xml;
 using System.Xml.Linq;
 using System.Xml.Serialization;
+using ClaseParaCostos;
+using ClaseParaPrecios;
+using System.Drawing;
 
 namespace CostToInvoiceButton
 {
@@ -22,8 +25,11 @@ namespace CostToInvoiceButton
         public DoubleScreen()
         {
             InitializeComponent();
+
             dataGridInvoice.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
         }
+
+        //Controls Events
         private void dataGridServicios_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
         {
             ClearTxtBoxes();
@@ -32,16 +38,16 @@ namespace CostToInvoiceButton
             {
                 if (e.RowIndex != -1)
                 {
-                    txtItem.Text = dataGridServicios.Rows[e.RowIndex].Cells[0].FormattedValue.ToString().Trim();
+                    txtItem.Text = dataGridServicios.Rows[e.RowIndex].Cells[2].FormattedValue.ToString().Trim();
                     txtItemNumber.Text = dataGridServicios.Rows[e.RowIndex].Cells[1].FormattedValue.ToString().Trim();
-                    txtIdService.Text = dataGridServicios.Rows[e.RowIndex].Cells[3].FormattedValue.ToString().Trim();
+                    txtIdService.Text = dataGridServicios.Rows[e.RowIndex].Cells[0].FormattedValue.ToString().Trim();
                     txtSupplierName.Text = dataGridServicios.Rows[e.RowIndex].Cells[4].FormattedValue.ToString().Trim();
-                    txtCost.Text = dataGridServicios.Rows[e.RowIndex].Cells[5].FormattedValue.ToString().Trim();
-                    txtPrice.Text = dataGridServicios.Rows[e.RowIndex].Cells[6].FormattedValue.ToString().Trim();
                     txtInvoice.Text = dataGridServicios.Rows[e.RowIndex].Cells[7].FormattedValue.ToString().Trim();
 
-                    string airtport = dataGridServicios.Rows[e.RowIndex].Cells[2].FormattedValue.ToString().Trim();
-                    airtport = airtport.Replace('_', '-').Trim();
+                    string airtport = dataGridServicios.Rows[e.RowIndex].Cells[3].FormattedValue.ToString().Trim();
+
+                    GetCosts();
+                    GetPrices();
                     /*
                                         var client = new RestClient("https://iccs.bigmachines.com/");
                                         client.Authenticator = new HttpBasicAuthenticator("implementador", "Sinergy*2018");
@@ -67,10 +73,9 @@ namespace CostToInvoiceButton
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message);
+                MessageBox.Show(ex.StackTrace);
             }
         }
-
         private void quitToolStripMenuItem_Click(object sender, EventArgs e)
         {
             this.Close();
@@ -91,7 +96,6 @@ namespace CostToInvoiceButton
                 MessageBox.Show(ex.Message);
             }
         }
-
         private void BtnAdd_Click(object sender, EventArgs e)
         {
             if (ValidateData())
@@ -119,65 +123,6 @@ namespace CostToInvoiceButton
                 MessageBox.Show("All data must be filled correctly");
             }
         }
-        private bool ValidateData()
-        {
-            bool res = true;
-
-            if (!IsNumber(txtQty.Text) || txtQty.Text == "0")
-            {
-                res = false;
-            }
-            if (!IsFloatValue(txtPrice.Text))
-            {
-                res = false;
-            }
-            if (!IsNumber(txtInvoice.Text))
-            {
-                res = false;
-            }
-            else
-            {
-                if (Convert.ToInt32(txtInvoice.Text) >= 6 || Convert.ToInt32(txtInvoice.Text) == 0)
-                {
-                    res = false;
-                }
-            }
-            if (!IsFloatValue(txtCost.Text))
-            {
-                res = false;
-            }
-
-            return res;
-        }
-
-        private bool ValidateRows()
-        {
-            bool res = true;
-            foreach (DataGridViewRow dgvRenglon in dataGridInvoice.Rows)
-            {
-
-                if (txtItem.Text == dgvRenglon.Cells[1].Value.ToString())
-                {
-                    res = false;
-                }
-            }
-            return res;
-        }
-
-        private void ClearTxtBoxes()
-        {
-            txtAmount.Text = "0";
-            txtCost.Text = "";
-            txtIdService.Text = "";
-            txtInvoice.Text = "";
-            txtItem.Text = "";
-            txtItemNumber.Text = "";
-            txtPrice.Text = "";
-            txtQty.Text = "1";
-            txtSupplierName.Text = "";
-        }
-
-
         private void txtQty_TextChanged(object sender, EventArgs e)
         {
             try
@@ -189,7 +134,6 @@ namespace CostToInvoiceButton
 
             }
         }
-
         private void txtPrice_TextChanged(object sender, EventArgs e)
         {
             try
@@ -201,22 +145,6 @@ namespace CostToInvoiceButton
 
             }
         }
-
-        public bool IsFloatValue(string text)
-        {
-            Regex regex = new Regex(@"^\d*\.?\d{1,2}$");
-            return regex.IsMatch(text);
-        }
-        public bool IsNumber(string text)
-        {
-            return text.All(char.IsDigit);
-        }
-
-        private void SetTotal()
-        {
-            txtAmount.Text = (Convert.ToDouble(txtPrice.Text) * Convert.ToInt32(txtQty.Text)).ToString();
-        }
-
         private void saveToolStripMenuItem_Click(object sender, EventArgs e)
         {
             int i = 0;
@@ -267,7 +195,6 @@ namespace CostToInvoiceButton
             }
             this.Close();
         }
-
         private void btnDelete_Click(object sender, EventArgs e)
         {
             if (dataGridInvoice.Rows.Count > 0)
@@ -276,7 +203,6 @@ namespace CostToInvoiceButton
                 dataGridInvoice.Rows.RemoveAt(row);
             }
         }
-
         private void dataGridInvoice_CellContentClick(object sender, DataGridViewCellEventArgs e)
         {
             if (e.RowIndex != -1)
@@ -298,6 +224,7 @@ namespace CostToInvoiceButton
             }
         }
 
+        //Functions
         private void getSuppliers()
         {
             try
@@ -374,6 +301,135 @@ namespace CostToInvoiceButton
             {
                 Console.WriteLine(ex.StackTrace);
             }
+        }
+        private bool ValidateData()
+        {
+            bool res = true;
+
+            if (!IsNumber(txtQty.Text) || txtQty.Text == "0")
+            {
+                res = false;
+            }
+            if (!IsFloatValue(txtPrice.Text))
+            {
+                res = false;
+            }
+            if (!IsNumber(txtInvoice.Text))
+            {
+                res = false;
+            }
+            else
+            {
+                if (Convert.ToInt32(txtInvoice.Text) >= 6 || Convert.ToInt32(txtInvoice.Text) == 0)
+                {
+                    res = false;
+                }
+            }
+            if (!IsFloatValue(txtCost.Text))
+            {
+                res = false;
+            }
+
+            return res;
+        }
+        private bool ValidateRows()
+        {
+            bool res = true;
+            foreach (DataGridViewRow dgvRenglon in dataGridInvoice.Rows)
+            {
+
+                if (txtItem.Text == dgvRenglon.Cells[1].Value.ToString())
+                {
+                    res = false;
+                }
+            }
+            return res;
+        }
+        private void ClearTxtBoxes()
+        {
+            txtAmount.Text = "0";
+            txtCost.Text = "";
+            txtIdService.Text = "";
+            txtInvoice.Text = "";
+            txtItem.Text = "";
+            txtItemNumber.Text = "";
+            txtPrice.Text = "";
+            txtQty.Text = "1";
+            txtSupplierName.Text = "";
+        }
+        public bool IsFloatValue(string text)
+        {
+            Regex regex = new Regex(@"^\d*\.?\d{1,2}$");
+            return regex.IsMatch(text);
+        }
+        public bool IsNumber(string text)
+        {
+            return text.All(char.IsDigit);
+        }
+        private void SetTotal()
+        {
+            txtAmount.Text = (Convert.ToDouble(txtPrice.Text) * Convert.ToInt32(txtQty.Text)).ToString();
+        }
+        private void GetCosts()
+        {
+            try
+            {
+                var client = new RestClient("https://iccs.bigmachines.com/");
+
+                string User = Encoding.UTF8.GetString(Convert.FromBase64String("aW1wbGVtZW50YWRvcg=="));
+                string Pass = Encoding.UTF8.GetString(Convert.FromBase64String("U2luZXJneSoyMDE4"));
+                client.Authenticator = new HttpBasicAuthenticator(User, Pass);
+                // string definicion = "?totalResults=false&q={str_item_number:'" + dataGridServicios.Rows[e.RowIndex].Cells[1].FormattedValue.ToString().Trim() + "',str_icao_iata_code:'" + airtport + "'}";
+                string definicion = "?totalResults=true&q={str_item_number:'TPFSSAS0024',str_icao_iata_code:'MMTO-TLC',str_aircraft_type:'LJ24'}";
+                var request = new RestRequest("rest/v6/customCostos/" + definicion, Method.GET);
+                IRestResponse response = client.Execute(request);
+                ClaseParaCostos.RootObject rootObjectCosts = JsonConvert.DeserializeObject<ClaseParaCostos.RootObject>(response.Content);
+                if (rootObjectCosts.items.Count > 0)
+                {
+                    txtCost.Text = rootObjectCosts.items[0].flo_cost.ToString();
+                }
+                else
+                {
+
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.StackTrace);
+            }
+        }
+        private void GetPrices()
+        {
+            try
+            {
+                var client = new RestClient("https://iccs.bigmachines.com/");
+                string User = Encoding.UTF8.GetString(Convert.FromBase64String("aW1wbGVtZW50YWRvcg=="));
+                string Pass = Encoding.UTF8.GetString(Convert.FromBase64String("U2luZXJneSoyMDE4"));
+                client.Authenticator = new HttpBasicAuthenticator(User, Pass);
+
+                //string definicion = "?totalResults=false&q={str_item_number:'" + dataGridServicios.Rows[e.RowIndex].Cells[1].FormattedValue.ToString().Trim() + "',str_icao_iata_code:'" + airtport + "'}";
+                string definicion = "?totalResults=true&q={str_item_number:'AIFERAS0072',str_icao_iata_code:'MMTO-TLC'}";
+                var request = new RestRequest("rest/v6/customPrecios/" + definicion, Method.GET);
+                IRestResponse response = client.Execute(request);
+                ClaseParaPrecios.RootObject rootObjectPrices = JsonConvert.DeserializeObject<ClaseParaPrecios.RootObject>(response.Content);
+                if (rootObjectPrices.items.Count > 0)
+                {
+                    txtPrice.Text = rootObjectPrices.items[0].flo_amount.ToString();
+                }
+                else
+                {
+
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.StackTrace);
+            }
+        }
+
+        private void dataGridServicios_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+
         }
     }
 

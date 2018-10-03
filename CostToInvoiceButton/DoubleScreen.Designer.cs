@@ -34,8 +34,6 @@
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle7 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle8 = new System.Windows.Forms.DataGridViewCellStyle();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(DoubleScreen));
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -81,12 +79,10 @@
             this.label14 = new System.Windows.Forms.Label();
             this.label15 = new System.Windows.Forms.Label();
             this.cboSuppliers = new System.Windows.Forms.ComboBox();
-            this.grdComponents = new System.Windows.Forms.DataGridView();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridSuppliers)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridServicios)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridInvoice)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.grdComponents)).BeginInit();
             this.SuspendLayout();
             // 
             // menuStrip1
@@ -203,17 +199,17 @@
             this.dataGridServicios.Size = new System.Drawing.Size(744, 151);
             this.dataGridServicios.TabIndex = 4;
             this.dataGridServicios.TabStop = false;
+            this.dataGridServicios.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridServicios_CellContentClick);
             this.dataGridServicios.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridServicios_CellDoubleClick);
             // 
             // txtIdService
             // 
-            this.txtIdService.Location = new System.Drawing.Point(122, 441);
+            this.txtIdService.Location = new System.Drawing.Point(128, 438);
             this.txtIdService.Name = "txtIdService";
             this.txtIdService.ReadOnly = true;
             this.txtIdService.Size = new System.Drawing.Size(100, 20);
             this.txtIdService.TabIndex = 35;
             this.txtIdService.TabStop = false;
-            this.txtIdService.Visible = false;
             // 
             // label8
             // 
@@ -228,7 +224,7 @@
             // label7
             // 
             this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(443, 394);
+            this.label7.Location = new System.Drawing.Point(623, 394);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(31, 13);
             this.label7.TabIndex = 33;
@@ -237,7 +233,7 @@
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(622, 394);
+            this.label6.Location = new System.Drawing.Point(459, 394);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(28, 13);
             this.label6.TabIndex = 32;
@@ -298,12 +294,13 @@
             // 
             // txtSupplierName
             // 
-            this.txtSupplierName.Location = new System.Drawing.Point(91, 321);
+            this.txtSupplierName.Location = new System.Drawing.Point(97, 321);
             this.txtSupplierName.Name = "txtSupplierName";
             this.txtSupplierName.ReadOnly = true;
-            this.txtSupplierName.Size = new System.Drawing.Size(667, 20);
+            this.txtSupplierName.Size = new System.Drawing.Size(601, 20);
             this.txtSupplierName.TabIndex = 25;
             this.txtSupplierName.TabStop = false;
+            this.txtSupplierName.Visible = false;
             // 
             // txtAmount
             // 
@@ -317,14 +314,14 @@
             // 
             // txtCost
             // 
-            this.txtCost.Location = new System.Drawing.Point(658, 394);
+            this.txtCost.Location = new System.Drawing.Point(495, 390);
             this.txtCost.Name = "txtCost";
             this.txtCost.Size = new System.Drawing.Size(100, 20);
             this.txtCost.TabIndex = 24;
             // 
             // txtQty
             // 
-            this.txtQty.Location = new System.Drawing.Point(327, 391);
+            this.txtQty.Location = new System.Drawing.Point(327, 390);
             this.txtQty.Name = "txtQty";
             this.txtQty.Size = new System.Drawing.Size(100, 20);
             this.txtQty.TabIndex = 22;
@@ -333,7 +330,7 @@
             // 
             // txtPrice
             // 
-            this.txtPrice.Location = new System.Drawing.Point(478, 391);
+            this.txtPrice.Location = new System.Drawing.Point(658, 390);
             this.txtPrice.Name = "txtPrice";
             this.txtPrice.Size = new System.Drawing.Size(100, 20);
             this.txtPrice.TabIndex = 23;
@@ -341,7 +338,7 @@
             // 
             // txtItemNumber
             // 
-            this.txtItemNumber.Location = new System.Drawing.Point(91, 347);
+            this.txtItemNumber.Location = new System.Drawing.Point(97, 347);
             this.txtItemNumber.Name = "txtItemNumber";
             this.txtItemNumber.ReadOnly = true;
             this.txtItemNumber.Size = new System.Drawing.Size(179, 20);
@@ -350,9 +347,9 @@
             // 
             // txtInvoice
             // 
-            this.txtInvoice.Location = new System.Drawing.Point(91, 391);
+            this.txtInvoice.Location = new System.Drawing.Point(97, 390);
             this.txtInvoice.Name = "txtInvoice";
-            this.txtInvoice.Size = new System.Drawing.Size(100, 20);
+            this.txtInvoice.Size = new System.Drawing.Size(81, 20);
             this.txtInvoice.TabIndex = 19;
             // 
             // BtnAdd
@@ -370,9 +367,9 @@
             this.label9.AutoSize = true;
             this.label9.Location = new System.Drawing.Point(9, 394);
             this.label9.Name = "label9";
-            this.label9.Size = new System.Drawing.Size(52, 13);
+            this.label9.Size = new System.Drawing.Size(82, 13);
             this.label9.TabIndex = 39;
-            this.label9.Text = "# Invoice";
+            this.label9.Text = "Invoice Number";
             // 
             // dataGridInvoice
             // 
@@ -531,46 +528,10 @@
             // cboSuppliers
             // 
             this.cboSuppliers.FormattingEnabled = true;
-            this.cboSuppliers.Location = new System.Drawing.Point(91, 309);
+            this.cboSuppliers.Location = new System.Drawing.Point(97, 309);
             this.cboSuppliers.Name = "cboSuppliers";
-            this.cboSuppliers.Size = new System.Drawing.Size(665, 21);
+            this.cboSuppliers.Size = new System.Drawing.Size(661, 21);
             this.cboSuppliers.TabIndex = 47;
-            // 
-            // grdComponents
-            // 
-            this.grdComponents.AllowUserToAddRows = false;
-            this.grdComponents.AllowUserToDeleteRows = false;
-            this.grdComponents.AllowUserToResizeColumns = false;
-            this.grdComponents.AllowUserToResizeRows = false;
-            this.grdComponents.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.grdComponents.CellBorderStyle = System.Windows.Forms.DataGridViewCellBorderStyle.None;
-            dataGridViewCellStyle7.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle7.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle7.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle7.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle7.SelectionBackColor = System.Drawing.SystemColors.ControlDarkDark;
-            dataGridViewCellStyle7.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle7.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.grdComponents.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle7;
-            this.grdComponents.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.grdComponents.EditMode = System.Windows.Forms.DataGridViewEditMode.EditProgrammatically;
-            this.grdComponents.Location = new System.Drawing.Point(14, 144);
-            this.grdComponents.MultiSelect = false;
-            this.grdComponents.Name = "grdComponents";
-            dataGridViewCellStyle8.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle8.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle8.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle8.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle8.SelectionBackColor = System.Drawing.SystemColors.ControlDarkDark;
-            dataGridViewCellStyle8.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle8.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.grdComponents.RowHeadersDefaultCellStyle = dataGridViewCellStyle8;
-            this.grdComponents.RowHeadersVisible = false;
-            this.grdComponents.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.grdComponents.Size = new System.Drawing.Size(744, 87);
-            this.grdComponents.TabIndex = 48;
-            this.grdComponents.TabStop = false;
-            this.grdComponents.Visible = false;
             // 
             // DoubleScreen
             // 
@@ -578,7 +539,6 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(768, 625);
             this.Controls.Add(this.dataGridSuppliers);
-            this.Controls.Add(this.grdComponents);
             this.Controls.Add(this.cboSuppliers);
             this.Controls.Add(this.label15);
             this.Controls.Add(this.label14);
@@ -621,7 +581,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.dataGridSuppliers)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridServicios)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridInvoice)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.grdComponents)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -672,6 +631,5 @@
         private System.Windows.Forms.DataGridViewButtonColumn EditColumn;
         private System.Windows.Forms.DataGridViewButtonColumn DeleteColumn;
         private System.Windows.Forms.ComboBox cboSuppliers;
-        private System.Windows.Forms.DataGridView grdComponents;
     }
 }

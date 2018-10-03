@@ -6,10 +6,10 @@ namespace CostToInvoiceButton
 {
     public class Services
     {
-        public string Description { get; set; }
+        public string ID { get; set; }
         public string ItemNumber { get; set; }
+        public string Description { get; set; }
         public string Airport { get; set; }
-        public string ServiceID { get; set; }
         public string Supplier { get; set; }
         public string Cost { get; set; }
         public string Price { get; set; }

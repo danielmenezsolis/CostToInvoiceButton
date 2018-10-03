@@ -40,7 +40,6 @@ namespace CostToInvoiceButton
                 this.inDesignMode = inDesignMode;
             }
         }
-
         public new void Click()
         {
             try
@@ -51,12 +50,10 @@ namespace CostToInvoiceButton
                     IncidentID = Incident.ID;
                     GetDeleteComponents();
                     CreateChildComponents();
-
                     servicios = GetListServices();
                     doubleScreen = new DoubleScreen();
                     DgvServicios = ((DataGridView)doubleScreen.Controls["dataGridServicios"]);
                     DgvServicios.DataSource = servicios;
-                    DgvServicios.Columns[2].Visible = false;
                     DgvServicios.Columns[3].Visible = false;
                     DgvServicios.Columns[4].Visible = false;
                     DgvServicios.Columns[5].Visible = false;
@@ -64,14 +61,21 @@ namespace CostToInvoiceButton
                     DgvServicios.Columns[7].Visible = false;
                     DgvServicios.Columns[8].Visible = false;
 
-                    DgvServicios.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+                    DgvServicios.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.DisplayedCells;
+                    DgvServicios.Columns[0].Width = 20;
+                    DgvServicios.Columns[1].Width = 55;
+                    DgvServicios.Columns[2].Width = 600;
+                    DgvServicios.Columns[9].Width = 60;
+                    DgvServicios.Columns[10].Width = 60;
+                    DgvServicios.Columns[11].Width = 60;
+                    DgvServicios.Columns[12].Width = 45;
                     doubleScreen.ShowDialog();
                     //((TextBox)doubleScreen.Controls["txtResult"]).Text
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error en Click: " + ex.Message);
+                MessageBox.Show("Error en Click: " + ex.StackTrace);
             }
         }
         public bool Init()
@@ -112,8 +116,7 @@ namespace CostToInvoiceButton
                 ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
                 APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
                 clientInfoHeader.AppID = "Query Example";
-                String queryString = "SELECT ItemNumber,ItemDescription,Airport,ID,IDProveedor,Costo,Precio,InternalInvoice,Itinerary,Paquete,Componente,Informativo,ParentPaxID FROM CO.Services WHERE Incident =" + IncidentID + " ORDER BY ID ASC, ParentPaxId ASC";
-
+                String queryString = "SELECT ID,ItemNumber,ItemDescription,Airport,IDProveedor,Costo,Precio,InternalInvoice,Itinerary,Paquete,Componente,Informativo,ParentPaxID FROM CO.Services WHERE Incident =" + IncidentID + " ORDER BY ID ASC, ParentPaxId ASC";
                 clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 10000, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
                 foreach (CSVTable table in queryCSV.CSVTables)
                 {
@@ -123,11 +126,10 @@ namespace CostToInvoiceButton
                         Services service = new Services();
                         Char delimiter = '|';
                         string[] substrings = data.Split(delimiter);
-                        MessageBox.Show(substrings.Length.ToString());
-                        service.ItemNumber = substrings[0];
-                        service.Description = substrings[1].Replace('"', ' ').Trim();
-                        service.Airport = substrings[2];
-                        service.ServiceID = substrings[3];
+                        service.ID = substrings[0];
+                        service.ItemNumber = substrings[1];
+                        service.Description = substrings[2].Replace('"', ' ').Trim();
+                        service.Airport = substrings[3].Replace('_', '-').Trim();
                         service.Supplier = substrings[4].Replace('"', ' ').Trim();
                         service.Cost = substrings[5];
                         service.Price = substrings[6];
@@ -604,41 +606,34 @@ namespace CostToInvoiceButton
             }
 
         }
-     
+
     }
 
 
     [AddIn("Invoice to Cost", Version = "1.0.0.0")]
     public class WorkspaceRibbonButtonFactory : IWorkspaceRibbonButtonFactory
     {
-
         IGlobalContext globalContext { get; set; }
-
         public IWorkspaceRibbonButton CreateControl(bool inDesignMode, IRecordContext RecordContext)
         {
             return new WorkspaceRibbonAddIn(inDesignMode, RecordContext, globalContext);
         }
-
         public System.Drawing.Image Image32
         {
             get { return Properties.Resources.money32; }
         }
-
         public System.Drawing.Image Image16
         {
             get { return Properties.Resources.money16; }
         }
-
         public string Text
         {
             get { return "Invoice to Cost"; }
         }
-
         public string Tooltip
         {
             get { return "Create Invoice"; }
         }
-
         public bool Initialize(IGlobalContext GlobalContext)
         {
             globalContext = GlobalContext;

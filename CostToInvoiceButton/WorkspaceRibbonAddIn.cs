@@ -46,8 +46,42 @@ namespace CostToInvoiceButton
             {
                 if (Init())
                 {
+                    string Utilidad = "";
+                    string Royalty = "";
+                    string Combustible = "";
+                    string CombustibleI = "";
+                    string Seneam = "";
                     Incident = (IIncident)recordContext.GetWorkspaceRecord(WorkspaceRecordType.Incident);
+                    IList<ICfVal> IncCustomFieldList = Incident.CustomField;
+                    if (IncCustomFieldList != null)
+                    {
+                        foreach (ICfVal inccampos in IncCustomFieldList)
+                        {
+                            if (inccampos.CfId == 61)
+                            {
+                                Royalty = inccampos.ValStr;
+                            }
+                            if (inccampos.CfId == 62)
+                            {
+                                Utilidad = inccampos.ValStr;
+                            }
+                            if (inccampos.CfId == 63)
+                            {
+                                Combustible = inccampos.ValStr;
+                            }
+                            if (inccampos.CfId == 81)
+                            {
+                                Seneam = inccampos.ValStr;
+                            }
+                            if (inccampos.CfId == 82)
+                            {
+                                CombustibleI = inccampos.ValStr;
+                            }
+
+                        }
+                    }
                     IncidentID = Incident.ID;
+                    string SRType = GetSRType();
                     GetDeleteComponents();
                     CreateChildComponents();
                     servicios = GetListServices();
@@ -60,17 +94,15 @@ namespace CostToInvoiceButton
                     DgvServicios.Columns[6].Visible = false;
                     DgvServicios.Columns[7].Visible = false;
                     DgvServicios.Columns[8].Visible = false;
-
                     DgvServicios.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.DisplayedCells;
-                    DgvServicios.Columns[0].Width = 20;
-                    DgvServicios.Columns[1].Width = 55;
-                    DgvServicios.Columns[2].Width = 600;
-                    DgvServicios.Columns[9].Width = 60;
-                    DgvServicios.Columns[10].Width = 60;
-                    DgvServicios.Columns[11].Width = 60;
-                    DgvServicios.Columns[12].Width = 45;
+                    ((TextBox)doubleScreen.Controls["txtUtilidad"]).Text = Utilidad;
+                    ((TextBox)doubleScreen.Controls["txtRoyalti"]).Text = Utilidad;
+                    ((TextBox)doubleScreen.Controls["txtCombustible"]).Text = Utilidad;
+                    ((TextBox)doubleScreen.Controls["txtCombustibleI"]).Text = Utilidad;
+                    ((TextBox)doubleScreen.Controls["txtSeneam"]).Text = Utilidad;
+
                     doubleScreen.ShowDialog();
-                    //((TextBox)doubleScreen.Controls["txtResult"]).Text
+
                 }
             }
             catch (Exception ex)
@@ -606,38 +638,83 @@ namespace CostToInvoiceButton
             }
 
         }
+        public string GetSRType()
+        {
+            string SRTYPE = "";
 
-    }
+            if (IncidentID != 0)
+            {
+                ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
+                APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
+                clientInfoHeader.AppID = "Query Example";
+                String queryString = "SELECT I.Customfields.c.sr_type.LookupName FROM Incident I WHERE id=" + IncidentID + "";
+                clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 1, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
+                foreach (CSVTable table in queryCSV.CSVTables)
+                {
+                    String[] rowData = table.Rows;
+                    foreach (String data in rowData)
+                    {
+                        SRTYPE = data;
+                    }
+                }
+            }
+            switch (SRTYPE)
+            {
+                case "Catering":
+                    SRTYPE = "CATERING";
+                    break;
+                case "FCC":
+                    SRTYPE = "FCC";
+                    break;
+                case "FBO":
+                    SRTYPE = "FBO";
+                    break;
+                case "Fuel":
+                    SRTYPE = "FUEL";
+                    break;
+                case "Hangar Space":
+                    SRTYPE = "GYCUSTODIA";
+                    break;
+                case "SENEAM Fee":
+                    SRTYPE = "SENEAM";
+                    break;
+                case "Permits":
+                    SRTYPE = "PERMISOS";
+                    break;
+            }
+            return SRTYPE;
+        }
 
 
-    [AddIn("Invoice to Cost", Version = "1.0.0.0")]
-    public class WorkspaceRibbonButtonFactory : IWorkspaceRibbonButtonFactory
-    {
-        IGlobalContext globalContext { get; set; }
-        public IWorkspaceRibbonButton CreateControl(bool inDesignMode, IRecordContext RecordContext)
+        [AddIn("Invoice to Cost", Version = "1.0.0.0")]
+        public class WorkspaceRibbonButtonFactory : IWorkspaceRibbonButtonFactory
         {
-            return new WorkspaceRibbonAddIn(inDesignMode, RecordContext, globalContext);
-        }
-        public System.Drawing.Image Image32
-        {
-            get { return Properties.Resources.money32; }
-        }
-        public System.Drawing.Image Image16
-        {
-            get { return Properties.Resources.money16; }
-        }
-        public string Text
-        {
-            get { return "Invoice to Cost"; }
-        }
-        public string Tooltip
-        {
-            get { return "Create Invoice"; }
-        }
-        public bool Initialize(IGlobalContext GlobalContext)
-        {
-            globalContext = GlobalContext;
-            return true;
+            IGlobalContext globalContext { get; set; }
+            public IWorkspaceRibbonButton CreateControl(bool inDesignMode, IRecordContext RecordContext)
+            {
+                return new WorkspaceRibbonAddIn(inDesignMode, RecordContext, globalContext);
+            }
+            public System.Drawing.Image Image32
+            {
+                get { return Properties.Resources.money32; }
+            }
+            public System.Drawing.Image Image16
+            {
+                get { return Properties.Resources.money16; }
+            }
+            public string Text
+            {
+                get { return "Invoice to Cost"; }
+            }
+            public string Tooltip
+            {
+                get { return "Create Invoice"; }
+            }
+            public bool Initialize(IGlobalContext GlobalContext)
+            {
+                globalContext = GlobalContext;
+                return true;
+            }
         }
     }
 }

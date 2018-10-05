@@ -3,8 +3,6 @@ using Newtonsoft.Json;
 using RestSharp;
 using RestSharp.Authenticators;
 using System;
-using System.Collections.Generic;
-using System.Data;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -17,6 +15,7 @@ using System.Xml.Serialization;
 using ClaseParaCostos;
 using ClaseParaPrecios;
 using System.Drawing;
+using System.Collections.Generic;
 
 namespace CostToInvoiceButton
 {
@@ -25,7 +24,6 @@ namespace CostToInvoiceButton
         public DoubleScreen()
         {
             InitializeComponent();
-
             dataGridInvoice.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
         }
 
@@ -34,6 +32,7 @@ namespace CostToInvoiceButton
         {
             ClearTxtBoxes();
             dataGridSuppliers.DataSource = null;
+            cboSuppliers.DataSource = null;
             try
             {
                 if (e.RowIndex != -1)
@@ -43,17 +42,19 @@ namespace CostToInvoiceButton
                     txtIdService.Text = dataGridServicios.Rows[e.RowIndex].Cells[0].FormattedValue.ToString().Trim();
                     txtSupplierName.Text = dataGridServicios.Rows[e.RowIndex].Cells[4].FormattedValue.ToString().Trim();
                     txtInvoice.Text = dataGridServicios.Rows[e.RowIndex].Cells[7].FormattedValue.ToString().Trim();
-
                     string airtport = dataGridServicios.Rows[e.RowIndex].Cells[3].FormattedValue.ToString().Trim();
+                    airtport = "IO_AEREO_" + airtport;
 
                     GetCosts();
                     GetPrices();
+                    getSuppliers(txtItem.Text, airtport);
                     /*
                                         var client = new RestClient("https://iccs.bigmachines.com/");
                                         client.Authenticator = new HttpBasicAuthenticator("implementador", "Sinergy*2018");
                                         string definicion = "?totalResults=false&q={str_item_number:'" + dataGridServicios.Rows[e.RowIndex].Cells[1].FormattedValue.ToString().Trim() + "',str_icao_iata_code:'" + airtport + "'}";
                                         var request = new RestRequest("rest/v6/customCostos/" + definicion, Method.GET);
-                                        IRestResponse response = client.Execute(request);
+                                  | Azx Q
+                                  IRestResponse response = client.Execute(request);
                                         RootObject rootObject = JsonConvert.DeserializeObject<RootObject>(response.Content);
                                         if (rootObject.items.Count > 0)
                                         {
@@ -131,7 +132,7 @@ namespace CostToInvoiceButton
             }
             catch (Exception ex)
             {
-
+                MessageBox.Show(ex.StackTrace);
             }
         }
         private void txtPrice_TextChanged(object sender, EventArgs e)
@@ -142,7 +143,7 @@ namespace CostToInvoiceButton
             }
             catch (Exception ex)
             {
-
+                MessageBox.Show(ex.Message);
             }
         }
         private void saveToolStripMenuItem_Click(object sender, EventArgs e)
@@ -225,7 +226,7 @@ namespace CostToInvoiceButton
         }
 
         //Functions
-        private void getSuppliers()
+        private void getSuppliers(string itemnumber, string airport)
         {
             try
             {
@@ -237,22 +238,27 @@ namespace CostToInvoiceButton
     "		<pub:runReport>" +
     "			<pub:reportRequest>" +
     "			<pub:attributeFormat>xml</pub:attributeFormat>" +
-    "				<pub:attributeLocale>en</pub:attributeLocale>" +
-    "				<pub:attributeTemplate>default</pub:attributeTemplate>" +
-    "				<pub:reportAbsolutePath>Custom/Integracion/XX_ITEM_SUPPLIER_ORG_REP.xdo</pub:reportAbsolutePath>" +
+    "				<pub:attributeLocale></pub:attributeLocale>" +
+    "				<pub:attributeTemplate></pub:attributeTemplate>" +
+    "				<pub:reportAbsolutePath>/Custom/Financials/Facturas Proveedores/XXICCS_PROVEEDORES.xdo</pub:reportAbsolutePath>" +
     "				<pub:sizeOfDataChunkDownload>-1</pub:sizeOfDataChunkDownload>" +
     "			</pub:reportRequest>" +
     "		</pub:runReport>" +
     "	</soap:Body>" +
     "</soap:Envelope>";
                 byte[] byteArray = Encoding.UTF8.GetBytes(envelope);
+                // Construct the base 64 encoded string used as credentials for the service call
                 byte[] toEncodeAsBytes = ASCIIEncoding.ASCII.GetBytes("itotal" + ":" + "Oracle123");
                 string credentials = Convert.ToBase64String(toEncodeAsBytes);
+                // Create HttpWebRequest connection to the service
                 HttpWebRequest request =
                  (HttpWebRequest)WebRequest.Create("https://egqy-test.fa.us6.oraclecloud.com:443/xmlpserver/services/ExternalReportWSSService");
+                // Configure the request content type to be xml, HTTP method to be POST, and set the content length
                 request.Method = "POST";
+
                 request.ContentType = "application/soap+xml; charset=UTF-8;action=\"\"";
                 request.ContentLength = byteArray.Length;
+                // Configure the request to use basic authentication, with base64 encoded user name and password, to invoke the service.
                 request.Headers.Add("Authorization", "Basic " + credentials);
                 // Set the SOAP action to be invoked; while the call works without this, the value is expected to be set based as per standards
                 //request.Headers.Add("SOAPAction", "http://xmlns.oracle.com/apps/cdm/foundation/parties/organizationService/applicationModule/findOrganizationProfile");
@@ -277,6 +283,8 @@ namespace CostToInvoiceButton
                         nms.AddNamespace("ns2", "http://xmlns.oracle.com/oxp/service/PublicReportService");
 
                         XmlNode desiredNode = xmlDoc.SelectSingleNode("//ns2:runReportReturn", nms);
+                        Dictionary<string, string> test = new Dictionary<string, string>();
+                        test.Add("0", "NO SUPPLIER");
                         if (desiredNode.HasChildNodes)
                         {
                             for (int i = 0; i < desiredNode.ChildNodes.Count; i++)
@@ -287,13 +295,24 @@ namespace CostToInvoiceButton
                                     string decodedString = Encoding.UTF8.GetString(data);
                                     XmlTextReader reader = new XmlTextReader(new System.IO.StringReader(decodedString));
                                     reader.Read();
-                                    XmlSerializer serializer = new XmlSerializer(typeof(DATA_DS));
-                                    DATA_DS res = (DATA_DS)serializer.Deserialize(reader);
+                                    XmlSerializer serializer = new XmlSerializer(typeof(DATA_DS_SUPPLIER));
+                                    DATA_DS_ITEMSUP res = (DATA_DS_ITEMSUP)serializer.Deserialize(reader);
+                                    var lista = res.G_N_ITEMSUP.Find(x => (x.ORGANIZATION_CODE == airport));
 
+                                    foreach (var item in lista.G_1_ITEMSUP)
+                                    {
+                                        if (item.ITEM_NUMBER == itemnumber)
+                                        {
+                                            test.Add(item.VENDOR_ID, item.PARTY_NAME);
+                                        }
+                                    }
                                 }
                             }
                         }
-
+                        cboSuppliers.DataSource = new BindingSource(test, null);
+                        cboSuppliers.DisplayMember = "Value";
+                        cboSuppliers.ValueMember = "Key";
+                        string value = ((KeyValuePair<string, string>)cboSuppliers.SelectedItem).Value;
                     }
                 }
             }

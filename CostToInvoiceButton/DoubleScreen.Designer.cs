@@ -43,7 +43,6 @@
             this.dataGridSuppliers = new System.Windows.Forms.DataGridView();
             this.dataGridServicios = new System.Windows.Forms.DataGridView();
             this.txtIdService = new System.Windows.Forms.TextBox();
-            this.label8 = new System.Windows.Forms.Label();
             this.label7 = new System.Windows.Forms.Label();
             this.label6 = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
@@ -79,6 +78,13 @@
             this.label14 = new System.Windows.Forms.Label();
             this.label15 = new System.Windows.Forms.Label();
             this.cboSuppliers = new System.Windows.Forms.ComboBox();
+            this.label16 = new System.Windows.Forms.Label();
+            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.txtUtilidad = new System.Windows.Forms.TextBox();
+            this.txtRoyalty = new System.Windows.Forms.TextBox();
+            this.txtCombustible = new System.Windows.Forms.TextBox();
+            this.txtCombustibleI = new System.Windows.Forms.TextBox();
+            this.txtSemeam = new System.Windows.Forms.TextBox();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridSuppliers)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridServicios)).BeginInit();
@@ -204,22 +210,12 @@
             // 
             // txtIdService
             // 
-            this.txtIdService.Location = new System.Drawing.Point(128, 438);
+            this.txtIdService.Location = new System.Drawing.Point(97, 458);
             this.txtIdService.Name = "txtIdService";
             this.txtIdService.ReadOnly = true;
             this.txtIdService.Size = new System.Drawing.Size(100, 20);
             this.txtIdService.TabIndex = 35;
             this.txtIdService.TabStop = false;
-            // 
-            // label8
-            // 
-            this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(263, 448);
-            this.label8.Name = "label8";
-            this.label8.Size = new System.Drawing.Size(43, 13);
-            this.label8.TabIndex = 34;
-            this.label8.Text = "Amount";
-            this.label8.Visible = false;
             // 
             // label7
             // 
@@ -294,7 +290,7 @@
             // 
             // txtSupplierName
             // 
-            this.txtSupplierName.Location = new System.Drawing.Point(97, 321);
+            this.txtSupplierName.Location = new System.Drawing.Point(97, 302);
             this.txtSupplierName.Name = "txtSupplierName";
             this.txtSupplierName.ReadOnly = true;
             this.txtSupplierName.Size = new System.Drawing.Size(601, 20);
@@ -304,7 +300,7 @@
             // 
             // txtAmount
             // 
-            this.txtAmount.Location = new System.Drawing.Point(312, 440);
+            this.txtAmount.Location = new System.Drawing.Point(193, 458);
             this.txtAmount.Name = "txtAmount";
             this.txtAmount.ReadOnly = true;
             this.txtAmount.Size = new System.Drawing.Size(100, 20);
@@ -317,14 +313,14 @@
             this.txtCost.Location = new System.Drawing.Point(495, 390);
             this.txtCost.Name = "txtCost";
             this.txtCost.Size = new System.Drawing.Size(100, 20);
-            this.txtCost.TabIndex = 24;
+            this.txtCost.TabIndex = 22;
             // 
             // txtQty
             // 
             this.txtQty.Location = new System.Drawing.Point(327, 390);
             this.txtQty.Name = "txtQty";
             this.txtQty.Size = new System.Drawing.Size(100, 20);
-            this.txtQty.TabIndex = 22;
+            this.txtQty.TabIndex = 21;
             this.txtQty.Text = "1";
             this.txtQty.TextChanged += new System.EventHandler(this.txtQty_TextChanged);
             // 
@@ -348,16 +344,17 @@
             // txtInvoice
             // 
             this.txtInvoice.Location = new System.Drawing.Point(97, 390);
+            this.txtInvoice.MaxLength = 2;
             this.txtInvoice.Name = "txtInvoice";
-            this.txtInvoice.Size = new System.Drawing.Size(81, 20);
+            this.txtInvoice.Size = new System.Drawing.Size(42, 20);
             this.txtInvoice.TabIndex = 19;
             // 
             // BtnAdd
             // 
-            this.BtnAdd.Location = new System.Drawing.Point(19, 438);
+            this.BtnAdd.Location = new System.Drawing.Point(12, 432);
             this.BtnAdd.Name = "BtnAdd";
             this.BtnAdd.Size = new System.Drawing.Size(75, 23);
-            this.BtnAdd.TabIndex = 18;
+            this.BtnAdd.TabIndex = 24;
             this.BtnAdd.Text = "Add";
             this.BtnAdd.UseVisualStyleBackColor = true;
             this.BtnAdd.Click += new System.EventHandler(this.BtnAdd_Click);
@@ -528,16 +525,88 @@
             // cboSuppliers
             // 
             this.cboSuppliers.FormattingEnabled = true;
-            this.cboSuppliers.Location = new System.Drawing.Point(97, 309);
+            this.cboSuppliers.Location = new System.Drawing.Point(97, 320);
             this.cboSuppliers.Name = "cboSuppliers";
             this.cboSuppliers.Size = new System.Drawing.Size(661, 21);
             this.cboSuppliers.TabIndex = 47;
+            // 
+            // label16
+            // 
+            this.label16.AutoSize = true;
+            this.label16.Location = new System.Drawing.Point(152, 393);
+            this.label16.Name = "label16";
+            this.label16.Size = new System.Drawing.Size(49, 13);
+            this.label16.TabIndex = 48;
+            this.label16.Text = "Currency";
+            // 
+            // textBox1
+            // 
+            this.textBox1.Enabled = false;
+            this.textBox1.Location = new System.Drawing.Point(217, 391);
+            this.textBox1.MaxLength = 5;
+            this.textBox1.Name = "textBox1";
+            this.textBox1.ReadOnly = true;
+            this.textBox1.Size = new System.Drawing.Size(59, 20);
+            this.textBox1.TabIndex = 49;
+            this.textBox1.TabStop = false;
+            // 
+            // txtUtilidad
+            // 
+            this.txtUtilidad.Location = new System.Drawing.Point(97, 432);
+            this.txtUtilidad.Name = "txtUtilidad";
+            this.txtUtilidad.ReadOnly = true;
+            this.txtUtilidad.Size = new System.Drawing.Size(100, 20);
+            this.txtUtilidad.TabIndex = 50;
+            this.txtUtilidad.TabStop = false;
+            // 
+            // txtRoyalty
+            // 
+            this.txtRoyalty.Location = new System.Drawing.Point(203, 432);
+            this.txtRoyalty.Name = "txtRoyalty";
+            this.txtRoyalty.ReadOnly = true;
+            this.txtRoyalty.Size = new System.Drawing.Size(100, 20);
+            this.txtRoyalty.TabIndex = 51;
+            this.txtRoyalty.TabStop = false;
+            // 
+            // txtCombustible
+            // 
+            this.txtCombustible.Location = new System.Drawing.Point(309, 432);
+            this.txtCombustible.Name = "txtCombustible";
+            this.txtCombustible.ReadOnly = true;
+            this.txtCombustible.Size = new System.Drawing.Size(100, 20);
+            this.txtCombustible.TabIndex = 52;
+            this.txtCombustible.TabStop = false;
+            // 
+            // txtCombustibleI
+            // 
+            this.txtCombustibleI.Location = new System.Drawing.Point(415, 432);
+            this.txtCombustibleI.Name = "txtCombustibleI";
+            this.txtCombustibleI.ReadOnly = true;
+            this.txtCombustibleI.Size = new System.Drawing.Size(100, 20);
+            this.txtCombustibleI.TabIndex = 53;
+            this.txtCombustibleI.TabStop = false;
+            // 
+            // txtSemeam
+            // 
+            this.txtSemeam.Location = new System.Drawing.Point(521, 432);
+            this.txtSemeam.Name = "txtSemeam";
+            this.txtSemeam.ReadOnly = true;
+            this.txtSemeam.Size = new System.Drawing.Size(100, 20);
+            this.txtSemeam.TabIndex = 54;
+            this.txtSemeam.TabStop = false;
             // 
             // DoubleScreen
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(768, 625);
+            this.Controls.Add(this.txtSemeam);
+            this.Controls.Add(this.txtCombustibleI);
+            this.Controls.Add(this.txtCombustible);
+            this.Controls.Add(this.txtRoyalty);
+            this.Controls.Add(this.txtUtilidad);
+            this.Controls.Add(this.textBox1);
+            this.Controls.Add(this.label16);
             this.Controls.Add(this.dataGridSuppliers);
             this.Controls.Add(this.cboSuppliers);
             this.Controls.Add(this.label15);
@@ -549,7 +618,6 @@
             this.Controls.Add(this.dataGridInvoice);
             this.Controls.Add(this.label9);
             this.Controls.Add(this.txtIdService);
-            this.Controls.Add(this.label8);
             this.Controls.Add(this.label7);
             this.Controls.Add(this.label6);
             this.Controls.Add(this.label5);
@@ -595,7 +663,6 @@
         private System.Windows.Forms.DataGridView dataGridSuppliers;
         private System.Windows.Forms.DataGridView dataGridServicios;
         private System.Windows.Forms.TextBox txtIdService;
-        private System.Windows.Forms.Label label8;
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.Label label5;
@@ -631,5 +698,12 @@
         private System.Windows.Forms.DataGridViewButtonColumn EditColumn;
         private System.Windows.Forms.DataGridViewButtonColumn DeleteColumn;
         private System.Windows.Forms.ComboBox cboSuppliers;
+        private System.Windows.Forms.Label label16;
+        private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.TextBox txtUtilidad;
+        private System.Windows.Forms.TextBox txtRoyalty;
+        private System.Windows.Forms.TextBox txtCombustible;
+        private System.Windows.Forms.TextBox txtCombustibleI;
+        private System.Windows.Forms.TextBox txtSemeam;
     }
 }

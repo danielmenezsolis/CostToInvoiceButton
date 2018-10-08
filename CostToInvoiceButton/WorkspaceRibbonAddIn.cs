@@ -51,6 +51,8 @@ namespace CostToInvoiceButton
                     string Combustible = "";
                     string CombustibleI = "";
                     string Seneam = "";
+                    int AircraftId = 0;
+                    string ICAO = "";
                     Incident = (IIncident)recordContext.GetWorkspaceRecord(WorkspaceRecordType.Incident);
                     IList<ICfVal> IncCustomFieldList = Incident.CustomField;
                     if (IncCustomFieldList != null)
@@ -81,11 +83,20 @@ namespace CostToInvoiceButton
                         }
                     }
                     IncidentID = Incident.ID;
+                    IList<ICustomAttribute> customAttributes = Incident.CustomAttributes;
+                    foreach (ICustomAttribute custom in customAttributes)
+                    {
+                        if (custom.GenericField.Name == "CO$Aircraft")
+                        {
+                            AircraftId = Convert.ToInt32(custom.GenericField.DataValue.Value);
+                        }
+                    }
+                    ICAO = getTail(AircraftId);
                     string SRType = GetSRType();
                     GetDeleteComponents();
                     CreateChildComponents();
                     servicios = GetListServices();
-                    doubleScreen = new DoubleScreen();
+                    doubleScreen = new DoubleScreen(global,recordContext);
                     DgvServicios = ((DataGridView)doubleScreen.Controls["dataGridServicios"]);
                     DgvServicios.DataSource = servicios;
                     DgvServicios.Columns[3].Visible = false;
@@ -94,26 +105,28 @@ namespace CostToInvoiceButton
                     DgvServicios.Columns[6].Visible = false;
                     DgvServicios.Columns[7].Visible = false;
                     DgvServicios.Columns[8].Visible = false;
-                    DgvServicios.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.DisplayedCells;
+                    DgvServicios.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+                    ((System.Windows.Forms.Label)doubleScreen.Controls["lblSrType"]).Text = SRType.ToUpper();
+                    ((System.Windows.Forms.Label)doubleScreen.Controls["lblIdIncident"]).Text = IncidentID.ToString();
                     ((TextBox)doubleScreen.Controls["txtUtilidad"]).Text = Utilidad;
-                    ((TextBox)doubleScreen.Controls["txtRoyalti"]).Text = Utilidad;
-                    ((TextBox)doubleScreen.Controls["txtCombustible"]).Text = Utilidad;
-                    ((TextBox)doubleScreen.Controls["txtCombustibleI"]).Text = Utilidad;
-                    ((TextBox)doubleScreen.Controls["txtSeneam"]).Text = Utilidad;
+                    ((TextBox)doubleScreen.Controls["txtRoyalty"]).Text = Royalty;
+                    ((TextBox)doubleScreen.Controls["txtCombustible"]).Text = Combustible;
+                    ((TextBox)doubleScreen.Controls["txtCombustibleI"]).Text = CombustibleI;
+                    ((TextBox)doubleScreen.Controls["txtICAOD"]).Text = ICAO;
 
                     doubleScreen.ShowDialog();
-
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error en Click: " + ex.StackTrace);
+                MessageBox.Show("Error en Click: " + ex.InnerException.ToString());
             }
         }
         public bool Init()
         {
             try
             {
+
                 bool result = false;
                 EndpointAddress endPointAddr = new EndpointAddress(global.GetInterfaceServiceUrl(ConnectServiceType.Soap));
                 BasicHttpBinding binding = new BasicHttpBinding(BasicHttpSecurityMode.TransportWithMessageCredential);
@@ -144,6 +157,7 @@ namespace CostToInvoiceButton
         {
             try
             {
+
                 List<Services> services = new List<Services>();
                 ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
                 APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
@@ -153,6 +167,7 @@ namespace CostToInvoiceButton
                 foreach (CSVTable table in queryCSV.CSVTables)
                 {
                     String[] rowData = table.Rows;
+
                     foreach (String data in rowData)
                     {
                         Services service = new Services();
@@ -188,6 +203,7 @@ namespace CostToInvoiceButton
         {
             try
             {
+
                 ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
                 APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
                 clientInfoHeader.AppID = "Query Example";
@@ -212,26 +228,35 @@ namespace CostToInvoiceButton
         }
         public void DeleteComponents(int id)
         {
-            var client = new RestClient("https://iccsmx.custhelp.com/");
-            var request = new RestRequest("/services/rest/connect/v1.4/CO.Services/" + id, Method.DELETE)
+            try
             {
-                RequestFormat = DataFormat.Json
-            };
-            request.AddHeader("Authorization", "Basic ZW9saXZhczpTaW5lcmd5KjIwMTg=");
-            request.AddHeader("X-HTTP-Method-Override", "DELETE");
-            request.AddHeader("OSvC-CREST-Application-Context", "Delete Service");
 
-            IRestResponse response = client.Execute(request);
-            var content = response.Content;
-            if (String.IsNullOrEmpty(content))
+                var client = new RestClient("https://iccsmx.custhelp.com/");
+                var request = new RestRequest("/services/rest/connect/v1.4/CO.Services/" + id, Method.DELETE)
+                {
+                    RequestFormat = DataFormat.Json
+                };
+                request.AddHeader("Authorization", "Basic ZW9saXZhczpTaW5lcmd5KjIwMTg=");
+                request.AddHeader("X-HTTP-Method-Override", "DELETE");
+                request.AddHeader("OSvC-CREST-Application-Context", "Delete Service");
+
+                IRestResponse response = client.Execute(request);
+                var content = response.Content;
+                if (String.IsNullOrEmpty(content))
+                {
+                    //MessageBox.Show(content);
+                }
+            }
+            catch (Exception ex)
             {
-                //MessageBox.Show(content);
+                MessageBox.Show("DElete: " + ex.InnerException.ToString());
             }
         }
         public void CreateChildComponents()
         {
             try
             {
+
                 ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
                 APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
                 clientInfoHeader.AppID = "Query Example";
@@ -265,6 +290,7 @@ namespace CostToInvoiceButton
         {
             try
             {
+
                 string envelope = "<soapenv:Envelope" +
                  "   xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\"" +
                  "   xmlns:typ=\"http://xmlns.oracle.com/apps/scm/productModel/items/structures/structureServiceV2/types/\"" +
@@ -384,158 +410,167 @@ namespace CostToInvoiceButton
         }
         public ComponentChild GetComponentData(ComponentChild component)
         {
-            string envelope = "<soapenv:Envelope" +
-                                   "   xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\"" +
-                                   "   xmlns:typ=\"http://xmlns.oracle.com/apps/scm/productModel/items/itemServiceV2/types/\"" +
-                                   "   xmlns:typ1=\"http://xmlns.oracle.com/adf/svc/types/\">" +
-                                   "<soapenv:Header/>" +
-                                   "<soapenv:Body>" +
-                                   "<typ:findItem>" +
-                                   "<typ:findCriteria>" +
-                                   "<typ1:fetchStart>0</typ1:fetchStart>" +
-                                   "<typ1:fetchSize>-1</typ1:fetchSize>" +
-                                   "<typ1:filter>" +
+            try
+            {
+
+                string envelope = "<soapenv:Envelope" +
+                                       "   xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\"" +
+                                       "   xmlns:typ=\"http://xmlns.oracle.com/apps/scm/productModel/items/itemServiceV2/types/\"" +
+                                       "   xmlns:typ1=\"http://xmlns.oracle.com/adf/svc/types/\">" +
+                                       "<soapenv:Header/>" +
+                                       "<soapenv:Body>" +
+                                       "<typ:findItem>" +
+                                       "<typ:findCriteria>" +
+                                       "<typ1:fetchStart>0</typ1:fetchStart>" +
+                                       "<typ1:fetchSize>-1</typ1:fetchSize>" +
+                                       "<typ1:filter>" +
+                                       "<typ1:group>" +
+                                       "<typ1:item>" +
+                                       "<typ1:conjunction>And</typ1:conjunction>" +
+                                       "<typ1:upperCaseCompare>true</typ1:upperCaseCompare>" +
+                                       "<typ1:attribute>ItemNumber</typ1:attribute>" +
+                                       "<typ1:operator>=</typ1:operator>" +
+                                       "<typ1:value>" + component.ItemNumber + "</typ1:value>" +
+                                       "</typ1:item>" +
+                                       "<typ1:item>" +
+                                       "<typ1:conjunction>And</typ1:conjunction>" +
+                                       "<typ1:upperCaseCompare>true</typ1:upperCaseCompare>" +
+                                       "<typ1:attribute>OrganizationCode</typ1:attribute>" +
+                                       "<typ1:operator>=</typ1:operator>" +
+                                       "<typ1:value>IO_AEREO_" + component.Airport + "</typ1:value>" +
+                                       "</typ1:item>" +
+                                       /*  "<typ1:item>" +
+                                   "<typ1:conjunction>And</typ1:conjunction>" +
+                                   "<typ1:upperCaseCompare>true</typ1:upperCaseCompare>" +
+                                   "<typ1:attribute>ItemCategory</typ1:attribute>" +
+                                   "<typ1:nested>" +
                                    "<typ1:group>" +
                                    "<typ1:item>" +
                                    "<typ1:conjunction>And</typ1:conjunction>" +
                                    "<typ1:upperCaseCompare>true</typ1:upperCaseCompare>" +
-                                   "<typ1:attribute>ItemNumber</typ1:attribute>" +
+                                   "<typ1:attribute>CategoryName</typ1:attribute>" +
                                    "<typ1:operator>=</typ1:operator>" +
-                                   "<typ1:value>" + component.ItemNumber + "</typ1:value>" +
+                                   "<typ1:value>FCC</typ1:value>" +
                                    "</typ1:item>" +
-                                   "<typ1:item>" +
-                                   "<typ1:conjunction>And</typ1:conjunction>" +
-                                   "<typ1:upperCaseCompare>true</typ1:upperCaseCompare>" +
-                                   "<typ1:attribute>OrganizationCode</typ1:attribute>" +
-                                   "<typ1:operator>=</typ1:operator>" +
-                                   "<typ1:value>IO_AEREO_" + component.Airport + "</typ1:value>" +
-                                   "</typ1:item>" +
-                                   /*  "<typ1:item>" +
-                               "<typ1:conjunction>And</typ1:conjunction>" +
-                               "<typ1:upperCaseCompare>true</typ1:upperCaseCompare>" +
-                               "<typ1:attribute>ItemCategory</typ1:attribute>" +
-                               "<typ1:nested>" +
-                               "<typ1:group>" +
-                               "<typ1:item>" +
-                               "<typ1:conjunction>And</typ1:conjunction>" +
-                               "<typ1:upperCaseCompare>true</typ1:upperCaseCompare>" +
-                               "<typ1:attribute>CategoryName</typ1:attribute>" +
-                               "<typ1:operator>=</typ1:operator>" +
-                               "<typ1:value>FCC</typ1:value>" +
-                               "</typ1:item>" +
-                               "</typ1:group>" +
-                               "</typ1:nested>" +
-                               "</typ1:item>" +*/
                                    "</typ1:group>" +
-                                   "</typ1:filter>" +
-                                   "<typ1:findAttribute>ItemDescription</typ1:findAttribute>" +
-                                   "<typ1:findAttribute>ItemDFF</typ1:findAttribute>" +
-                                   "</typ:findCriteria>" +
-                                   "<typ:findControl>" +
-                                   "<typ1:retrieveAllTranslations>true</typ1:retrieveAllTranslations>" +
-                                   "</typ:findControl>" +
-                                   "</typ:findItem>" +
-                                   "</soapenv:Body>" +
-                                   "</soapenv:Envelope>";
-            byte[] byteArray = Encoding.UTF8.GetBytes(envelope);
-            byte[] toEncodeAsBytes = System.Text.ASCIIEncoding.ASCII.GetBytes("itotal" + ":" + "Oracle123");
-            string credentials = System.Convert.ToBase64String(toEncodeAsBytes);
-            HttpWebRequest request =
-             (HttpWebRequest)WebRequest.Create("https://egqy-test.fa.us6.oraclecloud.com:443/fscmService/ItemServiceV2");
-            request.Method = "POST";
-            request.ContentType = "text/xml;charset=UTF-8";
-            request.ContentLength = byteArray.Length;
-            request.Headers.Add("Authorization", "Basic " + credentials);
-            request.Headers.Add("SOAPAction", "http://xmlns.oracle.com/apps/scm/productModel/items/itemServiceV2/findItem");
-            Stream dataStream = request.GetRequestStream();
-            dataStream.Write(byteArray, 0, byteArray.Length);
-            dataStream.Close();
-            XDocument doc;
-            XmlDocument docu = new XmlDocument();
-            string result = "";
-            using (WebResponse responseComponentGet = request.GetResponse())
-            {
-                using (Stream stream = responseComponentGet.GetResponseStream())
+                                   "</typ1:nested>" +
+                                   "</typ1:item>" +*/
+                                       "</typ1:group>" +
+                                       "</typ1:filter>" +
+                                       "<typ1:findAttribute>ItemDescription</typ1:findAttribute>" +
+                                       "<typ1:findAttribute>ItemDFF</typ1:findAttribute>" +
+                                       "</typ:findCriteria>" +
+                                       "<typ:findControl>" +
+                                       "<typ1:retrieveAllTranslations>true</typ1:retrieveAllTranslations>" +
+                                       "</typ:findControl>" +
+                                       "</typ:findItem>" +
+                                       "</soapenv:Body>" +
+                                       "</soapenv:Envelope>";
+                byte[] byteArray = Encoding.UTF8.GetBytes(envelope);
+                byte[] toEncodeAsBytes = System.Text.ASCIIEncoding.ASCII.GetBytes("itotal" + ":" + "Oracle123");
+                string credentials = System.Convert.ToBase64String(toEncodeAsBytes);
+                HttpWebRequest request =
+                 (HttpWebRequest)WebRequest.Create("https://egqy-test.fa.us6.oraclecloud.com:443/fscmService/ItemServiceV2");
+                request.Method = "POST";
+                request.ContentType = "text/xml;charset=UTF-8";
+                request.ContentLength = byteArray.Length;
+                request.Headers.Add("Authorization", "Basic " + credentials);
+                request.Headers.Add("SOAPAction", "http://xmlns.oracle.com/apps/scm/productModel/items/itemServiceV2/findItem");
+                Stream dataStream = request.GetRequestStream();
+                dataStream.Write(byteArray, 0, byteArray.Length);
+                dataStream.Close();
+                XDocument doc;
+                XmlDocument docu = new XmlDocument();
+                string result = "";
+                using (WebResponse responseComponentGet = request.GetResponse())
                 {
-                    doc = XDocument.Load(stream);
-                    result = doc.ToString();
-                    XmlDocument xmlDoc = new XmlDocument();
-                    xmlDoc.LoadXml(result);
-                    XmlNamespaceManager nms = new XmlNamespaceManager(xmlDoc.NameTable);
-                    nms.AddNamespace("env", "http://schemas.xmlsoap.org/soap/envelope/");
-                    nms.AddNamespace("wsa", "http://www.w3.org/2005/08/addressing");
-                    nms.AddNamespace("typ", "http://xmlns.oracle.com/apps/scm/productModel/items/itemServiceV2/types/");
-                    nms.AddNamespace("ns0", "http://xmlns.oracle.com/adf/svc/types/");
-                    nms.AddNamespace("ns1", "http://xmlns.oracle.com/apps/scm/productModel/items/itemServiceV2/");
-
-                    XmlNodeList nodeList = xmlDoc.SelectNodes("//ns0:Value", nms);
-                    foreach (XmlNode node in nodeList)
+                    using (Stream stream = responseComponentGet.GetResponseStream())
                     {
-                        if (node.HasChildNodes)
+                        doc = XDocument.Load(stream);
+                        result = doc.ToString();
+                        XmlDocument xmlDoc = new XmlDocument();
+                        xmlDoc.LoadXml(result);
+                        XmlNamespaceManager nms = new XmlNamespaceManager(xmlDoc.NameTable);
+                        nms.AddNamespace("env", "http://schemas.xmlsoap.org/soap/envelope/");
+                        nms.AddNamespace("wsa", "http://www.w3.org/2005/08/addressing");
+                        nms.AddNamespace("typ", "http://xmlns.oracle.com/apps/scm/productModel/items/itemServiceV2/types/");
+                        nms.AddNamespace("ns0", "http://xmlns.oracle.com/adf/svc/types/");
+                        nms.AddNamespace("ns1", "http://xmlns.oracle.com/apps/scm/productModel/items/itemServiceV2/");
+
+                        XmlNodeList nodeList = xmlDoc.SelectNodes("//ns0:Value", nms);
+                        foreach (XmlNode node in nodeList)
                         {
-                            if (node.LocalName == "Value")
+                            if (node.HasChildNodes)
                             {
-                                XmlNodeList nodeListvalue = node.ChildNodes;
-                                foreach (XmlNode nodeValue in nodeListvalue)
+                                if (node.LocalName == "Value")
                                 {
-                                    if (nodeValue.LocalName == "ItemDescription")
+                                    XmlNodeList nodeListvalue = node.ChildNodes;
+                                    foreach (XmlNode nodeValue in nodeListvalue)
                                     {
-                                        component.ItemDescription = nodeValue.InnerText.Trim().Replace("/", "");
-                                    }
-                                    if (nodeValue.LocalName == "ItemDFF")
-                                    {
-                                        XmlNodeList nodeListDeff = nodeValue.ChildNodes;
+                                        if (nodeValue.LocalName == "ItemDescription")
                                         {
-                                            foreach (XmlNode nodeDeff in nodeListDeff)
+                                            component.ItemDescription = nodeValue.InnerText.Trim().Replace("/", "");
+                                        }
+                                        if (nodeValue.LocalName == "ItemDFF")
+                                        {
+                                            XmlNodeList nodeListDeff = nodeValue.ChildNodes;
                                             {
-                                                if (nodeDeff.LocalName == "xxParticipacionCobro")
+                                                foreach (XmlNode nodeDeff in nodeListDeff)
                                                 {
-                                                    component.ParticipacionCobro = nodeDeff.InnerText == "SI" ? "1" : "0";
-                                                }
-                                                if (nodeDeff.LocalName == "xxCategoriaRoyalty")
-                                                {
-                                                    component.CategoriaRoyalty = nodeDeff.InnerText;
-                                                }
-                                                if (nodeDeff.LocalName == "xxPagos")
-                                                {
-                                                    component.Pagos = nodeDeff.InnerText;
-                                                }
-                                                if (nodeDeff.LocalName == "xxClasificacionPago")
-                                                {
-                                                    component.ClasificacionPagos = nodeDeff.InnerText;
-                                                }
-                                                if (nodeDeff.LocalName == "cuentaGastoCx")
-                                                {
-                                                    component.CuentaGasto = nodeDeff.InnerText;
-                                                }
-                                                if (nodeDeff.LocalName == "xxInformativo")
-                                                {
-                                                    component.Informativo = nodeDeff.InnerText == "SI" ? "1" : "0";
-                                                }
-                                                if (nodeDeff.LocalName == "xxPaqueteInv")
-                                                {
-                                                    component.Paquete = nodeDeff.InnerText == "SI" ? "1" : "0";
+                                                    if (nodeDeff.LocalName == "xxParticipacionCobro")
+                                                    {
+                                                        component.ParticipacionCobro = nodeDeff.InnerText == "SI" ? "1" : "0";
+                                                    }
+                                                    if (nodeDeff.LocalName == "xxCategoriaRoyalty")
+                                                    {
+                                                        component.CategoriaRoyalty = nodeDeff.InnerText;
+                                                    }
+                                                    if (nodeDeff.LocalName == "xxPagos")
+                                                    {
+                                                        component.Pagos = nodeDeff.InnerText;
+                                                    }
+                                                    if (nodeDeff.LocalName == "xxClasificacionPago")
+                                                    {
+                                                        component.ClasificacionPagos = nodeDeff.InnerText;
+                                                    }
+                                                    if (nodeDeff.LocalName == "cuentaGastoCx")
+                                                    {
+                                                        component.CuentaGasto = nodeDeff.InnerText;
+                                                    }
+                                                    if (nodeDeff.LocalName == "xxInformativo")
+                                                    {
+                                                        component.Informativo = nodeDeff.InnerText == "SI" ? "1" : "0";
+                                                    }
+                                                    if (nodeDeff.LocalName == "xxPaqueteInv")
+                                                    {
+                                                        component.Paquete = nodeDeff.InnerText == "SI" ? "1" : "0";
+                                                    }
                                                 }
                                             }
+
                                         }
 
                                     }
-
                                 }
                             }
                         }
+
                     }
-
+                    responseComponentGet.Close();
                 }
-                responseComponentGet.Close();
+                return component;
             }
-            return component;
-
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.InnerException.ToString());
+                return null;
+            }
         }
         public void InsertComponent(ComponentChild component)
         {
             try
             {
+
                 var client = new RestClient("https://iccsmx.custhelp.com/");
                 var request = new RestRequest("/services/rest/connect/v1.4/CO.Services/", Method.POST)
                 {
@@ -640,81 +675,132 @@ namespace CostToInvoiceButton
         }
         public string GetSRType()
         {
-            string SRTYPE = "";
-
-            if (IncidentID != 0)
+            try
             {
-                ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
-                APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
-                clientInfoHeader.AppID = "Query Example";
-                String queryString = "SELECT I.Customfields.c.sr_type.LookupName FROM Incident I WHERE id=" + IncidentID + "";
-                clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 1, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
-                foreach (CSVTable table in queryCSV.CSVTables)
+
+                string SRTYPE = "";
+
+                if (IncidentID != 0)
                 {
-                    String[] rowData = table.Rows;
-                    foreach (String data in rowData)
+                    ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
+                    APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
+                    clientInfoHeader.AppID = "Query Example";
+                    String queryString = "SELECT I.Customfields.c.sr_type.LookupName FROM Incident I WHERE id=" + IncidentID + "";
+                    clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 1, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
+                    foreach (CSVTable table in queryCSV.CSVTables)
                     {
-                        SRTYPE = data;
+                        String[] rowData = table.Rows;
+                        foreach (String data in rowData)
+                        {
+                            SRTYPE = data;
+                        }
                     }
                 }
+                switch (SRTYPE)
+                {
+                    case "Catering":
+                        SRTYPE = "CATERING";
+                        break;
+                    case "FCC":
+                        SRTYPE = "FCC";
+                        break;
+                    case "FBO":
+                        SRTYPE = "FBO";
+                        break;
+                    case "Fuel":
+                        SRTYPE = "FUEL";
+                        break;
+                    case "Hangar Space":
+                        SRTYPE = "GYCUSTODIA";
+                        break;
+                    case "SENEAM Fee":
+                        SRTYPE = "SENEAM";
+                        break;
+                    case "Permits":
+                        SRTYPE = "PERMISOS";
+                        break;
+                }
+                return SRTYPE;
             }
-            switch (SRTYPE)
+            catch (Exception ex)
             {
-                case "Catering":
-                    SRTYPE = "CATERING";
-                    break;
-                case "FCC":
-                    SRTYPE = "FCC";
-                    break;
-                case "FBO":
-                    SRTYPE = "FBO";
-                    break;
-                case "Fuel":
-                    SRTYPE = "FUEL";
-                    break;
-                case "Hangar Space":
-                    SRTYPE = "GYCUSTODIA";
-                    break;
-                case "SENEAM Fee":
-                    SRTYPE = "SENEAM";
-                    break;
-                case "Permits":
-                    SRTYPE = "PERMISOS";
-                    break;
+                MessageBox.Show("GetType: " + ex.InnerException.ToString());
+                return "";
             }
-            return SRTYPE;
+        }
+        public string getTail(int Tail)
+        {
+            string Icao = "";
+            ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
+            APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
+            clientInfoHeader.AppID = "Query Example";
+            String queryString = "SELECT LookupName,AircraftType1 FROM CO.Aircraft WHERE ID =" + Tail;
+            clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 10000, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
+            foreach (CSVTable table in queryCSV.CSVTables)
+            {
+                String[] rowData = table.Rows;
+                foreach (String data in rowData)
+                {
+                    Char delimiter = '|';
+                    String[] substrings = data.Split(delimiter);
+                    Icao = getICAODesi(Convert.ToInt32(substrings[1]));
+                }
+            }
+            return Icao;
+        }
+        public string getICAODesi(int IdAircraftType)
+        {
+            string Icao = "";
+            ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
+            APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
+            clientInfoHeader.AppID = "Query Example";
+            String queryString = "SELECT ICAODesignator FROM CO.AircraftType WHERE ID = " + IdAircraftType;
+            clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 10000, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
+            foreach (CSVTable table in queryCSV.CSVTables)
+            {
+                String[] rowData = table.Rows;
+                foreach (String data in rowData)
+                {
+                    Icao = data;
+                }
+            }
+
+            return Icao;
+
+
         }
 
+    }
 
-        [AddIn("Invoice to Cost", Version = "1.0.0.0")]
-        public class WorkspaceRibbonButtonFactory : IWorkspaceRibbonButtonFactory
+    [AddIn("Invoice to Cost", Version = "1.0.0.0")]
+    public class WorkspaceRibbonButtonFactory : IWorkspaceRibbonButtonFactory
+    {
+        IGlobalContext globalContext { get; set; }
+        public IWorkspaceRibbonButton CreateControl(bool inDesignMode, IRecordContext RecordContext)
         {
-            IGlobalContext globalContext { get; set; }
-            public IWorkspaceRibbonButton CreateControl(bool inDesignMode, IRecordContext RecordContext)
-            {
-                return new WorkspaceRibbonAddIn(inDesignMode, RecordContext, globalContext);
-            }
-            public System.Drawing.Image Image32
-            {
-                get { return Properties.Resources.money32; }
-            }
-            public System.Drawing.Image Image16
-            {
-                get { return Properties.Resources.money16; }
-            }
-            public string Text
-            {
-                get { return "Invoice to Cost"; }
-            }
-            public string Tooltip
-            {
-                get { return "Create Invoice"; }
-            }
-            public bool Initialize(IGlobalContext GlobalContext)
-            {
-                globalContext = GlobalContext;
-                return true;
-            }
+            return new WorkspaceRibbonAddIn(inDesignMode, RecordContext, globalContext);
+        }
+        public System.Drawing.Image Image32
+        {
+            get { return Properties.Resources.money32; }
+        }
+        public System.Drawing.Image Image16
+        {
+            get { return Properties.Resources.money16; }
+        }
+        public string Text
+        {
+            get { return "Invoice to Cost"; }
+        }
+        public string Tooltip
+        {
+            get { return "Create Invoice"; }
+        }
+        public bool Initialize(IGlobalContext GlobalContext)
+        {
+            globalContext = GlobalContext;
+            return true;
         }
     }
 }
+

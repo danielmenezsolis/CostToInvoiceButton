@@ -77,7 +77,6 @@
             this.label13 = new System.Windows.Forms.Label();
             this.label14 = new System.Windows.Forms.Label();
             this.label15 = new System.Windows.Forms.Label();
-            this.cboSuppliers = new System.Windows.Forms.ComboBox();
             this.label16 = new System.Windows.Forms.Label();
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.txtUtilidad = new System.Windows.Forms.TextBox();
@@ -85,6 +84,16 @@
             this.txtCombustible = new System.Windows.Forms.TextBox();
             this.txtCombustibleI = new System.Windows.Forms.TextBox();
             this.txtSemeam = new System.Windows.Forms.TextBox();
+            this.cboSuppliers = new System.Windows.Forms.ComboBox();
+            this.txtAirport = new System.Windows.Forms.TextBox();
+            this.lblSrType = new System.Windows.Forms.Label();
+            this.txtICAOD = new System.Windows.Forms.TextBox();
+            this.lblIdIncident = new System.Windows.Forms.Label();
+            this.txtATA = new System.Windows.Forms.TextBox();
+            this.txtATD = new System.Windows.Forms.TextBox();
+            this.txtFromAirport = new System.Windows.Forms.TextBox();
+            this.txtToAirtport = new System.Windows.Forms.TextBox();
+            this.txtArrivalAiport = new System.Windows.Forms.TextBox();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridSuppliers)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridServicios)).BeginInit();
@@ -164,7 +173,7 @@
             this.dataGridSuppliers.RowHeadersDefaultCellStyle = dataGridViewCellStyle2;
             this.dataGridSuppliers.RowHeadersVisible = false;
             this.dataGridSuppliers.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.dataGridSuppliers.Size = new System.Drawing.Size(744, 87);
+            this.dataGridSuppliers.Size = new System.Drawing.Size(744, 26);
             this.dataGridSuppliers.TabIndex = 5;
             this.dataGridSuppliers.TabStop = false;
             this.dataGridSuppliers.Visible = false;
@@ -210,10 +219,11 @@
             // 
             // txtIdService
             // 
-            this.txtIdService.Location = new System.Drawing.Point(97, 458);
+            this.txtIdService.Enabled = false;
+            this.txtIdService.Location = new System.Drawing.Point(97, 453);
             this.txtIdService.Name = "txtIdService";
             this.txtIdService.ReadOnly = true;
-            this.txtIdService.Size = new System.Drawing.Size(100, 20);
+            this.txtIdService.Size = new System.Drawing.Size(22, 20);
             this.txtIdService.TabIndex = 35;
             this.txtIdService.TabStop = false;
             // 
@@ -290,7 +300,7 @@
             // 
             // txtSupplierName
             // 
-            this.txtSupplierName.Location = new System.Drawing.Point(97, 302);
+            this.txtSupplierName.Location = new System.Drawing.Point(97, 310);
             this.txtSupplierName.Name = "txtSupplierName";
             this.txtSupplierName.ReadOnly = true;
             this.txtSupplierName.Size = new System.Drawing.Size(601, 20);
@@ -300,10 +310,11 @@
             // 
             // txtAmount
             // 
-            this.txtAmount.Location = new System.Drawing.Point(193, 458);
+            this.txtAmount.Enabled = false;
+            this.txtAmount.Location = new System.Drawing.Point(125, 453);
             this.txtAmount.Name = "txtAmount";
             this.txtAmount.ReadOnly = true;
-            this.txtAmount.Size = new System.Drawing.Size(100, 20);
+            this.txtAmount.Size = new System.Drawing.Size(22, 20);
             this.txtAmount.TabIndex = 24;
             this.txtAmount.TabStop = false;
             this.txtAmount.Visible = false;
@@ -314,6 +325,7 @@
             this.txtCost.Name = "txtCost";
             this.txtCost.Size = new System.Drawing.Size(100, 20);
             this.txtCost.TabIndex = 22;
+            this.txtCost.TextChanged += new System.EventHandler(this.txtCost_TextChanged);
             // 
             // txtQty
             // 
@@ -522,14 +534,6 @@
             this.label15.TabIndex = 46;
             this.label15.Text = "Invoice ";
             // 
-            // cboSuppliers
-            // 
-            this.cboSuppliers.FormattingEnabled = true;
-            this.cboSuppliers.Location = new System.Drawing.Point(97, 320);
-            this.cboSuppliers.Name = "cboSuppliers";
-            this.cboSuppliers.Size = new System.Drawing.Size(661, 21);
-            this.cboSuppliers.TabIndex = 47;
-            // 
             // label16
             // 
             this.label16.AutoSize = true;
@@ -552,54 +556,162 @@
             // 
             // txtUtilidad
             // 
+            this.txtUtilidad.Enabled = false;
             this.txtUtilidad.Location = new System.Drawing.Point(97, 432);
             this.txtUtilidad.Name = "txtUtilidad";
             this.txtUtilidad.ReadOnly = true;
-            this.txtUtilidad.Size = new System.Drawing.Size(100, 20);
+            this.txtUtilidad.Size = new System.Drawing.Size(22, 20);
             this.txtUtilidad.TabIndex = 50;
             this.txtUtilidad.TabStop = false;
             // 
             // txtRoyalty
             // 
-            this.txtRoyalty.Location = new System.Drawing.Point(203, 432);
+            this.txtRoyalty.Enabled = false;
+            this.txtRoyalty.Location = new System.Drawing.Point(153, 432);
             this.txtRoyalty.Name = "txtRoyalty";
             this.txtRoyalty.ReadOnly = true;
-            this.txtRoyalty.Size = new System.Drawing.Size(100, 20);
+            this.txtRoyalty.Size = new System.Drawing.Size(22, 20);
             this.txtRoyalty.TabIndex = 51;
             this.txtRoyalty.TabStop = false;
             // 
             // txtCombustible
             // 
-            this.txtCombustible.Location = new System.Drawing.Point(309, 432);
+            this.txtCombustible.Enabled = false;
+            this.txtCombustible.Location = new System.Drawing.Point(125, 432);
             this.txtCombustible.Name = "txtCombustible";
             this.txtCombustible.ReadOnly = true;
-            this.txtCombustible.Size = new System.Drawing.Size(100, 20);
+            this.txtCombustible.Size = new System.Drawing.Size(22, 20);
             this.txtCombustible.TabIndex = 52;
             this.txtCombustible.TabStop = false;
             // 
             // txtCombustibleI
             // 
-            this.txtCombustibleI.Location = new System.Drawing.Point(415, 432);
+            this.txtCombustibleI.Enabled = false;
+            this.txtCombustibleI.Location = new System.Drawing.Point(181, 432);
             this.txtCombustibleI.Name = "txtCombustibleI";
             this.txtCombustibleI.ReadOnly = true;
-            this.txtCombustibleI.Size = new System.Drawing.Size(100, 20);
+            this.txtCombustibleI.Size = new System.Drawing.Size(22, 20);
             this.txtCombustibleI.TabIndex = 53;
             this.txtCombustibleI.TabStop = false;
             // 
             // txtSemeam
             // 
-            this.txtSemeam.Location = new System.Drawing.Point(521, 432);
+            this.txtSemeam.Enabled = false;
+            this.txtSemeam.Location = new System.Drawing.Point(209, 432);
             this.txtSemeam.Name = "txtSemeam";
             this.txtSemeam.ReadOnly = true;
-            this.txtSemeam.Size = new System.Drawing.Size(100, 20);
+            this.txtSemeam.Size = new System.Drawing.Size(22, 20);
             this.txtSemeam.TabIndex = 54;
             this.txtSemeam.TabStop = false;
+            // 
+            // cboSuppliers
+            // 
+            this.cboSuppliers.Enabled = false;
+            this.cboSuppliers.FormattingEnabled = true;
+            this.cboSuppliers.Location = new System.Drawing.Point(97, 309);
+            this.cboSuppliers.Name = "cboSuppliers";
+            this.cboSuppliers.Size = new System.Drawing.Size(440, 21);
+            this.cboSuppliers.TabIndex = 55;
+            // 
+            // txtAirport
+            // 
+            this.txtAirport.Enabled = false;
+            this.txtAirport.Location = new System.Drawing.Point(153, 453);
+            this.txtAirport.Name = "txtAirport";
+            this.txtAirport.ReadOnly = true;
+            this.txtAirport.Size = new System.Drawing.Size(22, 20);
+            this.txtAirport.TabIndex = 56;
+            this.txtAirport.TabStop = false;
+            // 
+            // lblSrType
+            // 
+            this.lblSrType.Location = new System.Drawing.Point(324, 9);
+            this.lblSrType.Name = "lblSrType";
+            this.lblSrType.Size = new System.Drawing.Size(133, 22);
+            this.lblSrType.TabIndex = 57;
+            // 
+            // txtICAOD
+            // 
+            this.txtICAOD.Enabled = false;
+            this.txtICAOD.Location = new System.Drawing.Point(181, 453);
+            this.txtICAOD.Name = "txtICAOD";
+            this.txtICAOD.ReadOnly = true;
+            this.txtICAOD.Size = new System.Drawing.Size(22, 20);
+            this.txtICAOD.TabIndex = 58;
+            this.txtICAOD.TabStop = false;
+            // 
+            // lblIdIncident
+            // 
+            this.lblIdIncident.Location = new System.Drawing.Point(623, 9);
+            this.lblIdIncident.Name = "lblIdIncident";
+            this.lblIdIncident.Size = new System.Drawing.Size(133, 22);
+            this.lblIdIncident.TabIndex = 59;
+            // 
+            // txtATA
+            // 
+            this.txtATA.Enabled = false;
+            this.txtATA.Location = new System.Drawing.Point(237, 432);
+            this.txtATA.Name = "txtATA";
+            this.txtATA.ReadOnly = true;
+            this.txtATA.Size = new System.Drawing.Size(114, 20);
+            this.txtATA.TabIndex = 60;
+            this.txtATA.TabStop = false;
+            // 
+            // txtATD
+            // 
+            this.txtATD.Enabled = false;
+            this.txtATD.Location = new System.Drawing.Point(237, 453);
+            this.txtATD.Name = "txtATD";
+            this.txtATD.ReadOnly = true;
+            this.txtATD.Size = new System.Drawing.Size(114, 20);
+            this.txtATD.TabIndex = 61;
+            this.txtATD.TabStop = false;
+            // 
+            // txtFromAirport
+            // 
+            this.txtFromAirport.Enabled = false;
+            this.txtFromAirport.Location = new System.Drawing.Point(373, 432);
+            this.txtFromAirport.Name = "txtFromAirport";
+            this.txtFromAirport.ReadOnly = true;
+            this.txtFromAirport.Size = new System.Drawing.Size(114, 20);
+            this.txtFromAirport.TabIndex = 62;
+            this.txtFromAirport.TabStop = false;
+            // 
+            // txtToAirtport
+            // 
+            this.txtToAirtport.Enabled = false;
+            this.txtToAirtport.Location = new System.Drawing.Point(373, 453);
+            this.txtToAirtport.Name = "txtToAirtport";
+            this.txtToAirtport.ReadOnly = true;
+            this.txtToAirtport.Size = new System.Drawing.Size(114, 20);
+            this.txtToAirtport.TabIndex = 63;
+            this.txtToAirtport.TabStop = false;
+            // 
+            // txtArrivalAiport
+            // 
+            this.txtArrivalAiport.Enabled = false;
+            this.txtArrivalAiport.Location = new System.Drawing.Point(495, 432);
+            this.txtArrivalAiport.Name = "txtArrivalAiport";
+            this.txtArrivalAiport.ReadOnly = true;
+            this.txtArrivalAiport.Size = new System.Drawing.Size(114, 20);
+            this.txtArrivalAiport.TabIndex = 64;
+            this.txtArrivalAiport.TabStop = false;
             // 
             // DoubleScreen
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(768, 625);
+            this.Controls.Add(this.txtArrivalAiport);
+            this.Controls.Add(this.txtToAirtport);
+            this.Controls.Add(this.txtFromAirport);
+            this.Controls.Add(this.txtATD);
+            this.Controls.Add(this.txtATA);
+            this.Controls.Add(this.lblIdIncident);
+            this.Controls.Add(this.txtICAOD);
+            this.Controls.Add(this.lblSrType);
+            this.Controls.Add(this.txtAirport);
+            this.Controls.Add(this.cboSuppliers);
             this.Controls.Add(this.txtSemeam);
             this.Controls.Add(this.txtCombustibleI);
             this.Controls.Add(this.txtCombustible);
@@ -608,7 +720,6 @@
             this.Controls.Add(this.textBox1);
             this.Controls.Add(this.label16);
             this.Controls.Add(this.dataGridSuppliers);
-            this.Controls.Add(this.cboSuppliers);
             this.Controls.Add(this.label15);
             this.Controls.Add(this.label14);
             this.Controls.Add(this.label13);
@@ -697,7 +808,6 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn IdService;
         private System.Windows.Forms.DataGridViewButtonColumn EditColumn;
         private System.Windows.Forms.DataGridViewButtonColumn DeleteColumn;
-        private System.Windows.Forms.ComboBox cboSuppliers;
         private System.Windows.Forms.Label label16;
         private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.TextBox txtUtilidad;
@@ -705,5 +815,15 @@
         private System.Windows.Forms.TextBox txtCombustible;
         private System.Windows.Forms.TextBox txtCombustibleI;
         private System.Windows.Forms.TextBox txtSemeam;
+        private System.Windows.Forms.ComboBox cboSuppliers;
+        private System.Windows.Forms.TextBox txtAirport;
+        private System.Windows.Forms.Label lblSrType;
+        private System.Windows.Forms.TextBox txtICAOD;
+        private System.Windows.Forms.Label lblIdIncident;
+        private System.Windows.Forms.TextBox txtATA;
+        private System.Windows.Forms.TextBox txtATD;
+        private System.Windows.Forms.TextBox txtFromAirport;
+        private System.Windows.Forms.TextBox txtToAirtport;
+        private System.Windows.Forms.TextBox txtArrivalAiport;
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System.Xml.Serialization;
 using System.Collections.Generic;
+using System;
 
 namespace CostToInvoiceButton
 {
@@ -121,5 +122,18 @@ namespace CostToInvoiceButton
     {
         [XmlElement(ElementName = "G_N_SUPPLIER")]
         public List<G_N_SUPPLIER> G_N_SUPPLIER { get; set; }
+    }
+
+    public class Sup
+    {
+        public string Name { get; set; }
+        public string Id { get; set; }
+    }
+
+    public class WHours
+    {
+        public DateTime Opens { get; set; }
+        public DateTime Closes { get; set; }
+        public string Type { get; set; }
     }
 }

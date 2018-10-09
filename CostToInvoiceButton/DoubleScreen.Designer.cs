@@ -94,6 +94,8 @@
             this.txtFromAirport = new System.Windows.Forms.TextBox();
             this.txtToAirtport = new System.Windows.Forms.TextBox();
             this.txtArrivalAiport = new System.Windows.Forms.TextBox();
+            this.txtMainHour = new System.Windows.Forms.TextBox();
+            this.txtCategorias = new System.Windows.Forms.TextBox();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridSuppliers)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridServicios)).BeginInit();
@@ -697,11 +699,33 @@
             this.txtArrivalAiport.TabIndex = 64;
             this.txtArrivalAiport.TabStop = false;
             // 
+            // txtMainHour
+            // 
+            this.txtMainHour.Enabled = false;
+            this.txtMainHour.Location = new System.Drawing.Point(495, 453);
+            this.txtMainHour.Name = "txtMainHour";
+            this.txtMainHour.ReadOnly = true;
+            this.txtMainHour.Size = new System.Drawing.Size(114, 20);
+            this.txtMainHour.TabIndex = 65;
+            this.txtMainHour.TabStop = false;
+            // 
+            // txtCategorias
+            // 
+            this.txtCategorias.Enabled = false;
+            this.txtCategorias.Location = new System.Drawing.Point(209, 453);
+            this.txtCategorias.Name = "txtCategorias";
+            this.txtCategorias.ReadOnly = true;
+            this.txtCategorias.Size = new System.Drawing.Size(22, 20);
+            this.txtCategorias.TabIndex = 66;
+            this.txtCategorias.TabStop = false;
+            // 
             // DoubleScreen
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(768, 625);
+            this.Controls.Add(this.txtCategorias);
+            this.Controls.Add(this.txtMainHour);
             this.Controls.Add(this.txtArrivalAiport);
             this.Controls.Add(this.txtToAirtport);
             this.Controls.Add(this.txtFromAirport);
@@ -825,5 +849,7 @@
         private System.Windows.Forms.TextBox txtFromAirport;
         private System.Windows.Forms.TextBox txtToAirtport;
         private System.Windows.Forms.TextBox txtArrivalAiport;
+        private System.Windows.Forms.TextBox txtMainHour;
+        private System.Windows.Forms.TextBox txtCategorias;
     }
 }

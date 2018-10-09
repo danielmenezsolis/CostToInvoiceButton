@@ -96,15 +96,18 @@ namespace CostToInvoiceButton
                     GetDeleteComponents();
                     CreateChildComponents();
                     servicios = GetListServices();
-                    doubleScreen = new DoubleScreen(global,recordContext);
+                    doubleScreen = new DoubleScreen(global, recordContext);
                     DgvServicios = ((DataGridView)doubleScreen.Controls["dataGridServicios"]);
                     DgvServicios.DataSource = servicios;
+
                     DgvServicios.Columns[3].Visible = false;
                     DgvServicios.Columns[4].Visible = false;
                     DgvServicios.Columns[5].Visible = false;
                     DgvServicios.Columns[6].Visible = false;
                     DgvServicios.Columns[7].Visible = false;
                     DgvServicios.Columns[8].Visible = false;
+                    DgvServicios.Columns[13].Visible = false;
+
                     DgvServicios.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
                     ((System.Windows.Forms.Label)doubleScreen.Controls["lblSrType"]).Text = SRType.ToUpper();
                     ((System.Windows.Forms.Label)doubleScreen.Controls["lblIdIncident"]).Text = IncidentID.ToString();
@@ -126,7 +129,6 @@ namespace CostToInvoiceButton
         {
             try
             {
-
                 bool result = false;
                 EndpointAddress endPointAddr = new EndpointAddress(global.GetInterfaceServiceUrl(ConnectServiceType.Soap));
                 BasicHttpBinding binding = new BasicHttpBinding(BasicHttpSecurityMode.TransportWithMessageCredential);
@@ -162,7 +164,7 @@ namespace CostToInvoiceButton
                 ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
                 APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
                 clientInfoHeader.AppID = "Query Example";
-                String queryString = "SELECT ID,ItemNumber,ItemDescription,Airport,IDProveedor,Costo,Precio,InternalInvoice,Itinerary,Paquete,Componente,Informativo,ParentPaxID FROM CO.Services WHERE Incident =" + IncidentID + " ORDER BY ID ASC, ParentPaxId ASC";
+                String queryString = "SELECT ID,ItemNumber,ItemDescription,Airport,IDProveedor,Costo,Precio,InternalInvoice,Itinerary,Paquete,Componente,Informativo,ParentPaxID,Categories FROM CO.Services WHERE Incident =" + IncidentID + " ORDER BY ID ASC, ParentPaxId ASC";
                 clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 10000, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
                 foreach (CSVTable table in queryCSV.CSVTables)
                 {
@@ -186,6 +188,7 @@ namespace CostToInvoiceButton
                         service.Task = substrings[10] == "1" ? "Yes" : "No";
                         service.Informative = substrings[11] == "1" ? "Yes" : "No";
                         service.ParentPax = substrings[12];
+                        service.Categorias = substrings[13];
                         services.Add(service);
                     }
                 }

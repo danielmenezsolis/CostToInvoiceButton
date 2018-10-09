@@ -12,9 +12,6 @@ using System.Windows.Forms;
 using System.Xml;
 using System.Xml.Linq;
 using System.Xml.Serialization;
-using ClaseParaCostos;
-using ClaseParaPrecios;
-using System.Drawing;
 using System.Collections.Generic;
 using System.ServiceModel;
 using System.ServiceModel.Channels;
@@ -56,24 +53,36 @@ namespace CostToInvoiceButton
             {
                 if (e.RowIndex != -1)
                 {
-
-                    txtItem.Text = dataGridServicios.Rows[e.RowIndex].Cells[2].FormattedValue.ToString().Trim();
-                    txtItemNumber.Text = dataGridServicios.Rows[e.RowIndex].Cells[1].FormattedValue.ToString().Trim();
                     txtIdService.Text = dataGridServicios.Rows[e.RowIndex].Cells[0].FormattedValue.ToString().Trim();
+                    txtItemNumber.Text = dataGridServicios.Rows[e.RowIndex].Cells[1].FormattedValue.ToString().Trim();
+                    txtItem.Text = dataGridServicios.Rows[e.RowIndex].Cells[2].FormattedValue.ToString().Trim();
+                    string airtport = dataGridServicios.Rows[e.RowIndex].Cells[3].FormattedValue.ToString().Trim();
                     txtSupplierName.Text = dataGridServicios.Rows[e.RowIndex].Cells[4].FormattedValue.ToString().Trim();
                     txtInvoice.Text = dataGridServicios.Rows[e.RowIndex].Cells[7].FormattedValue.ToString().Trim();
-                    string airtport = dataGridServicios.Rows[e.RowIndex].Cells[3].FormattedValue.ToString().Trim();
+
+                    GetItineraryHours(String.IsNullOrEmpty(dataGridServicios.Rows[e.RowIndex].Cells[8].FormattedValue.ToString()) ? 0 : Convert.ToInt32(dataGridServicios.Rows[e.RowIndex].Cells[8].FormattedValue.ToString()));
+                    txtCategorias.Text = dataGridServicios.Rows[e.RowIndex].Cells[13].FormattedValue.ToString().Trim();
                     txtAirport.Text = "IO_AEREO_" + airtport.Replace("-", "_").Trim();
-                    int iti = String.IsNullOrEmpty(dataGridServicios.Rows[e.RowIndex].Cells[8].FormattedValue.ToString()) ? 0 : Convert.ToInt32(dataGridServicios.Rows[e.RowIndex].Cells[8].FormattedValue.ToString());
-                    GetItineraryHours(iti);
-                    MessageBox.Show(WHoursList.Count.ToString());
+                    txtMainHour.Text = GetMainHour();
+
+                    if (String.IsNullOrEmpty(dataGridServicios.Rows[e.RowIndex].Cells[5].FormattedValue.ToString()))
+                    {
+                        txtCost.Text = GetCosts().ToString();
+                    }
+                    else
+                    {
+                        txtCost.Text = dataGridServicios.Rows[e.RowIndex].Cells[5].FormattedValue.ToString();
+                    }
+                    if (String.IsNullOrEmpty(dataGridServicios.Rows[e.RowIndex].Cells[6].FormattedValue.ToString()))
+                    {
+                        txtPrice.Text = GetPrices().ToString();
+                    }
+                    else
+                    {
+                        txtPrice.Text = dataGridServicios.Rows[e.RowIndex].Cells[6].FormattedValue.ToString();
+                    }
                     getSuppliers();
-                    GetCosts();
-                    GetPrices();
-
-
                 }
-
             }
             catch (Exception ex)
             {
@@ -103,30 +112,37 @@ namespace CostToInvoiceButton
         }
         private void BtnAdd_Click(object sender, EventArgs e)
         {
-            if (ValidateData())
+            try
             {
-                if (dataGridInvoice.RowCount <= dataGridServicios.RowCount - 1)
+                if (ValidateData())
                 {
-                    if (ValidateRows())
+                    if (dataGridInvoice.RowCount <= dataGridServicios.RowCount - 1)
                     {
-                        double amount = (Convert.ToDouble(txtPrice.Text) * Convert.ToInt32(txtQty.Text));
+                        if (ValidateRows())
+                        {
+                            double amount = (Convert.ToDouble(txtPrice.Text) * Convert.ToInt32(txtQty.Text));
 
-                        dataGridInvoice.Rows.Add(txtInvoice.Text, txtItem.Text, cboSuppliers.Text, txtQty.Text, txtCost.Text, txtPrice.Text, amount, txtIdService.Text);
-                        ClearTxtBoxes();
+                            dataGridInvoice.Rows.Add(txtInvoice.Text, txtItem.Text, cboSuppliers.Text, txtQty.Text, txtCost.Text, txtPrice.Text, amount, txtIdService.Text);
+                            ClearTxtBoxes();
+                        }
+                        else
+                        {
+                            MessageBox.Show("Item has been already added");
+                        }
                     }
                     else
                     {
-                        MessageBox.Show("Item has been already added");
+                        MessageBox.Show("Cannot add more suppliers than services");
                     }
                 }
                 else
                 {
-                    MessageBox.Show("Cannot add more suppliers than services");
+                    MessageBox.Show("All data must be filled correctly");
                 }
             }
-            else
+            catch (Exception ex)
             {
-                MessageBox.Show("All data must be filled correctly");
+                global.LogMessage(ex.InnerException.ToString());
             }
         }
         private void txtQty_TextChanged(object sender, EventArgs e)
@@ -249,6 +265,14 @@ namespace CostToInvoiceButton
                     }
                 }
             }
+            if (lblSrType.Text == "FBO")
+            {
+                if (IsFloatValue(txtCost.Text))
+                {
+                    txtPrice.Text = (Convert.ToDouble(txtCost.Text) * 1.30).ToString();
+                }
+
+            }
         }
         //Functions
         public bool Init()
@@ -296,12 +320,11 @@ namespace CostToInvoiceButton
                     String[] rowData = table.Rows;
                     foreach (String data in rowData)
                     {
-                        MessageBox.Show("Holi");
                         Char delimiter = '|';
                         String[] substrings = data.Split(delimiter);
-                        txtATA.Text = substrings[0];
-                        txtATD.Text = substrings[1];
-                        getArrivalHours(String.IsNullOrEmpty(substrings[2]) ? 0 : Convert.ToInt32(substrings[2]));
+                        txtATA.Text = DateTimeOffset.Parse(substrings[0]).ToString();
+                        txtATD.Text = DateTimeOffset.Parse(substrings[1]).ToString();
+                        getArrivalHours(String.IsNullOrEmpty(substrings[2]) ? 0 : Convert.ToInt32(substrings[2]), substrings[0].Substring(0, 10), substrings[1].Substring(0, 10));
                         txtArrivalAiport.Text = getNIAirport(String.IsNullOrEmpty(substrings[2]) ? 0 : Convert.ToInt32(substrings[2]));
                         txtToAirtport.Text = getNIAirport(String.IsNullOrEmpty(substrings[3]) ? 0 : Convert.ToInt32(substrings[3]));
                         txtFromAirport.Text = getNIAirport(String.IsNullOrEmpty(substrings[4]) ? 0 : Convert.ToInt32(substrings[4]));
@@ -313,7 +336,7 @@ namespace CostToInvoiceButton
                 MessageBox.Show(ex.Message + ex.InnerException.ToString());
             }
         }
-        private void getArrivalHours(int Arrival)
+        private void getArrivalHours(int Arrival, string Open, string Close)
         {
             ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
             APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
@@ -330,8 +353,8 @@ namespace CostToInvoiceButton
                     WHours hours = new WHours();
                     Char delimiter = '|';
                     String[] substrings = data.Split(delimiter);
-                    hours.Opens = DateTime.Parse("2018/01/01 " + substrings[0].Trim());
-                    hours.Closes = DateTime.Parse("2018/01/01 " + substrings[1].Trim());
+                    hours.Opens = DateTime.Parse(Open + " " + substrings[0].Trim());
+                    hours.Closes = DateTime.Parse(Close + " " + substrings[1].Trim());
                     switch (substrings[02].Trim())
                     {
                         case "1":
@@ -476,7 +499,7 @@ namespace CostToInvoiceButton
             }
             else
             {
-                if (Convert.ToInt32(txtInvoice.Text) >= 6 || Convert.ToInt32(txtInvoice.Text) == 0)
+                if (Convert.ToInt32(txtInvoice.Text) >= 10 || Convert.ToInt32(txtInvoice.Text) == 0)
                 {
                     res = false;
                 }
@@ -533,13 +556,14 @@ namespace CostToInvoiceButton
         {
             txtAmount.Text = (Convert.ToDouble(txtPrice.Text) * Convert.ToInt32(txtQty.Text)).ToString();
         }
-        private void GetCosts()
+        private double GetCosts()
         {
             try
             {
+                double cost = 0;
                 if (lblSrType.Text == "CATERING")
                 {
-                    txtCost.Text = "0";
+                    cost = 0;
                 }
                 else
                 {
@@ -548,23 +572,25 @@ namespace CostToInvoiceButton
                     string Pass = Encoding.UTF8.GetString(Convert.FromBase64String("U2luZXJneSoyMDE4"));
                     client.Authenticator = new HttpBasicAuthenticator(User, Pass);
                     // string definicion = "?totalResults=false&q={str_item_number:'" + dataGridServicios.Rows[e.RowIndex].Cells[1].FormattedValue.ToString().Trim() + "',str_icao_iata_code:'" + airtport + "'}";
-                    string definicion = "?totalResults=true&q={str_item_number:'TPFSSAS0024',str_icao_iata_code:'MMTO-TLC',str_aircraft_type:'LJ24'}";
+                    string definicion = "?totalResults=true&q={str_item_number:'" + txtItemNumber.Text + "',str_icao_iata_code:'" + txtAirport.Text + "',str_aircraft_type:'" + txtICAOD.Text + "'}";
                     var request = new RestRequest("rest/v6/customCostos/" + definicion, Method.GET);
                     IRestResponse response = client.Execute(request);
                     ClaseParaCostos.RootObject rootObjectCosts = JsonConvert.DeserializeObject<ClaseParaCostos.RootObject>(response.Content);
                     if (rootObjectCosts.items.Count > 0)
                     {
-                        txtCost.Text = rootObjectCosts.items[0].flo_cost.ToString();
+                        cost = rootObjectCosts.items[0].flo_cost;
                     }
                     else
                     {
-
+                        cost = 0;
                     }
                 }
+                return cost;
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message);
+                global.LogMessage("GetCost:" + ex.Message);
+                return 0;
             }
         }
         private double GetPrices()
@@ -595,7 +621,7 @@ namespace CostToInvoiceButton
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.InnerException.ToString());
+                MessageBox.Show("GetPrice:" + ex.Message);
                 return 0;
             }
         }
@@ -643,7 +669,7 @@ namespace CostToInvoiceButton
                 ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
                 APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
                 clientInfoHeader.AppID = "Query Example";
-                String queryString = "SELECT ATA_ZUTC,ATD_ZUTC,ArrivalAirport,ToAirport,FromAirport FROM CO.Itinerary WHERE ID =" + Airport + " ";
+                String queryString = "SELECT Type.Name FROM CO.Airports WHERE ID =" + Airport + " ";
                 clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 1, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
                 foreach (CSVTable table in queryCSV.CSVTables)
                 {
@@ -654,6 +680,44 @@ namespace CostToInvoiceButton
                     }
                 }
                 return Nac;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+                return "";
+            }
+        }
+        private string GetMainHour()
+        {
+            try
+            {
+                string hour = "";
+                DateTime ArriveDate = DateTime.Parse(txtATA.Text);
+                DateTime DeliverDate = DateTime.Parse(txtATD.Text);
+                hour = "Extraordinary";
+                if (WHoursList.Count > 0)
+                {
+                    foreach (WHours w in WHoursList)
+                    {
+                        double totalminutesOpen = (ArriveDate - w.Opens).TotalMinutes;
+                        double totalminutesClose = (w.Closes - DeliverDate).TotalMinutes;
+                        if (w.Type == "Normal")
+                        {
+                            if (totalminutesOpen > 0 && totalminutesClose > 0)
+                            {
+                                hour = w.Type;
+                            }
+                        }
+                        if (w.Type == "Critical")
+                        {
+                            if (totalminutesOpen > 0 && totalminutesClose > 0)
+                            {
+                                hour = w.Type;
+                            }
+                        }
+                    }
+                }
+                return hour;
             }
             catch (Exception ex)
             {

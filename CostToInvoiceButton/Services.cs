@@ -19,6 +19,7 @@ namespace CostToInvoiceButton
         public string Task { get; set; }
         public string Informative { get; set; }
         public string ParentPax { get; set; }
+        public string Categorias { get; set; }
     }
     public class ComponentChild
     {

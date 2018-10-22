@@ -20,6 +20,8 @@ namespace CostToInvoiceButton
         public string Informative { get; set; }
         public string ParentPax { get; set; }
         public string Categorias { get; set; }
+        public string FuelId { get; set; }
+        public string RoyaltyItem { get; set; }
     }
     public class ComponentChild
     {
@@ -40,6 +42,8 @@ namespace CostToInvoiceButton
         public string Precio { get; set; }
         public int ID { get; set; }
         public int ParentPaxId { get; set; }
+        public int FuelId { get; set; }
+        public string Categories { get; set; }
     }
     public class Link
     {

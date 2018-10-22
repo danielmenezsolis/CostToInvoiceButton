@@ -6,13 +6,22 @@ namespace CostToInvoiceButton
 {
 
     //RATES
+    [XmlRoot(ElementName = "G_1_RATES")]
+    public class G_1_RATES
+    {
+        [XmlElement(ElementName = "CONVERSION_RATE")]
+        public string CONVERSION_RATE { get; set; }
+        [XmlElement(ElementName = "CONVERSION_DATE")]
+        public string CONVERSION_DATE { get; set; }
+    }
+
     [XmlRoot(ElementName = "G_N_RATES")]
     public class G_N_RATES
     {
-        [XmlElement(ElementName = "CONVERSION_DATE")]
-        public string CONVERSION_DATE { get; set; }
-        [XmlElement(ElementName = "CONVERSION_RATE")]
-        public string CONVERSION_RATE { get; set; }
+        [XmlElement(ElementName = "USER_CONVERSION_TYPE")]
+        public string USER_CONVERSION_TYPE { get; set; }
+        [XmlElement(ElementName = "G_1_RATES")]
+        public G_1_RATES G_1_RATES { get; set; }
     }
 
     [XmlRoot(ElementName = "DATA_DS_RATES")]
@@ -23,6 +32,7 @@ namespace CostToInvoiceButton
         [XmlElement(ElementName = "G_N_RATES")]
         public G_N_RATES G_N_RATES { get; set; }
     }
+
 
     //INPC
 

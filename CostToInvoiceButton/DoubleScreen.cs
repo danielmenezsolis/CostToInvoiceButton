@@ -1260,7 +1260,7 @@ namespace CostToInvoiceButton
                     {
                         foreach (ClaseParaPrecios.Item item in rootObjectPrices.items)
                     {
-                        
+                        //HolaPaps
                             DateTime inicio = DateTime.Parse(item.str_start_date);
                             DateTime fin = DateTime.Parse(item.str_end_date);
                             DateTime fecha = DateTime.Parse(txtFuelDateCharge.Text);

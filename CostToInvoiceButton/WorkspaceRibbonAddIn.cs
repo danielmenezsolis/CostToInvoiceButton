@@ -666,7 +666,7 @@ namespace CostToInvoiceButton
             ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
             APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
             clientInfoHeader.AppID = "Query Example";
-            String queryString = "SELECT SUM(Liters) Suma,date_trunc(VoucherDateTime,'day') FROM CO.Fueling WHERE Incident = " + IncidentID + " AND ArrivalAirport.AirportUse.Name = 'Federal'  GROUP BY date_trunc(VoucherDateTime,'day')";
+            String queryString = "SELECT SUM(Liters) Suma,date_trunc(VoucherDateTime,'day'),ID FROM CO.Fueling WHERE Incident = " + IncidentID + " AND ArrivalAirport.AirportUse.Name = 'Federal'  GROUP BY date_trunc(VoucherDateTime,'day')";
             clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 10000, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
             foreach (CSVTable table in queryCSV.CSVTables)
             {
@@ -681,7 +681,7 @@ namespace CostToInvoiceButton
                     component.ItemNumber = "ANFERAS0013";
                     component.Incident = IncidentID;
                     component.ParentPaxId = IncidentID;
-                    component.FuelId = int.Parse(DateTime.Parse(substrings[1]).ToString("yyMMdd"));
+                    component.FuelId = int.Parse(substrings[2]);
                     component.Componente = "1";
                     component = GetComponentData(component);
                     component.Categories = GetCategories(component.ItemNumber, component.Airport);
@@ -697,7 +697,7 @@ namespace CostToInvoiceButton
             ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
             APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
             clientInfoHeader.AppID = "Query Example";
-            String queryString = "SELECT SUM(Liters) Suma,date_trunc(VoucherDateTime,'day') FROM CO.Fueling WHERE Incident = " + IncidentID + " AND ArrivalAirport.AirportUse.Name = 'Federal'  GROUP BY date_trunc(VoucherDateTime,'day')";
+            String queryString = "SELECT SUM(Liters) Suma,date_trunc(VoucherDateTime,'day'),Id FROM CO.Fueling WHERE Incident = " + IncidentID + " AND ArrivalAirport.AirportUse.Name = 'Federal'  GROUP BY date_trunc(VoucherDateTime,'day')";
             clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 10000, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
             foreach (CSVTable table in queryCSV.CSVTables)
             {
@@ -712,7 +712,7 @@ namespace CostToInvoiceButton
                     component.ItemNumber = "ANIASAS0015";
                     component.Incident = IncidentID;
                     component.ParentPaxId = IncidentID;
-                    component.FuelId = int.Parse(DateTime.Parse(substrings[1]).ToString("yyMMdd"));
+                    component.FuelId = int.Parse(substrings[2]);
                     component.Componente = "1";
                     component = GetComponentData(component);
                     component.Categories = GetCategories(component.ItemNumber, component.Airport);
@@ -1602,7 +1602,7 @@ namespace CostToInvoiceButton
                     }
                 }
             }
-            queryString = "SELECT SUM(Liters) Suma,date_trunc(VoucherDateTime,'day') FROM CO.Fueling WHERE Incident = " + IncidentID + " AND ArrivalAirport.AirportUse.Name = 'Federal'  GROUP BY date_trunc(VoucherDateTime,'day')  HAVING SUM(Liters) < 1500";
+            queryString = "SELECT SUM(Liters) Suma,date_trunc(VoucherDateTime,'day'),ID FROM CO.Fueling WHERE Incident = " + IncidentID + " AND ArrivalAirport.AirportUse.Name = 'Federal'  GROUP BY date_trunc(VoucherDateTime,'day')  HAVING SUM(Liters) < 1500";
             clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 10000, "|", false, false, out queryCSV, out FileData);
             foreach (CSVTable table in queryCSV.CSVTables)
             {
@@ -1617,7 +1617,7 @@ namespace CostToInvoiceButton
                     component.ItemNumber = ItemN;
                     component.Incident = IncidentID;
                     component.ParentPaxId = IncidentID;
-                    component.FuelId = int.Parse(DateTime.Parse(substrings[1]).ToString("yyMMdd"));
+                    component.FuelId = int.Parse(substrings[2]);
                     component.Componente = "1";
                     component = GetComponentData(component);
                     component.Categories = GetCategories(component.ItemNumber, component.Airport);

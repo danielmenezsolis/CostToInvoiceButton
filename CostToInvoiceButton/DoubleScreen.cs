@@ -1134,17 +1134,13 @@ namespace CostToInvoiceButton
                     ClaseParaCostos.RootObject rootObjectCosts = JsonConvert.DeserializeObject<ClaseParaCostos.RootObject>(response.Content);
                     if (rootObjectCosts != null && rootObjectCosts.items.Count > 0)
                     {
-                        MessageBox.Show(rootObjectCosts.items.Count.ToString());
                         if (lblSrType.Text == "FUEL")
                         {
-                            MessageBox.Show("SiF");
                             foreach (ClaseParaCostos.Item item in rootObjectCosts.items)
                             {
                                 DateTime inicio = DateTime.Parse(item.str_start_date);
                                 DateTime fin = DateTime.Parse(item.str_end_date);
                                 DateTime fecha = DateTime.Parse(txtFuelDateCharge.Text);
-
-                                MessageBox.Show("Inicio: " + inicio.ToString() + "Fin: " + fin.ToString() + "Fecha:" + fecha.ToString());
                                 if (fecha.CompareTo(inicio) >= 0 && fecha.CompareTo(fin) <= 0)
                                 {
                                     cost = item.flo_cost;

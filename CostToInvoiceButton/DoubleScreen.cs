@@ -1256,25 +1256,23 @@ namespace CostToInvoiceButton
                 ClaseParaPrecios.RootObject rootObjectPrices = JsonConvert.DeserializeObject<ClaseParaPrecios.RootObject>(response.Content);
                 if (rootObjectPrices != null && rootObjectPrices.items.Count > 0)
                 {
-                    /*foreach (ClaseParaPrecios.Item item in rootObjectPrices.items)
+                    if (lblSrType.Text == "FUEL")
                     {
-                        DateTime inicio = DateTime.Parse(item.str_start_date);
-                        DateTime fin = DateTime.Parse(item.str_end_date);
-                        DateTime fecha;
-                        if (lblSrType.Text == "FUEL")
-                        {
-                            fecha = DateTime.Parse(txtFuelDateCharge.Text);
+                        foreach (ClaseParaPrecios.Item item in rootObjectPrices.items)
+                    {
+                        
+                            DateTime inicio = DateTime.Parse(item.str_start_date);
+                            DateTime fin = DateTime.Parse(item.str_end_date);
+                            DateTime fecha = DateTime.Parse(txtFuelDateCharge.Text);
+
+                            if (fecha.CompareTo(inicio) >= 0 && fecha.CompareTo(fin) <= 0)
+                            {
+                                price = item.flo_amount;
+                            }
                         }
-                        else
-                        {
-                            fecha = DateTime.Parse(txtATA.Text);
-                        }
-                        if (fecha.CompareTo(inicio) >= 0 && fecha.CompareTo(fin) <= 0)
-                        {
-                            price = item.flo_amount;
-                        }
-                    }*/
-                    price = rootObjectPrices.items[0].flo_amount;
+                    } else {
+                        price = rootObjectPrices.items[0].flo_amount;
+                    }
                 }
                 else
                 {

@@ -62,7 +62,6 @@ namespace CostToInvoiceButton
                     string ClientName = "";
                     string FuelType = "";
                     string CateringDeliveryDate = "";
-
                     Incident = (IIncident)recordContext.GetWorkspaceRecord(WorkspaceRecordType.Incident);
                     IList<ICfVal> IncCustomFieldList = Incident.CustomField;
                     if (IncCustomFieldList != null)
@@ -101,11 +100,9 @@ namespace CostToInvoiceButton
                             {
                                 SENEAM = inccampos.ValStr;
                             }
-
                         }
                     }
                     IncidentID = Incident.ID;
-
                     ICAO = getICAODesi(IncidentID);
                     SRType = GetSRType();
                     ClientType = GetClientType();
@@ -116,8 +113,6 @@ namespace CostToInvoiceButton
                         ArrivalAirportIncident = GetArrivalAirportIncident(IncidentID);
                         DepartureAirportIncident = GetDepartureAirportIncident(IncidentID);
                     }
-
-
                     if (SRType == "FUEL")
                     {
                         GetDeleteFuelItems();
@@ -209,8 +204,6 @@ namespace CostToInvoiceButton
                                     }
 
                                     minover = extension < 0 ? 0 : extension;
-
-
                                 }
                             }
                             if (!GetItineraryCountries(Convert.ToInt32(item.Itinerary)))
@@ -307,17 +300,12 @@ namespace CostToInvoiceButton
                     ((TextBox)doubleScreen.Controls["txtCateringDDate"]).Text = CateringDeliveryDate;
                     ((TextBox)doubleScreen.Controls["txtArrivalIncident"]).Text = ArrivalAirportIncident;
                     ((TextBox)doubleScreen.Controls["txtDepartureIncident"]).Text = DepartureAirportIncident;
-
                     ((ComboBox)doubleScreen.Controls["cboCurrency"]).Text = SRType == "FUEL" ? "MXN" : GetCurrency();
-
                     if (SRType == "CATERING")
                     {
                         ((TextBox)doubleScreen.Controls["txtInvoice"]).Visible = false;
                         ((System.Windows.Forms.Label)doubleScreen.Controls["lblInvoice"]).Text = "";
                     }
-
-
-
                     doubleScreen.ShowDialog();
                 }
             }
@@ -385,7 +373,6 @@ namespace CostToInvoiceButton
                 return 0;
             }
         }
-
         public string GetCurrency()
         {
             string cur = "";
@@ -405,7 +392,6 @@ namespace CostToInvoiceButton
 
             return cur;
         }
-
         public string GetFirstAirport()
         {
             string air = "";
@@ -425,7 +411,6 @@ namespace CostToInvoiceButton
 
             return air;
         }
-
         public double GetLitersSum(int FuelingId)
         {
             double sum = 0;
@@ -531,7 +516,6 @@ namespace CostToInvoiceButton
                 return null;
             }
         }
-
         public bool AirportOpen24(int Itinerarie)
         {
             bool open = true;
@@ -552,7 +536,6 @@ namespace CostToInvoiceButton
 
             return open;
         }
-
         public int getArrivalAirport(int Itinerarie)
         {
             int arriv = 0;
@@ -572,7 +555,6 @@ namespace CostToInvoiceButton
             }
             return arriv;
         }
-
         public string getOpenArrivalAirport(int Arrival)
         {
             string opens = "";
@@ -591,7 +573,6 @@ namespace CostToInvoiceButton
             }
             return opens;
         }
-
         public string getCloseArrivalAirport(int Arrival)
         {
             string closes = "";
@@ -636,7 +617,6 @@ namespace CostToInvoiceButton
                 return DateTime.Now;
             }
         }
-
         public DateTime getATDItinerary(int Itinerarie)
         {
             try
@@ -1345,8 +1325,6 @@ namespace CostToInvoiceButton
                 return "";
             }
         }
-
-
         public string GetClientType()
         {
             try
@@ -1381,7 +1359,6 @@ namespace CostToInvoiceButton
                 return "";
             }
         }
-
         public string GetArrivalAirportIncident(int incident)
         {
             try
@@ -1408,7 +1385,6 @@ namespace CostToInvoiceButton
                 return "";
             }
         }
-
         public string GetDepartureAirportIncident(int incident)
         {
             try
@@ -1435,8 +1411,6 @@ namespace CostToInvoiceButton
                 return "";
             }
         }
-
-
         public string getICAODesi(int Incident)
         {
             string Icao = "";
@@ -1455,9 +1429,6 @@ namespace CostToInvoiceButton
             }
             return Icao;
         }
-
-
-
         public string GetFuelType(int Incident)
         {
             try
@@ -1656,8 +1627,6 @@ namespace CostToInvoiceButton
                 return null;
             }
         }
-
-
         public string GetCategories(string ItemN, string Airport)
         {
             try
@@ -1761,8 +1730,6 @@ namespace CostToInvoiceButton
                 return "";
             }
         }
-
-
     }
 
     [AddIn("Invoice to Cost", Version = "1.0.0.0")]

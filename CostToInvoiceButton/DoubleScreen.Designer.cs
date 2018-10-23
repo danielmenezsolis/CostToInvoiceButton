@@ -121,6 +121,7 @@
             this.txtArrivalIncident = new System.Windows.Forms.TextBox();
             this.txtUOM = new System.Windows.Forms.TextBox();
             this.lblCurrencyCost = new System.Windows.Forms.Label();
+            this.txtCateringDDate = new System.Windows.Forms.TextBox();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridSuppliers)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridServicios)).BeginInit();
@@ -945,11 +946,20 @@
             this.lblCurrencyCost.TabIndex = 87;
             this.lblCurrencyCost.Text = "MXN";
             // 
+            // txtCateringDDate
+            // 
+            this.txtCateringDDate.Location = new System.Drawing.Point(736, 479);
+            this.txtCateringDDate.Name = "txtCateringDDate";
+            this.txtCateringDDate.Size = new System.Drawing.Size(35, 20);
+            this.txtCateringDDate.TabIndex = 88;
+            this.txtCateringDDate.TabStop = false;
+            // 
             // DoubleScreen
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(825, 651);
+            this.Controls.Add(this.txtCateringDDate);
             this.Controls.Add(this.lblCurrencyCost);
             this.Controls.Add(this.txtUOM);
             this.Controls.Add(this.txtDepartureIncident);
@@ -1122,5 +1132,6 @@
         private System.Windows.Forms.TextBox txtArrivalIncident;
         private System.Windows.Forms.TextBox txtUOM;
         private System.Windows.Forms.Label lblCurrencyCost;
+        private System.Windows.Forms.TextBox txtCateringDDate;
     }
 }

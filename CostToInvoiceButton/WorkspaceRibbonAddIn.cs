@@ -61,7 +61,7 @@ namespace CostToInvoiceButton
                     string ClientType = "";
                     string ClientName = "";
                     string FuelType = "";
-
+                    string CateringDeliveryDate = "";
 
                     Incident = (IIncident)recordContext.GetWorkspaceRecord(WorkspaceRecordType.Incident);
                     IList<ICfVal> IncCustomFieldList = Incident.CustomField;
@@ -69,6 +69,10 @@ namespace CostToInvoiceButton
                     {
                         foreach (ICfVal inccampos in IncCustomFieldList)
                         {
+                            if (inccampos.CfId == 37)
+                            {
+                                CateringDeliveryDate = inccampos.ValDttm.ToString();
+                            }
                             if (inccampos.CfId == 58)
                             {
                                 ClientName = inccampos.ValStr;
@@ -300,6 +304,7 @@ namespace CostToInvoiceButton
                     ((TextBox)doubleScreen.Controls["txtCombustibleI"]).Text = CombustibleI;
                     ((TextBox)doubleScreen.Controls["txtClientInfo"]).Text = ClientType;
                     ((TextBox)doubleScreen.Controls["txtICAOD"]).Text = ICAO;
+                    ((TextBox)doubleScreen.Controls["txtCateringDDate"]).Text = CateringDeliveryDate;
 
                     ((TextBox)doubleScreen.Controls["txtArrivalIncident"]).Text = ArrivalAirportIncident;
                     ((TextBox)doubleScreen.Controls["txtDepartureIncident"]).Text = DepartureAirportIncident;

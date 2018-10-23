@@ -375,10 +375,10 @@ namespace CostToInvoiceButton
                 {
                     if (txtUtilidad.Text == "A")
                     {
-                        if (txtCost.Text != "0" && !String.IsNullOrEmpty(txtCost.Text))
-                        {
-                            txtPrice.Text = txtCost.Text;
-                        }
+                        /*if (txtCost.Text != "0" && !String.IsNullOrEmpty(txtCost.Text))
+                        {*/
+                        txtPrice.Text = txtCost.Text;
+                        //}
                         //txtPrice.Text = GetPrices().ToString();
                     }
                     else
@@ -492,18 +492,30 @@ namespace CostToInvoiceButton
             try
             {
                 double galonprice = Convert.ToDouble(txtCost.Text) * 3.7853;
+                MessageBox.Show("Costo por galon: " + galonprice);
                 DateTime datecharge = DateTime.Parse(txtFuelDateCharge.Text);
+                MessageBox.Show("Fecha de carga: " + datecharge);
                 double rate = getExchangeRate(datecharge);
+                MessageBox.Show("Tipo de cambio: " + rate);
                 double galonrate = galonprice / rate; // costo por galon
+                MessageBox.Show("Costo por galon USD: " + galonrate);
                 double catcombus = GetCombCents(txtCombustible.Text);
+                MessageBox.Show("Centavos : " + catcombus);
                 galonrate = (galonrate + catcombus);
+                MessageBox.Show("Costo mas centavos : " + galonrate);
                 double IVA = (galonrate * .16);
+                MessageBox.Show("IVA : " + IVA);
                 galonrate = galonrate + IVA;
+                MessageBox.Show("Costo mas IVA : " + galonrate);
                 if (txtItemNumber.Text == "AGASIAS0270" || txtItemNumber.Text == "JFUEIAS0269")
                 {
                     galonrate = galonrate - GetCombCentI(txtCombustibleI.Text);
+                    MessageBox.Show("Costo menos Cents Int : " + galonrate);
                 }
-                galonrate = Math.Round(galonrate * Convert.ToDouble(txtGalones.Text), 4);
+                double galones = Convert.ToDouble(txtGalones.Text);
+                MessageBox.Show("Galones : " + galones);
+                galonrate = galonrate * galones;
+                MessageBox.Show("Costo total : " + galonrate);
 
                 return Math.Round((galonrate), 4).ToString();
             }
@@ -1085,7 +1097,6 @@ namespace CostToInvoiceButton
                     if (GetTicketSumCatA() > 0)
                     {
                         cost = GetTicketSumCatA();
-                        cost = (cost * 1.16);
                     }
                     else
                     {
@@ -1172,13 +1183,12 @@ namespace CostToInvoiceButton
                     ClaseParaCostos.RootObject rootObjectCosts = JsonConvert.DeserializeObject<ClaseParaCostos.RootObject>(response.Content);
                     if (rootObjectCosts != null && rootObjectCosts.items.Count > 0)
                     {
-                        MessageBox.Show(rootObjectCosts.items.Count.ToString());
                         if (lblSrType.Text == "FUEL")
                         {
                             foreach (ClaseParaCostos.Item item in rootObjectCosts.items)
                             {
-                                DateTime inicio = DateTime.Parse(item.str_start_date);
-                                DateTime fin = DateTime.Parse(item.str_end_date);
+                                DateTime inicio = DateTime.Parse(item.str_start_date + " " + "00:00");
+                                DateTime fin = DateTime.Parse(item.str_end_date + " " + "23:59");
                                 DateTime fecha = DateTime.Parse(txtFuelDateCharge.Text);
 
                                 if (fecha.CompareTo(inicio) >= 0 && fecha.CompareTo(fin) <= 0)
@@ -1193,8 +1203,8 @@ namespace CostToInvoiceButton
                         {
                             foreach (ClaseParaCostos.Item item in rootObjectCosts.items)
                             {
-                                DateTime inicio = DateTime.Parse(item.str_start_date);
-                                DateTime fin = DateTime.Parse(item.str_end_date);
+                                DateTime inicio = DateTime.Parse(item.str_start_date + " " + "00:00");
+                                DateTime fin = DateTime.Parse(item.str_end_date + " " + "23:59");
                                 DateTime fecha = DateTime.Parse(txtATA.Text);
 
                                 if (fecha.CompareTo(inicio) >= 0 && fecha.CompareTo(fin) <= 0)
@@ -1306,16 +1316,14 @@ namespace CostToInvoiceButton
                 ClaseParaPrecios.RootObject rootObjectPrices = JsonConvert.DeserializeObject<ClaseParaPrecios.RootObject>(response.Content);
                 if (rootObjectPrices != null && rootObjectPrices.items.Count > 0)
                 {
-                    MessageBox.Show(rootObjectPrices.items.Count.ToString());
                     if (lblSrType.Text == "FUEL")
                     {
                         foreach (ClaseParaPrecios.Item item in rootObjectPrices.items)
                         {
-                            DateTime inicio = DateTime.Parse(item.str_start_date);
-                            DateTime fin = DateTime.Parse(item.str_end_date);
+                            DateTime inicio = DateTime.Parse(item.str_start_date + " " + "00:00");
+                            DateTime fin = DateTime.Parse(item.str_end_date + " " + "23:59");
                             DateTime fecha = DateTime.Parse(txtFuelDateCharge.Text);
 
-                            MessageBox.Show("Inicio: " + inicio.ToString() + "Fin: " + fin.ToString() + "Fecha:" + fecha.ToString());
                             if (fecha.CompareTo(inicio) >= 0 && fecha.CompareTo(fin) <= 0)
                             {
                                 price = item.flo_amount;
@@ -1327,8 +1335,8 @@ namespace CostToInvoiceButton
                     {
                         foreach (ClaseParaPrecios.Item item in rootObjectPrices.items)
                         {
-                            DateTime inicio = DateTime.Parse(item.str_start_date);
-                            DateTime fin = DateTime.Parse(item.str_end_date);
+                            DateTime inicio = DateTime.Parse(item.str_start_date + " " + "00:00");
+                            DateTime fin = DateTime.Parse(item.str_end_date + " " + "23:59");
                             DateTime fecha = DateTime.Parse(txtATA.Text);
 
                             if (fecha.CompareTo(inicio) >= 0 && fecha.CompareTo(fin) <= 0)
@@ -2029,7 +2037,7 @@ namespace CostToInvoiceButton
 
         private void cboCurrency_SelectedIndexChanged(object sender, EventArgs e)
         {
-            /*try
+            try
             {
                 if (!String.IsNullOrEmpty(txtItemNumber.Text))
                 {
@@ -2039,43 +2047,47 @@ namespace CostToInvoiceButton
             catch (Exception ex)
             {
                 global.LogMessage("Error en txtCost.Text:" + ex.Message + "Det:" + ex.StackTrace);
-            }*/
+            }
         }
-        /*
-                private void applyExchangeRate(String moneda)
-                {
-                    double rate = 1;
-                    DateTime dateEx = DateTime.Today;
 
-                    if (lblSrType.Text == "FUEL")
-                    {
-                        dateEx = DateTime.Parse(txtFuelDateCharge.Text);
-                    }
-                    else if (lblSrType.Text == "FBO" || lblSrType.Text == "FCC")
-                    {
-                        dateEx = DateTime.Parse(GetItineraryArrivalDate(Convert.ToInt32(txtItinerary.Text)).ToString());
-                    }
-                    else
-                    {
-                        dateEx = DateTime.Parse(GetIncidentCreationDate(Convert.ToInt32(txtIdService.Text)).ToString());
-                    }
+        private void applyExchangeRate(String moneda)
+        {
+            double rate = 1;
+            DateTime dateEx = DateTime.Today;
 
-                    rate = getExchangeRate(dateEx);
-                    rate = 18.78;
+            if (lblSrType.Text == "FUEL")
+            {
+                dateEx = DateTime.Parse(txtFuelDateCharge.Text);
+            }
+            else if (lblSrType.Text == "FBO" || lblSrType.Text == "FCC")
+            {
+                dateEx = DateTime.Parse(GetItineraryArrivalDate(Convert.ToInt32(txtItinerary.Text)).ToString());
+            }
+            else
+            {
+                dateEx = DateTime.Parse(GetIncidentCreationDate(Convert.ToInt32(txtIdService.Text)).ToString());
+            }
 
-                    if (moneda == "MXN")
-                    {
-                        txtCost.Text = Math.Round((Convert.ToDouble(txtCost.Text) * rate), 4).ToString();
-                        txtPrice.Text = Math.Round((Convert.ToDouble(txtPrice.Text) * rate), 4).ToString();
-                    }
-                    else if (moneda == "USD")
-                    {
-                        txtCost.Text = Math.Round((Convert.ToDouble(txtCost.Text) / rate), 4).ToString();
-                        txtPrice.Text = Math.Round((Convert.ToDouble(txtPrice.Text) / rate), 4).ToString();
-                    }
+            rate = getExchangeRate(dateEx);
 
-                }
-                */
+            if (rate == 1)
+            {
+                rate = 18.78;
+            }
+
+            if (moneda == "MXN")
+            {
+                txtCost.Text = Math.Round((Convert.ToDouble(txtCost.Text) * rate), 4).ToString();
+                txtPrice.Text = Math.Round((Convert.ToDouble(txtPrice.Text) * rate), 4).ToString();
+            }
+            else if (moneda == "USD")
+            {
+                txtCost.Text = Math.Round((Convert.ToDouble(txtCost.Text) / rate), 4).ToString();
+                txtPrice.Text = Math.Round((Convert.ToDouble(txtPrice.Text) / rate), 4).ToString();
+            }
+
+        }
+
         private string GetItineraryArrivalDate(int idItinerary)
         {
             try

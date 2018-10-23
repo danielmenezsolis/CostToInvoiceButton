@@ -187,8 +187,15 @@ namespace CostToInvoiceButton
 
 
                     }
-
-
+                    // PAPS ESTUVO AQUI
+                    if (txtUOM.Text == "TW")
+                    {
+                        double b;
+                        if (double.TryParse(txtCost.Text, out b))
+                        {
+                            txtPrice.Text = GetMTOWPrice();
+                        }
+                    }
                     getSuppliers();
                 }
             }
@@ -1096,10 +1103,14 @@ namespace CostToInvoiceButton
                         {
                             definicion = "?totalResults=true&q={str_item_number:'" + txtItemNumber.Text + "',str_icao_iata_code:'" + txtAirport.Text + "',bol_int_fbo:1,str_schedule_type:'" + txtMainHour.Text + "',str_aircraft_type:'" + txtICAOD.Text + "',str_ft_arrival: '" + txtFromAirport.Text.ToUpper() + "', str_ft_depart: '" + txtToAirtport.Text.ToUpper() + "' ,str_client_category:'" + txtUtilidad.Text + "'} ";
                         }
+                        if (txtItemNumber.Text == "LANDSAF0008")
+                        {
+                            definicion = "?totalResults=true&q={str_item_number:'" + txtItemNumber.Text + "',str_icao_iata_code:'" + txtAirport.Text + "',str_schedule_type:'" + txtMainHour.Text + "'}&orderby=str_icao_iata_code:asc";
+                        }
                     }
                     if (lblSrType.Text == "FCC")
                     {
-                        definicion = "?totalResults=true&q={str_item_number:'" + txtItemNumber.Text + "',str_icao_iata_code:'" + txtAirport.Text + "',bol_intat:1,str_schedule_type:'" + txtMainHour.Text + "',str_aircraft_type:'" + txtICAOD.Text + "',str_client_category:'" + txtUtilidad.Text + "'} ";
+                        definicion = "?totalResults=true&q={str_item_number:'" + txtItemNumber.Text + "',str_icao_iata_code:'" + txtAirport.Text + "'} ";
                         if (txtCategorias.Text.Contains("AERO"))
                         {
                             definicion = "?totalResults=true&q={str_item_number:'" + txtItemNumber.Text + "',str_icao_iata_code:'" + txtAirport.Text + "',bol_intat:1,str_schedule_type:'" + txtMainHour.Text + "',str_aircraft_type:'" + txtICAOD.Text + "',str_ft_arrival: '" + txtFromAirport.Text.ToUpper() + "', str_ft_depart: '" + txtToAirtport.Text.ToUpper() + "' ,str_client_category:'" + txtUtilidad.Text + "'} ";
@@ -1109,6 +1120,10 @@ namespace CostToInvoiceButton
                             //definicion = "?totalResults=true&q={str_item_number:'" + txtItemNumber.Text + "',str_icao_iata_code:'" + txtAirport.Text + "',str_aircraft_type:'" + txtICAOD.Text + "'}";
                             definicion = "?totalResults=true&q={str_item_number:'" + txtItemNumber.Text + "',str_icao_iata_code:'" + txtAirport.Text + "'}";
                         }
+                        /*if (txtItemNumber.Text == "LANDSAF0008")
+                        {
+                            definicion = "?totalResults=true&q={str_item_number:'LANDSAF0008',str_icao_iata_code:'IO_AEREO_MMPR_PVR',str_ft_arrival:'DOMESTIC',str_schedule_type:'NORMAL'}&orderby=str_icao_iata_code:asc";
+                        }*/
                     }
 
                     if (lblSrType.Text == "FUEL")
@@ -1121,15 +1136,25 @@ namespace CostToInvoiceButton
                         if (txtItemNumber.Text == "ANFERAS0013" || txtItemNumber.Text == "ANIASAS0015" || txtItemNumber.Text == "AGASIAS0270" || txtItemNumber.Text == "JFUEIAS0269" || txtItemNumber.Text == "AGASIAS0011" || txtItemNumber.Text == "JFUEIAS0010" || txtItemNumber.Text == "AFMURAS0016")
                         {
                             //definicion = "?totalResults=true&q={str_item_number:'" + txtItemNumber.Text + "',str_icao_iata_code:'" + txtAirport.Text + "',str_aircraft_type:'" + txtICAOD.Text + "'}";
-                            definicion = "?totalResults=true&q={str_item_number:'" + txtItemNumber.Text + "',str_icao_iata_code:'" + txtAirport.Text + "',str_schedule_type:'" + txtMainHour.Text + "'}";
+                            definicion = "?totalResults=true&q={str_item_number:'" + txtItemNumber.Text + "',str_icao_iata_code:'" + txtAirport.Text + "',str_schedule_type:'NORMAL'}";
 
+                            if (txtItemNumber.Text == "IAFMUAS0271" || txtItemNumber.Text == "AFMURAS0016")
+                            {
+                                if (txtClientName.Text.Contains("NETJETS"))
+                                {
+                                    //definicion = "?totalResults=true&q={str_item_number:'" + txtItemNumber.Text + "',str_icao_iata_code:'" + txtAirport.Text + "',str_client_category:'NetJets'}";
+                                    definicion = "?totalResults=true&q={str_item_number:'" + txtItemNumber.Text + "',str_icao_iata_code:'" + txtAirport.Text + "',str_client_category:'NetJets'}";
+                                }
+                                //definicion = "?totalResults=true&q={str_item_number:'" + txtItemNumber.Text + "',str_icao_iata_code:'" + txtAirport.Text + "'}";
+                                definicion = "?totalResults=true&q={str_item_number:'" + txtItemNumber.Text + "',str_icao_iata_code:'" + txtAirport.Text + "'}";
+                            }
                             if (txtItemNumber.Text == "AGASIAS0270")
                             {
-                                definicion = "?totalResults=true&q={str_item_number:'AGASIAS0011',str_icao_iata_code:'" + txtAirport.Text + "',str_schedule_type:'" + txtMainHour.Text + "'}";
+                                definicion = "?totalResults=true&q={str_item_number:'AGASIAS0011',str_icao_iata_code:'" + txtAirport.Text + "',str_schedule_type:'NORMAL'}";
                             }
                             if (txtItemNumber.Text == "JFUEIAS0269")
                             {
-                                definicion = "?totalResults=true&q={str_item_number:'JFUEIAS0010',str_icao_iata_code:'" + txtAirport.Text + "',str_schedule_type:'" + txtMainHour.Text + "'}";
+                                definicion = "?totalResults=true&q={str_item_number:'JFUEIAS0010',str_icao_iata_code:'" + txtAirport.Text + "',str_schedule_type:'NORMAL'}";
                             }
                             if (txtItemNumber.Text == "ANFERAS0013")
                             {
@@ -1143,6 +1168,7 @@ namespace CostToInvoiceButton
                     ClaseParaCostos.RootObject rootObjectCosts = JsonConvert.DeserializeObject<ClaseParaCostos.RootObject>(response.Content);
                     if (rootObjectCosts != null && rootObjectCosts.items.Count > 0)
                     {
+                        MessageBox.Show(rootObjectCosts.items.Count.ToString());
                         if (lblSrType.Text == "FUEL")
                         {
                             foreach (ClaseParaCostos.Item item in rootObjectCosts.items)
@@ -1150,10 +1176,28 @@ namespace CostToInvoiceButton
                                 DateTime inicio = DateTime.Parse(item.str_start_date);
                                 DateTime fin = DateTime.Parse(item.str_end_date);
                                 DateTime fecha = DateTime.Parse(txtFuelDateCharge.Text);
+
                                 if (fecha.CompareTo(inicio) >= 0 && fecha.CompareTo(fin) <= 0)
                                 {
                                     cost = item.flo_cost;
                                     Curr = item.str_currency_code;
+                                    OUM = item.str_uom_code;
+                                }
+                            }
+                        }
+                        else if (lblSrType.Text == "FBO" || lblSrType.Text == "FCC")
+                        {
+                            foreach (ClaseParaCostos.Item item in rootObjectCosts.items)
+                            {
+                                DateTime inicio = DateTime.Parse(item.str_start_date);
+                                DateTime fin = DateTime.Parse(item.str_end_date);
+                                DateTime fecha = DateTime.Parse(txtATA.Text);
+
+                                if (fecha.CompareTo(inicio) >= 0 && fecha.CompareTo(fin) <= 0)
+                                {
+                                    cost = item.flo_cost;
+                                    Curr = item.str_currency_code;
+                                    OUM = item.str_uom_code;
                                 }
                             }
                         }
@@ -1161,7 +1205,9 @@ namespace CostToInvoiceButton
                         {
                             cost = rootObjectCosts.items[0].flo_cost;
                             Curr = rootObjectCosts.items[0].str_currency_code;
+                            OUM = rootObjectCosts.items[0].str_uom_code;
                         }
+                        txtUOM.Text = OUM;
                     }
                     else
                     {
@@ -1169,6 +1215,7 @@ namespace CostToInvoiceButton
                     }
                 }
                 Currency = Curr;
+                lblCurrencyCost.Text = Currency;
                 return cost;
             }
             catch (Exception ex)
@@ -1265,6 +1312,7 @@ namespace CostToInvoiceButton
                 ClaseParaPrecios.RootObject rootObjectPrices = JsonConvert.DeserializeObject<ClaseParaPrecios.RootObject>(response.Content);
                 if (rootObjectPrices != null && rootObjectPrices.items.Count > 0)
                 {
+                    MessageBox.Show(rootObjectPrices.items.Count.ToString());
                     if (lblSrType.Text == "FUEL")
                     {
                         foreach (ClaseParaPrecios.Item item in rootObjectPrices.items)
@@ -1272,15 +1320,34 @@ namespace CostToInvoiceButton
                             DateTime inicio = DateTime.Parse(item.str_start_date);
                             DateTime fin = DateTime.Parse(item.str_end_date);
                             DateTime fecha = DateTime.Parse(txtFuelDateCharge.Text);
+
+                            MessageBox.Show("Inicio: " + inicio.ToString() + "Fin: " + fin.ToString() + "Fecha:" + fecha.ToString());
                             if (fecha.CompareTo(inicio) >= 0 && fecha.CompareTo(fin) <= 0)
                             {
                                 price = item.flo_amount;
+                                Curr = item.str_currency_code;
+                            }
+                        }
+                    }
+                    else if (lblSrType.Text == "FBO" || lblSrType.Text == "FCC")
+                    {
+                        foreach (ClaseParaPrecios.Item item in rootObjectPrices.items)
+                        {
+                            DateTime inicio = DateTime.Parse(item.str_start_date);
+                            DateTime fin = DateTime.Parse(item.str_end_date);
+                            DateTime fecha = DateTime.Parse(txtATA.Text);
+
+                            if (fecha.CompareTo(inicio) >= 0 && fecha.CompareTo(fin) <= 0)
+                            {
+                                price = item.flo_amount;
+                                Curr = item.str_currency_code;
                             }
                         }
                     }
                     else
                     {
                         price = rootObjectPrices.items[0].flo_amount;
+                        Curr = rootObjectPrices.items[0].str_currency_code;
                     }
                 }
                 else
@@ -1963,7 +2030,7 @@ namespace CostToInvoiceButton
 
         private void cboCurrency_SelectedIndexChanged(object sender, EventArgs e)
         {
-            try
+            /*try
             {
                 if (!String.IsNullOrEmpty(txtItemNumber.Text))
                 {
@@ -1973,9 +2040,9 @@ namespace CostToInvoiceButton
             catch (Exception ex)
             {
                 global.LogMessage("Error en txtCost.Text:" + ex.Message + "Det:" + ex.StackTrace);
-            }
+            }*/
         }
-
+/*
         private void applyExchangeRate(String moneda)
         {
             double rate = 1;
@@ -2009,7 +2076,7 @@ namespace CostToInvoiceButton
             }
 
         }
-
+        */
         private string GetItineraryArrivalDate(int idItinerary)
         {
             try
@@ -2060,6 +2127,50 @@ namespace CostToInvoiceButton
             catch (Exception ex)
             {
                 MessageBox.Show("getfechaIncidente" + ex.Message + "Det:" + ex.StackTrace);
+                return "";
+            }
+        }
+        public string GetMTOWPrice()
+        {
+            try
+            {
+                double mtow = Convert.ToDouble(GetMTOW(txtICAOD.Text));
+                double cost = Convert.ToDouble(txtCost.Text);
+
+                double price = (mtow * cost);
+
+                return Math.Round((price), 4).ToString();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("GetMTOWPrice: " + ex.Message + "Det:" + ex.StackTrace);
+                return "";
+            }
+        }
+
+        private string GetMTOW(string idICAO)
+        {
+            try
+            {
+                string weight = "";
+                ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
+                APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
+                clientInfoHeader.AppID = "Query Example";
+                String queryString = "SELECT Weight FROM CO.AircraftType WHERE ICAODesignator= '" + idICAO + "'";
+                clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 1, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
+                foreach (CSVTable table in queryCSV.CSVTables)
+                {
+                    String[] rowData = table.Rows;
+                    foreach (String data in rowData)
+                    {
+                        weight = data;
+                    }
+                }
+                return String.IsNullOrEmpty(weight) ? "" : weight;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("GetMTOW" + ex.Message + "Det:" + ex.StackTrace);
                 return "";
             }
         }

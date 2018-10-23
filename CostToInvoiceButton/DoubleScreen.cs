@@ -373,11 +373,22 @@ namespace CostToInvoiceButton
 
                 if (lblSrType.Text == "CATERING")
                 {
+                    cboCurrency.Text = "MXN";
+
                     if (txtUtilidad.Text == "A")
                     {
                         /*if (txtCost.Text != "0" && !String.IsNullOrEmpty(txtCost.Text))
                         {*/
+
                         txtPrice.Text = txtCost.Text;
+                        if (lblCurrencyPrice.Text == "USD")
+                        {
+                            double rate = getExchangeRate(DateTime.Parse(txtCateringDDate.Text));
+                            double precio = Convert.ToDouble(txtPrice.Text);
+                            precio = precio / rate;
+
+                            txtPrice.Text = Math.Round(precio, 4).ToString();
+                        }
                         //}
                         //txtPrice.Text = GetPrices().ToString();
                     }
@@ -385,7 +396,20 @@ namespace CostToInvoiceButton
                     {
                         if (IsFloatValue(txtCost.Text))
                         {
-                            txtPrice.Text = Math.Round((Convert.ToDouble(txtCost.Text) + (Convert.ToDouble(txtCost.Text) * ((GetUtilidadPercentage(txtUtilidad.Text) / 100)))), 4).ToString();
+                            double precio = Convert.ToDouble(txtPrice.Text);
+                            double utilidad = GetUtilidadPercentage(txtUtilidad.Text) / 100;
+
+                            precio = precio + (precio * utilidad);
+                            txtPrice.Text = Math.Round(precio, 4).ToString();
+
+                            if (lblCurrencyPrice.Text == "USD")
+                            {
+                                double rate = getExchangeRate(DateTime.Parse(txtCateringDDate.Text));
+                                precio = Convert.ToDouble(txtPrice.Text);
+                                precio = precio / rate;
+
+                                txtPrice.Text = Math.Round(precio, 4).ToString();
+                            }
                         }
                     }
                 }

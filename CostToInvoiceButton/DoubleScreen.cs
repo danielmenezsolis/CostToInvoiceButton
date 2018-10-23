@@ -1085,9 +1085,14 @@ namespace CostToInvoiceButton
 
                 if (lblSrType.Text == "CATERING")
                 {
-                    if (txtUtilidad.Text == "A")
+                    if (GetTicketSumCatA() > 0)
                     {
                         cost = GetTicketSumCatA();
+                        cost = (cost * 1.16);
+                    }
+                    else
+                    {
+                        cost = 0;
                     }
                 }
                 else
@@ -1240,17 +1245,6 @@ namespace CostToInvoiceButton
                 string definicion = "";
                 //string definicion = "?totalResults=false&q={str_item_number:'" + dataGridServicios.Rows[e.RowIndex].Cells[1].FormattedValue.ToString().Trim() + "',str_icao_iata_code:'" + airtport + "'}";
                 // string definicion = "?totalResults=true&q={str_item_number:'" + txtItemNumber.Text + "',str_icao_iata_code:'" + txtAirport.Text + "'}";
-                if (lblSrType.Text == "CATERING")
-                {
-                    if (txtUtilidad.Text == "A")
-                    {
-                        definicion = "?totalResults=false&q={str_item_number:'" + txtItemNumber.Text + "',str_icao_iata_code:'" + txtAirport.Text + "'}";
-                    }
-                    else
-                    {
-                        price = 0;
-                    }
-                }
                 if (lblSrType.Text == "FBO")
                 {
                     definicion = "?totalResults=true&q={str_item_number:'" + txtItemNumber.Text + "',str_icao_iata_code:'" + txtAirport.Text + "',bol_int_fbo:1,str_schedule_type:'" + txtMainHour.Text + "',str_aircraft_type:'" + txtICAOD.Text + "',str_client_category:'" + txtUtilidad.Text + "'} ";
@@ -1351,6 +1345,11 @@ namespace CostToInvoiceButton
                     {
                         price = rootObjectPrices.items[0].flo_amount;
                         Curr = rootObjectPrices.items[0].str_currency_code;
+                    }
+                    if (lblSrType.Text == "CATERING")
+                    {
+                        price = Convert.ToDouble(txtPrice.Text);
+
                     }
                 }
                 else

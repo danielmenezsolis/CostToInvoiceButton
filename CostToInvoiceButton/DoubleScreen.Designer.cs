@@ -913,7 +913,7 @@
             // 
             // txtDepartureIncident
             // 
-            this.txtDepartureIncident.Location = new System.Drawing.Point(780, 335);
+            this.txtDepartureIncident.Location = new System.Drawing.Point(769, 336);
             this.txtDepartureIncident.Name = "txtDepartureIncident";
             this.txtDepartureIncident.Size = new System.Drawing.Size(35, 20);
             this.txtDepartureIncident.TabIndex = 85;
@@ -921,7 +921,7 @@
             // 
             // txtArrivalIncident
             // 
-            this.txtArrivalIncident.Location = new System.Drawing.Point(739, 336);
+            this.txtArrivalIncident.Location = new System.Drawing.Point(728, 336);
             this.txtArrivalIncident.Name = "txtArrivalIncident";
             this.txtArrivalIncident.Size = new System.Drawing.Size(35, 20);
             this.txtArrivalIncident.TabIndex = 84;

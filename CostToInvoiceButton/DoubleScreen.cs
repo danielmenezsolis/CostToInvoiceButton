@@ -67,14 +67,18 @@ namespace CostToInvoiceButton
                     txtInvoice.Text = dataGridServicios.Rows[e.RowIndex].Cells[7].FormattedValue.ToString().Trim();
                     if (lblSrType.Text == "FBO" || lblSrType.Text == "FCC")
                     {
-                        txtFBO.Text = GetFBOValue((String.IsNullOrEmpty(dataGridServicios.Rows[e.RowIndex].Cells[8].FormattedValue.ToString()) ? 0 : Convert.ToInt32(dataGridServicios.Rows[e.RowIndex].Cells[8].FormattedValue.ToString())));
-                        GetItineraryHours(String.IsNullOrEmpty(dataGridServicios.Rows[e.RowIndex].Cells[8].FormattedValue.ToString()) ? 0 : Convert.ToInt32(dataGridServicios.Rows[e.RowIndex].Cells[8].FormattedValue.ToString()));
-                        txtMainHour.Text = GetMainHour();
+                        txtFBO.Text = GetFBOValue((string.IsNullOrEmpty(dataGridServicios.Rows[e.RowIndex].Cells[8].FormattedValue.ToString()) ? 0 : Convert.ToInt32(dataGridServicios.Rows[e.RowIndex].Cells[8].FormattedValue.ToString())));
+                        GetItineraryHours(string.IsNullOrEmpty(dataGridServicios.Rows[e.RowIndex].Cells[8].FormattedValue.ToString()) ? 0 : Convert.ToInt32(dataGridServicios.Rows[e.RowIndex].Cells[8].FormattedValue.ToString()));
+                        txtMainHour.Text = GetMainHourFBOFCC(txtATA.Text, txtATD.Text);
+
                     }
                     if (lblSrType.Text == "FUEL")
                     {
                         txtFuelDateCharge.Text = GetFuelDataCharge(String.IsNullOrEmpty(dataGridServicios.Rows[e.RowIndex].Cells[14].FormattedValue.ToString()) ? 0 : Convert.ToInt32(dataGridServicios.Rows[e.RowIndex].Cells[14].FormattedValue.ToString()));
                         txtGalones.Text = GetGalones(String.IsNullOrEmpty(dataGridServicios.Rows[e.RowIndex].Cells[14].FormattedValue.ToString()) ? 0 : Convert.ToInt32(dataGridServicios.Rows[e.RowIndex].Cells[14].FormattedValue.ToString()));
+                        int Arrival = GetArrivalFuelAirport();
+                        getArrivalHours(Arrival, txtFuelDateCharge.Text.Substring(0, 10), txtFuelDateCharge.Text.Substring(0, 10));
+                        txtMainHour.Text = GetMainHourFBOFCC(txtFuelDateCharge.Text, txtFuelDateCharge.Text);
                     }
                     if (lblSrType.Text == "CATERING")
                     {
@@ -193,6 +197,9 @@ namespace CostToInvoiceButton
                 MessageBox.Show("ServiceDobleClic: " + ex.Message + "Det:" + ex.StackTrace);
             }
         }
+
+
+
         private void quitToolStripMenuItem_Click(object sender, EventArgs e)
         {
             this.Close();
@@ -676,6 +683,9 @@ namespace CostToInvoiceButton
                 MessageBox.Show("GetItineraryHours" + ex.Message + "DEtalle: " + ex.StackTrace);
             }
         }
+
+
+
         public int GetArrivalAirport(int Itinerary)
         {
             try
@@ -724,7 +734,7 @@ namespace CostToInvoiceButton
                         String[] substrings = data.Split(delimiter);
                         hours.Opens = DateTime.Parse(Open + " " + substrings[0].Trim());
                         hours.Closes = DateTime.Parse(Close + " " + substrings[1].Trim());
-                        switch (substrings[02].Trim())
+                        switch (substrings[2].Trim())
                         {
                             case "1":
                                 hours.Type = "EXTRAORDINARIO";
@@ -737,7 +747,6 @@ namespace CostToInvoiceButton
                                 hours.Type = "NORMAL";
                                 break;
                         }
-
                         WHoursList.Add(hours);
                     }
                 }
@@ -1112,15 +1121,15 @@ namespace CostToInvoiceButton
                         if (txtItemNumber.Text == "ANFERAS0013" || txtItemNumber.Text == "ANIASAS0015" || txtItemNumber.Text == "AGASIAS0270" || txtItemNumber.Text == "JFUEIAS0269" || txtItemNumber.Text == "AGASIAS0011" || txtItemNumber.Text == "JFUEIAS0010" || txtItemNumber.Text == "AFMURAS0016")
                         {
                             //definicion = "?totalResults=true&q={str_item_number:'" + txtItemNumber.Text + "',str_icao_iata_code:'" + txtAirport.Text + "',str_aircraft_type:'" + txtICAOD.Text + "'}";
-                            definicion = "?totalResults=true&q={str_item_number:'" + txtItemNumber.Text + "',str_icao_iata_code:'" + txtAirport.Text + "',str_schedule_type:'NORMAL'}";
+                            definicion = "?totalResults=true&q={str_item_number:'" + txtItemNumber.Text + "',str_icao_iata_code:'" + txtAirport.Text + "',str_schedule_type:'" + txtMainHour.Text + "'}";
 
                             if (txtItemNumber.Text == "AGASIAS0270")
                             {
-                                definicion = "?totalResults=true&q={str_item_number:'AGASIAS0011',str_icao_iata_code:'" + txtAirport.Text + "',str_schedule_type:'NORMAL'}";
+                                definicion = "?totalResults=true&q={str_item_number:'AGASIAS0011',str_icao_iata_code:'" + txtAirport.Text + "',str_schedule_type:'" + txtMainHour.Text + "'}";
                             }
                             if (txtItemNumber.Text == "JFUEIAS0269")
                             {
-                                definicion = "?totalResults=true&q={str_item_number:'JFUEIAS0010',str_icao_iata_code:'" + txtAirport.Text + "',str_schedule_type:'NORMAL'}";
+                                definicion = "?totalResults=true&q={str_item_number:'JFUEIAS0010',str_icao_iata_code:'" + txtAirport.Text + "',str_schedule_type:'" + txtMainHour.Text + "'}";
                             }
                             if (txtItemNumber.Text == "ANFERAS0013")
                             {
@@ -1259,18 +1268,18 @@ namespace CostToInvoiceButton
                     if (lblSrType.Text == "FUEL")
                     {
                         foreach (ClaseParaPrecios.Item item in rootObjectPrices.items)
-                    {
-                        //HolaPaps
+                        {
                             DateTime inicio = DateTime.Parse(item.str_start_date);
                             DateTime fin = DateTime.Parse(item.str_end_date);
                             DateTime fecha = DateTime.Parse(txtFuelDateCharge.Text);
-
                             if (fecha.CompareTo(inicio) >= 0 && fecha.CompareTo(fin) <= 0)
                             {
                                 price = item.flo_amount;
                             }
                         }
-                    } else {
+                    }
+                    else
+                    {
                         price = rootObjectPrices.items[0].flo_amount;
                     }
                 }
@@ -1396,20 +1405,25 @@ namespace CostToInvoiceButton
             try
             {
                 string Fueling = "";
+
                 ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
                 APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
                 clientInfoHeader.AppID = "Query Example";
-                String queryString = "SELECT VoucherDateTime FROM CO.Fueling WHERE ID =" + idFueling + " ";
+                String queryString = "SELECT VoucherDateTime,VoucherTime FROM CO.Fueling WHERE ID =" + idFueling + " ";
                 clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 1, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
                 foreach (CSVTable table in queryCSV.CSVTables)
                 {
                     String[] rowData = table.Rows;
                     foreach (String data in rowData)
                     {
-                        Fueling = data;
+                        Char delimiter = '|';
+                        String[] substrings = data.Split(delimiter);
+                        MessageBox.Show(substrings[0] + " " + substrings[1]);
+                        Fueling = DateTime.Parse(substrings[0] + " " + substrings[1]).ToString();
+
                     }
                 }
-                return String.IsNullOrEmpty(Fueling) ? "" : DateTime.Parse(Fueling).ToString();
+                return Fueling;
             }
 
             catch (Exception ex)
@@ -1578,6 +1592,34 @@ namespace CostToInvoiceButton
                 return null;
             }
         }
+
+        private int GetArrivalFuelAirport()
+        {
+            try
+            {
+                int airport = 0;
+                ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
+                APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
+                clientInfoHeader.AppID = "Query Example";
+                String queryString = "SELECT CustomFields.CO.Airports FROM Incident WHERE Id =  " + lblIdIncident.Text;
+                clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 1, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
+                foreach (CSVTable table in queryCSV.CSVTables)
+                {
+                    String[] rowData = table.Rows;
+                    foreach (String data in rowData)
+                    {
+                        airport = String.IsNullOrEmpty(data) ? 0 : int.Parse(data);
+                    }
+                }
+                return airport;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("GetArrivalFuelAirport: " + ex.Message + "Det:" + ex.StackTrace);
+                return 0;
+            }
+
+        }
         private string getAirportCollectionDeductionFee(int Airport)
         {
             try
@@ -1606,12 +1648,12 @@ namespace CostToInvoiceButton
             }
         }
 
-        private string GetMainHour()
+        private string GetMainHourFBOFCC(string ata, string atd)
         {
             try
             {
-                DateTime ArriveDate = DateTime.Parse(txtATA.Text);
-                DateTime DeliverDate = DateTime.Parse(txtATD.Text);
+                DateTime ArriveDate = DateTime.Parse(ata);
+                DateTime DeliverDate = DateTime.Parse(atd);
                 string hour = "EXTRAORDINARIO";
                 if (WHoursList.Count > 0)
                 {

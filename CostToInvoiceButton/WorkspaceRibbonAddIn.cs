@@ -765,9 +765,7 @@ namespace CostToInvoiceButton
             }
             catch (Exception ex)
             {
-
                 MessageBox.Show("GetListServices: " + ex.Message + "Detail: " + ex.StackTrace);
-
                 return null;
             }
         }

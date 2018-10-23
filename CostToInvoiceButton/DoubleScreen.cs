@@ -205,9 +205,6 @@ namespace CostToInvoiceButton
                 MessageBox.Show("ServiceDobleClic: " + ex.Message + "Det:" + ex.StackTrace);
             }
         }
-
-
-
         private void quitToolStripMenuItem_Click(object sender, EventArgs e)
         {
             this.Close();
@@ -487,7 +484,6 @@ namespace CostToInvoiceButton
 
 
             }
-
 
             return prices;
         }

@@ -1079,6 +1079,7 @@ namespace CostToInvoiceButton
         {
             try
             {
+                string OUM = "";
                 string Curr = "";
                 double cost = 0;
 
@@ -1228,6 +1229,7 @@ namespace CostToInvoiceButton
         }
         private double GetPrices()
         {
+            string Curr = "";
             double price = 0;
             try
             {
@@ -2043,41 +2045,41 @@ namespace CostToInvoiceButton
                 global.LogMessage("Error en txtCost.Text:" + ex.Message + "Det:" + ex.StackTrace);
             }*/
         }
-/*
-        private void applyExchangeRate(String moneda)
-        {
-            double rate = 1;
-            DateTime dateEx = DateTime.Today;
+        /*
+                private void applyExchangeRate(String moneda)
+                {
+                    double rate = 1;
+                    DateTime dateEx = DateTime.Today;
 
-            if (lblSrType.Text == "FUEL")
-            {
-                dateEx = DateTime.Parse(txtFuelDateCharge.Text);
-            }
-            else if (lblSrType.Text == "FBO" || lblSrType.Text == "FCC")
-            {
-                dateEx = DateTime.Parse(GetItineraryArrivalDate(Convert.ToInt32(txtItinerary.Text)).ToString());
-            }
-            else
-            {
-                dateEx = DateTime.Parse(GetIncidentCreationDate(Convert.ToInt32(txtIdService.Text)).ToString());
-            }
+                    if (lblSrType.Text == "FUEL")
+                    {
+                        dateEx = DateTime.Parse(txtFuelDateCharge.Text);
+                    }
+                    else if (lblSrType.Text == "FBO" || lblSrType.Text == "FCC")
+                    {
+                        dateEx = DateTime.Parse(GetItineraryArrivalDate(Convert.ToInt32(txtItinerary.Text)).ToString());
+                    }
+                    else
+                    {
+                        dateEx = DateTime.Parse(GetIncidentCreationDate(Convert.ToInt32(txtIdService.Text)).ToString());
+                    }
 
-            rate = getExchangeRate(dateEx);
-            rate = 18.78;
+                    rate = getExchangeRate(dateEx);
+                    rate = 18.78;
 
-            if (moneda == "MXN")
-            {
-                txtCost.Text = Math.Round((Convert.ToDouble(txtCost.Text) * rate), 4).ToString();
-                txtPrice.Text = Math.Round((Convert.ToDouble(txtPrice.Text) * rate), 4).ToString();
-            }
-            else if (moneda == "USD")
-            {
-                txtCost.Text = Math.Round((Convert.ToDouble(txtCost.Text) / rate), 4).ToString();
-                txtPrice.Text = Math.Round((Convert.ToDouble(txtPrice.Text) / rate), 4).ToString();
-            }
+                    if (moneda == "MXN")
+                    {
+                        txtCost.Text = Math.Round((Convert.ToDouble(txtCost.Text) * rate), 4).ToString();
+                        txtPrice.Text = Math.Round((Convert.ToDouble(txtPrice.Text) * rate), 4).ToString();
+                    }
+                    else if (moneda == "USD")
+                    {
+                        txtCost.Text = Math.Round((Convert.ToDouble(txtCost.Text) / rate), 4).ToString();
+                        txtPrice.Text = Math.Round((Convert.ToDouble(txtPrice.Text) / rate), 4).ToString();
+                    }
 
-        }
-        */
+                }
+                */
         private string GetItineraryArrivalDate(int idItinerary)
         {
             try

@@ -119,6 +119,8 @@
             this.txtRoyaltyItem = new System.Windows.Forms.TextBox();
             this.txtDepartureIncident = new System.Windows.Forms.TextBox();
             this.txtArrivalIncident = new System.Windows.Forms.TextBox();
+            this.txtUOM = new System.Windows.Forms.TextBox();
+            this.lblCurrencyCost = new System.Windows.Forms.Label();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridSuppliers)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridServicios)).BeginInit();
@@ -927,11 +929,29 @@
             this.txtArrivalIncident.TabIndex = 84;
             this.txtArrivalIncident.TabStop = false;
             // 
+            // txtUOM
+            // 
+            this.txtUOM.Location = new System.Drawing.Point(97, 336);
+            this.txtUOM.Name = "txtUOM";
+            this.txtUOM.Size = new System.Drawing.Size(54, 20);
+            this.txtUOM.TabIndex = 86;
+            // 
+            // lblCurrencyCost
+            // 
+            this.lblCurrencyCost.AutoSize = true;
+            this.lblCurrencyCost.Location = new System.Drawing.Point(572, 395);
+            this.lblCurrencyCost.Name = "lblCurrencyCost";
+            this.lblCurrencyCost.Size = new System.Drawing.Size(31, 13);
+            this.lblCurrencyCost.TabIndex = 87;
+            this.lblCurrencyCost.Text = "MXN";
+            // 
             // DoubleScreen
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(825, 651);
+            this.Controls.Add(this.lblCurrencyCost);
+            this.Controls.Add(this.txtUOM);
             this.Controls.Add(this.txtDepartureIncident);
             this.Controls.Add(this.txtArrivalIncident);
             this.Controls.Add(this.txtRoyaltyItem);
@@ -1100,5 +1120,7 @@
         private System.Windows.Forms.TextBox txtRoyaltyItem;
         private System.Windows.Forms.TextBox txtDepartureIncident;
         private System.Windows.Forms.TextBox txtArrivalIncident;
+        private System.Windows.Forms.TextBox txtUOM;
+        private System.Windows.Forms.Label lblCurrencyCost;
     }
 }

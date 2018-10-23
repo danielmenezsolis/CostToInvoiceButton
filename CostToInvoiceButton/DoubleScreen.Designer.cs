@@ -113,7 +113,7 @@
             this.txtDailyRate = new System.Windows.Forms.TextBox();
             this.txtWeekRate = new System.Windows.Forms.TextBox();
             this.label9 = new System.Windows.Forms.Label();
-            this.lblCurrency = new System.Windows.Forms.Label();
+            this.lblCurrencyPrice = new System.Windows.Forms.Label();
             this.txtCateringCollection = new System.Windows.Forms.TextBox();
             this.txtCollectionDeduction = new System.Windows.Forms.TextBox();
             this.txtRoyaltyItem = new System.Windows.Forms.TextBox();
@@ -881,14 +881,14 @@
             this.label9.TabIndex = 79;
             this.label9.Text = "Customer Name";
             // 
-            // lblCurrency
+            // lblCurrencyPrice
             // 
-            this.lblCurrency.AutoSize = true;
-            this.lblCurrency.Location = new System.Drawing.Point(736, 398);
-            this.lblCurrency.Name = "lblCurrency";
-            this.lblCurrency.Size = new System.Drawing.Size(31, 13);
-            this.lblCurrency.TabIndex = 80;
-            this.lblCurrency.Text = "MXN";
+            this.lblCurrencyPrice.AutoSize = true;
+            this.lblCurrencyPrice.Location = new System.Drawing.Point(734, 395);
+            this.lblCurrencyPrice.Name = "lblCurrencyPrice";
+            this.lblCurrencyPrice.Size = new System.Drawing.Size(31, 13);
+            this.lblCurrencyPrice.TabIndex = 80;
+            this.lblCurrencyPrice.Text = "MXN";
             // 
             // txtCateringCollection
             // 
@@ -967,7 +967,7 @@
             this.Controls.Add(this.txtRoyaltyItem);
             this.Controls.Add(this.txtCollectionDeduction);
             this.Controls.Add(this.txtCateringCollection);
-            this.Controls.Add(this.lblCurrency);
+            this.Controls.Add(this.lblCurrencyPrice);
             this.Controls.Add(this.label9);
             this.Controls.Add(this.txtWeekRate);
             this.Controls.Add(this.txtDailyRate);
@@ -1111,7 +1111,7 @@
         private System.Windows.Forms.TextBox txtDailyRate;
         private System.Windows.Forms.TextBox txtWeekRate;
         private System.Windows.Forms.Label label9;
-        private System.Windows.Forms.Label lblCurrency;
+        private System.Windows.Forms.Label lblCurrencyPrice;
         private System.Windows.Forms.TextBox txtCateringCollection;
         private System.Windows.Forms.TextBox txtCollectionDeduction;
         private System.Windows.Forms.DataGridViewTextBoxColumn InvoiceNumber;

@@ -296,7 +296,7 @@ namespace CostToInvoiceButton
                     DgvServicios.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.DisplayedCells;
                     ((System.Windows.Forms.Label)doubleScreen.Controls["lblSrType"]).Text = SRType.ToUpper();
                     ((System.Windows.Forms.Label)doubleScreen.Controls["lblIdIncident"]).Text = IncidentID.ToString();
-                    ((System.Windows.Forms.Label)doubleScreen.Controls["lblCurrency"]).Text = GetCurrency();
+                    ((System.Windows.Forms.Label)doubleScreen.Controls["lblCurrencyPrice"]).Text = GetCurrency();
                     ((TextBox)doubleScreen.Controls["txtUtilidad"]).Text = Utilidad;
                     ((TextBox)doubleScreen.Controls["txtClientName"]).Text = ClientName;
                     ((TextBox)doubleScreen.Controls["txtRoyalty"]).Text = Royalty;
@@ -305,11 +305,8 @@ namespace CostToInvoiceButton
                     ((TextBox)doubleScreen.Controls["txtClientInfo"]).Text = ClientType;
                     ((TextBox)doubleScreen.Controls["txtICAOD"]).Text = ICAO;
                     ((TextBox)doubleScreen.Controls["txtCateringDDate"]).Text = CateringDeliveryDate;
-
                     ((TextBox)doubleScreen.Controls["txtArrivalIncident"]).Text = ArrivalAirportIncident;
                     ((TextBox)doubleScreen.Controls["txtDepartureIncident"]).Text = DepartureAirportIncident;
-
-
 
                     ((ComboBox)doubleScreen.Controls["cboCurrency"]).Text = SRType == "FUEL" ? "MXN" : GetCurrency();
 
@@ -326,7 +323,7 @@ namespace CostToInvoiceButton
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error en Click: " + ex.Message + "DEt" + ex.StackTrace);
+                MessageBox.Show("Error en Click: " + ex.Message + "Det" + ex.StackTrace);
             }
         }
         public bool Init()

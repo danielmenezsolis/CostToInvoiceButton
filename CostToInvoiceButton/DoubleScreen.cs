@@ -383,10 +383,13 @@ namespace CostToInvoiceButton
                         txtPrice.Text = txtCost.Text;
                         if (lblCurrencyPrice.Text == "USD")
                         {
+                            MessageBox.Show("TipoA USD");
                             double rate = getExchangeRate(DateTime.Parse(txtCateringDDate.Text));
+                            MessageBox.Show("Tipo de Cambio:" + rate.ToString());
                             double precio = Convert.ToDouble(txtPrice.Text);
+                            MessageBox.Show("Precio:" + precio.ToString());
                             precio = precio / rate;
-
+                            MessageBox.Show("Precio/Tipode Cambio:" + precio.ToString());
                             txtPrice.Text = Math.Round(precio, 4).ToString();
                         }
                         //}
@@ -396,7 +399,7 @@ namespace CostToInvoiceButton
                     {
                         if (IsFloatValue(txtCost.Text))
                         {
-                            double precio = Convert.ToDouble(txtPrice.Text);
+                            double precio = Convert.ToDouble(txtCost.Text);
                             double utilidad = GetUtilidadPercentage(txtUtilidad.Text) / 100;
 
                             precio = precio + (precio * utilidad);
@@ -404,10 +407,13 @@ namespace CostToInvoiceButton
 
                             if (lblCurrencyPrice.Text == "USD")
                             {
+                                MessageBox.Show("OtroTipo USD");
                                 double rate = getExchangeRate(DateTime.Parse(txtCateringDDate.Text));
+                                MessageBox.Show("Tipo de Cambio:" + rate.ToString());
                                 precio = Convert.ToDouble(txtPrice.Text);
+                                MessageBox.Show("Precio:" + precio.ToString());
                                 precio = precio / rate;
-
+                                MessageBox.Show("Precio/Tipode Cambio:" + precio.ToString());
                                 txtPrice.Text = Math.Round(precio, 4).ToString();
                             }
                         }
@@ -2061,7 +2067,7 @@ namespace CostToInvoiceButton
 
         private void cboCurrency_SelectedIndexChanged(object sender, EventArgs e)
         {
-            try
+            /*try
             {
                 if (!String.IsNullOrEmpty(txtItemNumber.Text))
                 {
@@ -2071,7 +2077,7 @@ namespace CostToInvoiceButton
             catch (Exception ex)
             {
                 global.LogMessage("Error en txtCost.Text:" + ex.Message + "Det:" + ex.StackTrace);
-            }
+            }*/
         }
 
         private void applyExchangeRate(String moneda)

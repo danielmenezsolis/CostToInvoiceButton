@@ -128,6 +128,17 @@ namespace CostToInvoiceButton
                             txtPrice.Text = Math.Round(GetPrices(), 4).ToString();
                         }
                     }
+                    if (lblSrType.Text == "FBO" || lblSrType.Text == "FCC")
+                    {
+                        if (txtItemNumber.Text == "AGASIAS0270" || txtItemNumber.Text == "JFUEIAS0269" || txtItemNumber.Text == "AGASIAS0011" || txtItemNumber.Text == "JFUEIAS0010")
+                        {
+                            double b;
+                            if (double.TryParse(txtCost.Text, out b))
+                            {
+                                txtPrice.Text = GetFuelPrice();
+                            }
+                        }
+                    }
                     if ((lblSrType.Text == "FBO" && txtItemNumber.Text == "ASFIEAP357") || (lblSrType.Text == "FCC" && txtItemNumber.Text == "AIPRTFE0101"))
                     {
                         //List<ItiPrices> itiPrices = new List<ItiPrices>();
@@ -518,9 +529,17 @@ namespace CostToInvoiceButton
         {
             try
             {
+                DateTime datecharge = DateTime.Now;
                 double galonprice = Convert.ToDouble(txtCost.Text) * 3.7853;
                 //MessageBox.Show("Costo por galon: " + galonprice);
-                DateTime datecharge = DateTime.Parse(txtFuelDateCharge.Text);
+                if (lblSrType.Text ==  "FUEL")
+                {
+                    datecharge = DateTime.Parse(txtFuelDateCharge.Text);
+                }
+                else
+                {
+                    datecharge = DateTime.Parse(txtATA.Text);
+                }
                 //MessageBox.Show("Fecha de carga: " + datecharge);
                 double rate = getExchangeRate(datecharge);
                 //MessageBox.Show("Tipo de cambio: " + rate);

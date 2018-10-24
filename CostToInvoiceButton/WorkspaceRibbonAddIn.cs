@@ -1811,7 +1811,7 @@ namespace CostToInvoiceButton
                 return "";
             }
         }
-        public string GetCargoGroup(String strIcao)
+        public string GetCargoGroup(string strIcao)
         {
             string cGroup = "";
             ClientInfoHeader clientInfoHeader = new ClientInfoHeader();

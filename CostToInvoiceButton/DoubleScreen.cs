@@ -187,8 +187,6 @@ namespace CostToInvoiceButton
 
 
                     }
-
-                    // PAPS ESTUVO AQUI
                     if (txtUOM.Text == "TW")
                     {
                         double b;
@@ -430,7 +428,6 @@ namespace CostToInvoiceButton
                     {
                         txtPrice.Text = Math.Round((Convert.ToDouble(txtCost.Text) * 1.30), 4).ToString();
                     }
-
                 }
                 if (lblSrType.Text == "FUEL")
                 {
@@ -522,30 +519,30 @@ namespace CostToInvoiceButton
             try
             {
                 double galonprice = Convert.ToDouble(txtCost.Text) * 3.7853;
-                MessageBox.Show("Costo por galon: " + galonprice);
+                //MessageBox.Show("Costo por galon: " + galonprice);
                 DateTime datecharge = DateTime.Parse(txtFuelDateCharge.Text);
-                MessageBox.Show("Fecha de carga: " + datecharge);
+                //MessageBox.Show("Fecha de carga: " + datecharge);
                 double rate = getExchangeRate(datecharge);
-                MessageBox.Show("Tipo de cambio: " + rate);
+                //MessageBox.Show("Tipo de cambio: " + rate);
                 double galonrate = galonprice / rate; // costo por galon
-                MessageBox.Show("Costo por galon USD: " + galonrate);
+                //MessageBox.Show("Costo por galon USD: " + galonrate);
                 double catcombus = GetCombCents(txtCombustible.Text);
-                MessageBox.Show("Centavos : " + catcombus);
+                //MessageBox.Show("Centavos : " + catcombus);
                 galonrate = (galonrate + catcombus);
-                MessageBox.Show("Costo mas centavos : " + galonrate);
+                //MessageBox.Show("Costo mas centavos : " + galonrate);
                 double IVA = (galonrate * .16);
-                MessageBox.Show("IVA : " + IVA);
+                //MessageBox.Show("IVA : " + IVA);
                 galonrate = galonrate + IVA;
-                MessageBox.Show("Costo mas IVA : " + galonrate);
+                //MessageBox.Show("Costo mas IVA : " + galonrate);
                 if (txtItemNumber.Text == "AGASIAS0270" || txtItemNumber.Text == "JFUEIAS0269")
                 {
                     galonrate = galonrate - GetCombCentI(txtCombustibleI.Text);
-                    MessageBox.Show("Costo menos Cents Int : " + galonrate);
+                    //MessageBox.Show("Costo menos Cents Int : " + galonrate);
                 }
                 double galones = Convert.ToDouble(txtGalones.Text);
-                MessageBox.Show("Galones : " + galones);
+                //MessageBox.Show("Galones : " + galones);
                 galonrate = galonrate * galones;
-                MessageBox.Show("Costo total : " + galonrate);
+                //MessageBox.Show("Costo total : " + galonrate);
 
                 return Math.Round((galonrate), 4).ToString();
             }
@@ -692,8 +689,6 @@ namespace CostToInvoiceButton
             }
             return vali;
         }
-
-
         private void GetItineraryHours(int Itinerary)
         {
             try
@@ -729,9 +724,6 @@ namespace CostToInvoiceButton
                 MessageBox.Show("GetItineraryHours" + ex.Message + "DEtalle: " + ex.StackTrace);
             }
         }
-
-
-
         public int GetArrivalAirport(int Itinerary)
         {
             try
@@ -757,9 +749,7 @@ namespace CostToInvoiceButton
                 MessageBox.Show("ArrivalAirport" + ex.Message + "DEtalle: " + ex.StackTrace);
                 return 0;
             }
-
         }
-
         private void getArrivalHours(int Arrival, string Open, string Close)
         {
             try
@@ -1152,6 +1142,31 @@ namespace CostToInvoiceButton
                         {
                             definicion = "?totalResults=true&q={str_item_number:'" + txtItemNumber.Text + "',str_icao_iata_code:'" + txtAirport.Text + "',str_schedule_type:'" + txtMainHour.Text + "'}&orderby=str_icao_iata_code:asc";
                         }
+                        if (txtItemNumber.Text == "ANFERAS0013" || txtItemNumber.Text == "ANIASAS0015" || txtItemNumber.Text == "AGASIAS0270" || txtItemNumber.Text == "JFUEIAS0269" || txtItemNumber.Text == "AGASIAS0011" || txtItemNumber.Text == "JFUEIAS0010" || txtItemNumber.Text == "AFMURAS0016")
+                        {
+                            definicion = "?totalResults=true&q={str_item_number:'" + txtItemNumber.Text + "',str_icao_iata_code:'" + txtAirport.Text + "',str_schedule_type:'NORMAL'}";
+
+                            if (txtItemNumber.Text == "IAFMUAS0271" || txtItemNumber.Text == "AFMURAS0016")
+                            {
+                                if (txtClientName.Text.Contains("NETJETS"))
+                                {
+                                    definicion = "?totalResults=true&q={str_item_number:'" + txtItemNumber.Text + "',str_icao_iata_code:'" + txtAirport.Text + "',str_client_category:'NetJets'}";
+                                }
+                                definicion = "?totalResults=true&q={str_item_number:'" + txtItemNumber.Text + "',str_icao_iata_code:'" + txtAirport.Text + "'}";
+                            }
+                            if (txtItemNumber.Text == "AGASIAS0270")
+                            {
+                                definicion = "?totalResults=true&q={str_item_number:'AGASIAS0011',str_icao_iata_code:'" + txtAirport.Text + "',str_schedule_type:'NORMAL'}";
+                            }
+                            if (txtItemNumber.Text == "JFUEIAS0269")
+                            {
+                                definicion = "?totalResults=true&q={str_item_number:'JFUEIAS0010',str_icao_iata_code:'" + txtAirport.Text + "',str_schedule_type:'NORMAL'}";
+                            }
+                            if (txtItemNumber.Text == "ANFERAS0013")
+                            {
+                                definicion = "?totalResults=true&q={$or:[{str_icao_iata_code:{$exists:false}},{str_icao_iata_code:'" + txtAirport.Text + "'}],str_item_number:'ANFERAS0013',str_aircraft_type:'" + txtICAOD.Text + "'}";
+                            }
+                        }
                     }
                     if (lblSrType.Text == "FCC")
                     {
@@ -1165,32 +1180,20 @@ namespace CostToInvoiceButton
                             //definicion = "?totalResults=true&q={str_item_number:'" + txtItemNumber.Text + "',str_icao_iata_code:'" + txtAirport.Text + "',str_aircraft_type:'" + txtICAOD.Text + "'}";
                             definicion = "?totalResults=true&q={str_item_number:'" + txtItemNumber.Text + "',str_icao_iata_code:'" + txtAirport.Text + "'}";
                         }
-                        /*if (txtItemNumber.Text == "LANDSAF0008")
-                        {
-                            definicion = "?totalResults=true&q={str_item_number:'LANDSAF0008',str_icao_iata_code:'IO_AEREO_MMPR_PVR',str_ft_arrival:'DOMESTIC',str_schedule_type:'NORMAL'}&orderby=str_icao_iata_code:asc";
-                        }*/
                     }
 
                     if (lblSrType.Text == "FUEL")
                     {
-                        /*
-                        if (txtItemNumber.Text == "AFMURAS0016")
-                        {
-                            definicion = "?totalResults=true&q={str_item_number:'" + txtItemNumber.Text + "'}";
-                        }*/
                         if (txtItemNumber.Text == "ANFERAS0013" || txtItemNumber.Text == "ANIASAS0015" || txtItemNumber.Text == "AGASIAS0270" || txtItemNumber.Text == "JFUEIAS0269" || txtItemNumber.Text == "AGASIAS0011" || txtItemNumber.Text == "JFUEIAS0010" || txtItemNumber.Text == "AFMURAS0016")
                         {
-                            //definicion = "?totalResults=true&q={str_item_number:'" + txtItemNumber.Text + "',str_icao_iata_code:'" + txtAirport.Text + "',str_aircraft_type:'" + txtICAOD.Text + "'}";
                             definicion = "?totalResults=true&q={str_item_number:'" + txtItemNumber.Text + "',str_icao_iata_code:'" + txtAirport.Text + "',str_schedule_type:'NORMAL'}";
 
                             if (txtItemNumber.Text == "IAFMUAS0271" || txtItemNumber.Text == "AFMURAS0016")
                             {
                                 if (txtClientName.Text.Contains("NETJETS"))
                                 {
-                                    //definicion = "?totalResults=true&q={str_item_number:'" + txtItemNumber.Text + "',str_icao_iata_code:'" + txtAirport.Text + "',str_client_category:'NetJets'}";
                                     definicion = "?totalResults=true&q={str_item_number:'" + txtItemNumber.Text + "',str_icao_iata_code:'" + txtAirport.Text + "',str_client_category:'NetJets'}";
                                 }
-                                //definicion = "?totalResults=true&q={str_item_number:'" + txtItemNumber.Text + "',str_icao_iata_code:'" + txtAirport.Text + "'}";
                                 definicion = "?totalResults=true&q={str_item_number:'" + txtItemNumber.Text + "',str_icao_iata_code:'" + txtAirport.Text + "'}";
                             }
                             if (txtItemNumber.Text == "AGASIAS0270")
@@ -1284,11 +1287,7 @@ namespace CostToInvoiceButton
                 // string definicion = "?totalResults=true&q={str_item_number:'" + txtItemNumber.Text + "',str_icao_iata_code:'" + txtAirport.Text + "'}";
                 if (lblSrType.Text == "FBO")
                 {
-                    definicion = "?totalResults=true&q={str_item_number:'" + txtItemNumber.Text + "',str_icao_iata_code:'" + txtAirport.Text + "',bol_int_fbo:1,str_schedule_type:'" + txtMainHour.Text + "',str_aircraft_type:'" + txtICAOD.Text + "',str_client_category:'" + txtUtilidad.Text + "'} ";
-                    if (txtItemNumber.Text == "DISONAP249")
-                    {
-                        definicion = "?totalResults=true&q={str_item_number:'" + txtItemNumber.Text + "',str_icao_iata_code:'" + txtAirport.Text + "',bol_int_fbo:1,str_schedule_type:'" + txtMainHour.Text + "',str_aircraft_type:'" + txtICAOD.Text + "',str_client_category:'" + txtUtilidad.Text + "'} ";
-                    }
+                    definicion = "?totalResults=true&q={str_item_number:'" + txtItemNumber.Text + "',str_icao_iata_code:'" + txtAirport.Text + "',bol_int_fbo:1,$or:[{str_schedule_type:{$exists:false}},{str_schedule_type:'" + txtMainHour.Text + "'}],$or:[{str_aircraft_type:{$exists:false}},{str_aircraft_type:'" + txtICAOD.Text + "'}],$or:[{str_client_category:{$exists:false}},{str_client_category:'" + txtUtilidad.Text + "'}]}";
                 }
 
                 if (lblSrType.Text == "FUEL")
@@ -1384,12 +1383,16 @@ namespace CostToInvoiceButton
                     if (lblSrType.Text == "CATERING")
                     {
                         price = Convert.ToDouble(txtPrice.Text);
-
                     }
                 }
                 else
                 {
                     price = 0;
+                }
+                if (lblSrType.Text == "FBO" && price == 0)
+                {
+                    price = Math.Round(Convert.ToDouble(txtCost.Text) * 1.30);
+                    txtPrice.Text = Math.Round((Convert.ToDouble(txtCost.Text) * 1.30), 4).ToString();
                 }
                 return price;
             }

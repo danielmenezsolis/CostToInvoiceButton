@@ -33,7 +33,7 @@ namespace CostToInvoiceButton
         public int IncidentID { get; set; }
         public string ArrivalAirportIncident { get; set; }
         public string DepartureAirportIncident { get; set; }
-        public string SRType { get; set; }
+
 
         public WorkspaceRibbonAddIn(bool inDesignMode, IRecordContext RecordContext, IGlobalContext globalContext)
         {
@@ -57,11 +57,12 @@ namespace CostToInvoiceButton
                     string SENEAM = "";
                     string SeneamCat = "";
                     string ICAO = "";
-
+                    string SRType = "";
                     string ClientType = "";
                     string ClientName = "";
                     string FuelType = "";
                     string CateringDeliveryDate = "";
+                    string AircraftCategory = "";
                     Incident = (IIncident)recordContext.GetWorkspaceRecord(WorkspaceRecordType.Incident);
                     IList<ICfVal> IncCustomFieldList = Incident.CustomField;
                     if (IncCustomFieldList != null)
@@ -105,8 +106,8 @@ namespace CostToInvoiceButton
                     IncidentID = Incident.ID;
                     ICAO = getICAODesi(IncidentID);
                     SRType = GetSRType();
+                    AircraftCategory = GetCargoGroup(ICAO);
                     ClientType = GetClientType();
-                    FuelType = GetFuelType(IncidentID);
                     GetDeleteComponents();
                     CreateChildComponents();
                     if (SRType != "FBO" || SRType != "FCC")
@@ -117,8 +118,9 @@ namespace CostToInvoiceButton
                     if (SRType == "FUEL")
                     {
                         GetDeleteFuelItems();
-                        GetFuelData(ClientType, FuelType, 0, "");
-                        CreateFuelMinimun(ClientType, FuelType, 0, "");
+                        FuelType = GetFuelType(IncidentID);
+                        GetFuelData(ClientType, FuelType);
+                        CreateFuelMinimun(ClientType, FuelType);
                         if (SENEAM == "1")
                         {
                             CreateAirNavFee();
@@ -136,7 +138,7 @@ namespace CostToInvoiceButton
                         {
                             ComponentChild component = new ComponentChild();
                             component.Airport = item.Airport.Replace("-", "_");
-
+                            //component.ItemNumber = getFBOItemNumber(Convert.ToInt32(item.Itinerary));
                             component.ItemNumber = "ASFIEAP357";
                             if (!String.IsNullOrEmpty(component.ItemNumber))
                             {
@@ -149,35 +151,6 @@ namespace CostToInvoiceButton
                                     component.Componente = "1";
                                     component.ParentPaxId = IncidentID;
                                     InsertComponent(component);
-                                }
-                            }
-
-                            if (!GetItineraryCountries(int.Parse(item.Itinerary)))
-                            {
-                                component.ItemNumber = "IISNNAP248";
-                                if (!String.IsNullOrEmpty(component.ItemNumber))
-                                {
-                                    component = GetComponentData(component);
-                                    if (!String.IsNullOrEmpty(component.ItemDescription))
-                                    {
-                                        component.Incident = IncidentID;
-                                        component.Itinerary = Convert.ToInt32(item.Itinerary);
-                                        component.Categories = GetCategories(component.ItemNumber, component.Airport);
-                                        component.Componente = "1";
-                                        component.ParentPaxId = IncidentID;
-                                        InsertComponent(component);
-                                    }
-                                }
-                            }
-                            GetDeleteFuelItems();
-                            GetFuelData(ClientType, FuelType, int.Parse(item.Itinerary), item.Airport);
-                            CreateFuelMinimun(ClientType, FuelType, int.Parse(item.Itinerary), item.Airport);
-                            if (SENEAM == "1")
-                            {
-                                CreateAirNavFee();
-                                if (Utilidad != "A" && !String.IsNullOrEmpty(Utilidad))
-                                {
-                                    CreateAirNavICCS();
                                 }
                             }
                         }
@@ -326,6 +299,7 @@ namespace CostToInvoiceButton
                     ((TextBox)doubleScreen.Controls["txtCombustibleI"]).Text = CombustibleI;
                     ((TextBox)doubleScreen.Controls["txtClientInfo"]).Text = ClientType;
                     ((TextBox)doubleScreen.Controls["txtICAOD"]).Text = ICAO;
+                    ((TextBox)doubleScreen.Controls["txtCargoGroup"]).Text = AircraftCategory;
                     ((TextBox)doubleScreen.Controls["txtCateringDDate"]).Text = CateringDeliveryDate;
                     ((TextBox)doubleScreen.Controls["txtArrivalIncident"]).Text = ArrivalAirportIncident;
                     ((TextBox)doubleScreen.Controls["txtDepartureIncident"]).Text = DepartureAirportIncident;
@@ -1517,21 +1491,10 @@ namespace CostToInvoiceButton
                 return true;
             }
         }
-        public void GetFuelData(string ClientType, string FuelType, int Itinerar, string Air)
+        public void GetFuelData(string ClientType, string FuelType)
         {
-            string[] LookCountry = new string[2];
-
-            if (SRType == "FUEL")
-            {
-                LookCountry = GetCountryLook();
-            }
-            else
-            {
-                ArrivalAirportIncident = Air;
-                LookCountry = GetCountryLookItinerary(Itinerar);
-            }
             string ItemN = "";
-
+            string[] LookCountry = GetCountryLook();
             try
             {
                 ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
@@ -1575,12 +1538,12 @@ namespace CostToInvoiceButton
                             Incident = IncidentID,
                             Airport = ArrivalAirportIncident.Replace('-', '_').Trim(),
                             Componente = "0",
-                            Itinerary = Itinerar,
                             FuelId = Convert.ToInt32(substrings[3]),
                         };
                         component.Categories = GetCategories(component.ItemNumber, component.Airport);
                         component = GetComponentData(component);
                         InsertComponent(component);
+
                     }
                 }
             }
@@ -1589,19 +1552,10 @@ namespace CostToInvoiceButton
                 MessageBox.Show("GetFuelData: " + ex.Message + "Det:" + ex.StackTrace);
             }
         }
-        public void CreateFuelMinimun(string ClientType, string FuelType, int Itinerar, string Air)
+        public void CreateFuelMinimun(string ClientType, string FuelType)
         {
-            string[] LookCountry = new string[2];
             string ItemN = "AFMURAS0016";
-            if (SRType == "FUEL")
-            {
-                LookCountry = GetCountryLook();
-            }
-            else
-            {
-                ArrivalAirportIncident = Air;
-                LookCountry = GetCountryLookItinerary(Itinerar);
-            }
+            string[] LookCountry = GetCountryLook();
 
             ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
             APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
@@ -1633,11 +1587,10 @@ namespace CostToInvoiceButton
                     Char delimiter = '|';
                     string[] substrings = data.Split(delimiter);
                     ComponentChild component = new ComponentChild();
-                    component.Airport = ArrivalAirportIncident.Replace("-", "_");
+                    component.Airport = ArrivalAirportIncident;
                     component.ItemNumber = ItemN;
                     component.Incident = IncidentID;
                     component.ParentPaxId = IncidentID;
-                    component.Itinerary = Itinerar;
                     component.FuelId = int.Parse(substrings[2]);
                     component.Componente = "1";
                     component = GetComponentData(component);
@@ -1658,34 +1611,6 @@ namespace CostToInvoiceButton
                 APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
                 clientInfoHeader.AppID = "Query Example";
                 String queryString = "SELECT CustomFields.CO.Airports1.Country.LookupName,CustomFields.CO.Airports1.LookupName FROM Incident WHERE ID =" + IncidentID + "";
-                clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 1, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
-                foreach (CSVTable table in queryCSV.CSVTables)
-                {
-                    String[] rowData = table.Rows;
-                    foreach (String data in rowData)
-                    {
-                        Char delimiter = '|';
-                        string[] substrings = data.Split(delimiter);
-                        res = substrings;
-                    }
-                }
-                return res;
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.StackTrace);
-                return null;
-            }
-        }
-        public string[] GetCountryLookItinerary(int itinerary)
-        {
-            try
-            {
-                string[] res = new string[2];
-                ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
-                APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
-                clientInfoHeader.AppID = "Query Example";
-                String queryString = "SELECT ArrivalAirport.Country.LookupName,ToAirport.LookupName FROM CO.Itinerary WHERE ID =" + itinerary + "";
                 clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 1, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
                 foreach (CSVTable table in queryCSV.CSVTables)
                 {
@@ -1808,7 +1733,32 @@ namespace CostToInvoiceButton
                 return "";
             }
         }
-
+        private string GetCargoGroup(string idICAO)
+        {
+            try
+            {
+                string cargo = "";
+                ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
+                APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
+                clientInfoHeader.AppID = "Query Example";
+                String queryString = "SELECT CargoGroup.LookupName FROM CO.AircraftType WHERE ICAODesignator = '" + idICAO + "'";
+                clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 1, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
+                foreach (CSVTable table in queryCSV.CSVTables)
+                {
+                    String[] rowData = table.Rows;
+                    foreach (String data in rowData)
+                    {
+                        cargo = data;
+                    }
+                }
+                return String.IsNullOrEmpty(cargo) ? "" : cargo;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("GetCargoGroup" + ex.Message + "Det:" + ex.StackTrace);
+                return "";
+            }
+        }
     }
 
     [AddIn("Invoice to Cost", Version = "1.0.0.0")]

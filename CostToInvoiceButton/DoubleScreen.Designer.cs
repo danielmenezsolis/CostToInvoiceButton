@@ -122,6 +122,7 @@
             this.txtUOM = new System.Windows.Forms.TextBox();
             this.lblCurrencyCost = new System.Windows.Forms.Label();
             this.txtCateringDDate = new System.Windows.Forms.TextBox();
+            this.txtCargoGroup = new System.Windows.Forms.TextBox();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridSuppliers)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridServicios)).BeginInit();
@@ -932,9 +933,9 @@
             // 
             // txtUOM
             // 
-            this.txtUOM.Location = new System.Drawing.Point(97, 336);
+            this.txtUOM.Location = new System.Drawing.Point(49, 336);
             this.txtUOM.Name = "txtUOM";
-            this.txtUOM.Size = new System.Drawing.Size(54, 20);
+            this.txtUOM.Size = new System.Drawing.Size(39, 20);
             this.txtUOM.TabIndex = 86;
             // 
             // lblCurrencyCost
@@ -954,11 +955,20 @@
             this.txtCateringDDate.TabIndex = 88;
             this.txtCateringDDate.TabStop = false;
             // 
+            // txtCargoGroup
+            // 
+            this.txtCargoGroup.Location = new System.Drawing.Point(6, 336);
+            this.txtCargoGroup.Name = "txtCargoGroup";
+            this.txtCargoGroup.Size = new System.Drawing.Size(37, 20);
+            this.txtCargoGroup.TabIndex = 89;
+            this.txtCargoGroup.TabStop = false;
+            // 
             // DoubleScreen
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(825, 651);
+            this.Controls.Add(this.txtCargoGroup);
             this.Controls.Add(this.txtCateringDDate);
             this.Controls.Add(this.lblCurrencyCost);
             this.Controls.Add(this.txtUOM);
@@ -1133,5 +1143,6 @@
         private System.Windows.Forms.TextBox txtUOM;
         private System.Windows.Forms.Label lblCurrencyCost;
         private System.Windows.Forms.TextBox txtCateringDDate;
+        private System.Windows.Forms.TextBox txtCargoGroup;
     }
 }

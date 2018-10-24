@@ -62,6 +62,7 @@ namespace CostToInvoiceButton
                     string ClientName = "";
                     string FuelType = "";
                     string CateringDeliveryDate = "";
+                    string AircraftCategory = "";
                     Incident = (IIncident)recordContext.GetWorkspaceRecord(WorkspaceRecordType.Incident);
                     IList<ICfVal> IncCustomFieldList = Incident.CustomField;
                     if (IncCustomFieldList != null)
@@ -105,6 +106,7 @@ namespace CostToInvoiceButton
                     IncidentID = Incident.ID;
                     ICAO = getICAODesi(IncidentID);
                     SRType = GetSRType();
+                    AircraftCategory = GetCargoGroup(ICAO);
                     ClientType = GetClientType();
                     GetDeleteComponents();
                     CreateChildComponents();
@@ -297,6 +299,7 @@ namespace CostToInvoiceButton
                     ((TextBox)doubleScreen.Controls["txtCombustibleI"]).Text = CombustibleI;
                     ((TextBox)doubleScreen.Controls["txtClientInfo"]).Text = ClientType;
                     ((TextBox)doubleScreen.Controls["txtICAOD"]).Text = ICAO;
+                    ((TextBox)doubleScreen.Controls["txtCargoGroup"]).Text = AircraftCategory;
                     ((TextBox)doubleScreen.Controls["txtCateringDDate"]).Text = CateringDeliveryDate;
                     ((TextBox)doubleScreen.Controls["txtArrivalIncident"]).Text = ArrivalAirportIncident;
                     ((TextBox)doubleScreen.Controls["txtDepartureIncident"]).Text = DepartureAirportIncident;
@@ -1727,6 +1730,32 @@ namespace CostToInvoiceButton
             catch (Exception ex)
             {
                 MessageBox.Show(ex.StackTrace);
+                return "";
+            }
+        }
+        private string GetCargoGroup(string idICAO)
+        {
+            try
+            {
+                string cargo = "";
+                ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
+                APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
+                clientInfoHeader.AppID = "Query Example";
+                String queryString = "SELECT CargoGroup.LookupName FROM CO.AircraftType WHERE ICAODesignator = '" + idICAO + "'";
+                clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 1, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
+                foreach (CSVTable table in queryCSV.CSVTables)
+                {
+                    String[] rowData = table.Rows;
+                    foreach (String data in rowData)
+                    {
+                        cargo = data;
+                    }
+                }
+                return String.IsNullOrEmpty(cargo) ? "" : cargo;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("GetCargoGroup" + ex.Message + "Det:" + ex.StackTrace);
                 return "";
             }
         }

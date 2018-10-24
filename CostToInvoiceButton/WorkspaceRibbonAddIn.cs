@@ -1811,13 +1811,13 @@ namespace CostToInvoiceButton
                 return "";
             }
         }
-        public string GetCargoGroup(String strIcao)
+        public string GetCargoGroup(string strIcao)
         {
             string cGroup = "";
             ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
             APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
             clientInfoHeader.AppID = "Query Example";
-            String queryString = "SELECT CargoGroup.LookupName FROM CO.AircraftType WHERE ICAODesignator = = " + strIcao;
+            String queryString = "SELECT CargoGroup.LookupName FROM CO.AircraftType WHERE ICAODesignator = '" + strIcao + "'";
             clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 1, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
             foreach (CSVTable table in queryCSV.CSVTables)
             {

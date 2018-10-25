@@ -48,6 +48,7 @@ namespace CostToInvoiceButton
         public int FuelId { get; set; }
         public string Categories { get; set; }
         public int ServiceParent { get; set; }
+        public string MCreated { get; set; }
     }
     public class Link
     {

@@ -57,7 +57,6 @@ namespace CostToInvoiceButton
                     string SENEAM = "";
                     string SeneamCat = "";
                     string ICAO = "";
-
                     string ClientType = "";
                     string ClientName = "";
                     string FuelType = "";
@@ -109,8 +108,8 @@ namespace CostToInvoiceButton
                     AircraftCategory = GetCargoGroup(ICAO);
                     ClientType = GetClientType();
                     FuelType = GetFuelType(IncidentID);
-                    GetDeleteComponents();
-                    CreateChildComponents();
+                    GetDeleteMCreated();
+                    //CreateChildComponents();
                     if (SRType != "FBO" || SRType != "FCC")
                     {
                         ArrivalAirportIncident = GetArrivalAirportIncident(IncidentID);
@@ -148,7 +147,8 @@ namespace CostToInvoiceButton
                                     component.Incident = IncidentID;
                                     component.Itinerary = Convert.ToInt32(item.Itinerary);
                                     component.Categories = GetCategories(component.ItemNumber, component.Airport);
-                                    component.Componente = "1";
+                                    component.MCreated = "1";
+                                    component.Componente = "0";
                                     component.ParentPaxId = IncidentID;
                                     InsertComponent(component);
                                 }
@@ -165,7 +165,8 @@ namespace CostToInvoiceButton
                                         component.Incident = IncidentID;
                                         component.Itinerary = Convert.ToInt32(item.Itinerary);
                                         component.Categories = GetCategories(component.ItemNumber, component.Airport);
-                                        component.Componente = "1";
+                                        component.MCreated = "1";
+                                        component.MCreated = "0";
                                         component.ParentPaxId = IncidentID;
                                         InsertComponent(component);
                                     }
@@ -183,7 +184,8 @@ namespace CostToInvoiceButton
                                         component.Incident = IncidentID;
                                         component.Itinerary = Convert.ToInt32(item.Itinerary);
                                         component.Categories = GetCategories(component.ItemNumber, component.Airport);
-                                        component.Componente = "1";
+                                        component.MCreated = "1";
+                                        component.MCreated = "0";
                                         component.ParentPaxId = IncidentID;
                                         InsertComponent(component);
                                     }
@@ -224,7 +226,8 @@ namespace CostToInvoiceButton
                                         component.Incident = IncidentID;
                                         component.Itinerary = Convert.ToInt32(item.Itinerary);
                                         component.Categories = GetCategories(component.ItemNumber, component.Airport);
-                                        component.Componente = "1";
+                                        component.MCreated = "1";
+                                        component.Componente = "0";
                                         component.ParentPaxId = IncidentID;
                                         InsertComponent(component);
                                     }
@@ -271,7 +274,8 @@ namespace CostToInvoiceButton
                                         component.Incident = IncidentID;
                                         component.Itinerary = Convert.ToInt32(item.Itinerary);
                                         component.Categories = GetCategories(component.ItemNumber, component.Airport);
-                                        component.Componente = "1";
+                                        component.MCreated = "1";
+                                        component.Componente = "0";
                                         component.ParentPaxId = IncidentID;
                                         InsertComponent(component);
                                     }
@@ -291,7 +295,8 @@ namespace CostToInvoiceButton
                                         component.Incident = IncidentID;
                                         component.Itinerary = Convert.ToInt32(item.Itinerary);
                                         component.Categories = GetCategories(component.ItemNumber, component.Airport);
-                                        component.Componente = "1";
+                                        component.Componente = "0";
+                                        component.MCreated = "1";
                                         component.ParentPaxId = IncidentID;
                                         InsertComponent(component);
                                     }
@@ -309,7 +314,8 @@ namespace CostToInvoiceButton
                                             component.Incident = IncidentID;
                                             component.Itinerary = Convert.ToInt32(item.Itinerary);
                                             component.Categories = GetCategories(component.ItemNumber, component.Airport);
-                                            component.Componente = "1";
+                                            component.MCreated = "1";
+                                            component.Componente = "0";
                                             component.ParentPaxId = IncidentID;
                                             InsertComponent(component);
                                         }
@@ -717,7 +723,8 @@ namespace CostToInvoiceButton
                     component.Incident = IncidentID;
                     component.ParentPaxId = IncidentID;
                     component.FuelId = int.Parse(substrings[2]);
-                    component.Componente = "1";
+                    component.MCreated = "1";
+                    component.Componente = "0";
                     component = GetComponentData(component);
                     component.Categories = GetCategories(component.ItemNumber, component.Airport);
                     if (!string.IsNullOrEmpty(component.ItemDescription))
@@ -748,7 +755,8 @@ namespace CostToInvoiceButton
                     component.Incident = IncidentID;
                     component.ParentPaxId = IncidentID;
                     component.FuelId = int.Parse(substrings[2]);
-                    component.Componente = "1";
+                    component.Componente = "0";
+                    component.MCreated = "1";
                     component = GetComponentData(component);
                     component.Categories = GetCategories(component.ItemNumber, component.Airport);
                     if (!string.IsNullOrEmpty(component.ItemDescription))
@@ -832,7 +840,7 @@ namespace CostToInvoiceButton
                 MessageBox.Show(ex.Message);
             }
         }
-        public void GetDeleteComponents()
+        public void GetDeleteMCreated()
         {
             try
             {
@@ -840,7 +848,7 @@ namespace CostToInvoiceButton
                 ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
                 APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
                 clientInfoHeader.AppID = "Query Example";
-                String queryString = "SELECT ID FROM CO.Services WHERE Componente = '1' AND Incident = " + IncidentID;
+                String queryString = "SELECT ID FROM CO.Services WHERE ManualCreated = '1' AND Incident = " + IncidentID;
                 clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 10000, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
                 if (queryCSV.CSVTables.Length > 0)
                 {
@@ -1013,6 +1021,7 @@ namespace CostToInvoiceButton
                                             componentchild.Airport = component.Airport;
                                             componentchild.Incident = IncidentID;
                                             componentchild.Componente = "1";
+
                                             componentchild.ItemNumber = nodeValue.InnerText;
                                             componentchild.Itinerary = component.Itinerary;
                                             componentchild.Categories = GetCategories(componentchild.ItemNumber, componentchild.Airport);
@@ -1215,7 +1224,7 @@ namespace CostToInvoiceButton
                 string body = "{";
                 body += "\"Airport\":\"" + component.Airport + "\",";
                 body += "\"ParentPaxId\":\"" + component.ParentPaxId + "\",";
-               
+
                 if (!String.IsNullOrEmpty(component.ServiceParent.ToString()) && component.ServiceParent > 0)
                 {
                     body += "\"Services\":";
@@ -1250,7 +1259,7 @@ namespace CostToInvoiceButton
                     body += "\"ClasificacionPagos\":\"" + component.ClasificacionPagos + "\",";
                 }
                 body += "\"Componente\":\"" + component.Componente + "\",";
-
+                body += "\"ManualCreated\":\"" + component.MCreated + "\",";
                 if (String.IsNullOrEmpty(component.Costo))
                 {
                     body += "\"Costo\":null,";
@@ -1610,6 +1619,7 @@ namespace CostToInvoiceButton
                             Incident = IncidentID,
                             Airport = ArrivalAirportIncident.Replace('-', '_').Trim(),
                             Componente = "0",
+                            MCreated = "1",
                             Itinerary = Itinerar,
                             FuelId = Convert.ToInt32(substrings[3]),
                         };
@@ -1637,7 +1647,6 @@ namespace CostToInvoiceButton
                 ArrivalAirportIncident = Air;
                 LookCountry = GetCountryLookItinerary(Itinerar);
             }
-
             ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
             APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
             clientInfoHeader.AppID = "Query Example";
@@ -1674,7 +1683,8 @@ namespace CostToInvoiceButton
                     component.ParentPaxId = IncidentID;
                     component.Itinerary = Itinerar;
                     component.FuelId = int.Parse(substrings[2]);
-                    component.Componente = "1";
+                    component.MCreated = "1";
+                    component.Componente = "0";
                     component = GetComponentData(component);
                     component.Categories = GetCategories(component.ItemNumber, component.Airport);
                     if (!string.IsNullOrEmpty(component.ItemDescription))
@@ -1862,7 +1872,6 @@ namespace CostToInvoiceButton
             return cGroup;
         }
     }
-
     [AddIn("Invoice to Cost", Version = "1.0.0.0")]
     public class WorkspaceRibbonButtonFactory : IWorkspaceRibbonButtonFactory
     {

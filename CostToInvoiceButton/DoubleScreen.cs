@@ -64,7 +64,6 @@ namespace CostToInvoiceButton
                     txtParticipacionCobro.Text = dataGridServicios.Rows[e.RowIndex].Cells[16].FormattedValue.ToString().Trim();
                     string airtport = dataGridServicios.Rows[e.RowIndex].Cells[3].FormattedValue.ToString().Trim();
                     txtAirport.Text = "IO_AEREO_" + airtport.Replace("-", "_").Trim();
-                    //txtClientName.Text = dataGridServicios.Rows[e.RowIndex].Cells[4].FormattedValue.ToString().Trim();
                     txtInvoice.Text = dataGridServicios.Rows[e.RowIndex].Cells[7].FormattedValue.ToString().Trim();
                     if (lblSrType.Text == "FBO" || lblSrType.Text == "FCC")
                     {
@@ -226,7 +225,6 @@ namespace CostToInvoiceButton
             {
                 if (e.RowIndex != -1)
                 {
-                    //txtClientName.Text = dataGridSuppliers.Rows[e.RowIndex].Cells[1].FormattedValue.ToString().Trim();
                     txtCost.Text = dataGridSuppliers.Rows[e.RowIndex].Cells[4].FormattedValue.ToString().Trim();
                     txtPrice.Text = dataGridSuppliers.Rows[e.RowIndex].Cells[4].FormattedValue.ToString().Trim();
                 }

@@ -154,6 +154,24 @@ namespace CostToInvoiceButton
                                 }
                             }
 
+                            if (ClientName.Contains("NETJETS"))
+                            {
+                                component.ItemNumber = "AIPRTFE0101";
+                                if (!String.IsNullOrEmpty(component.ItemNumber))
+                                {
+                                    component = GetComponentData(component);
+                                    if (!String.IsNullOrEmpty(component.ItemDescription))
+                                    {
+                                        component.Incident = IncidentID;
+                                        component.Itinerary = Convert.ToInt32(item.Itinerary);
+                                        component.Categories = GetCategories(component.ItemNumber, component.Airport);
+                                        component.Componente = "1";
+                                        component.ParentPaxId = IncidentID;
+                                        InsertComponent(component);
+                                    }
+                                }
+                            }
+
                             if (!GetItineraryCountries(int.Parse(item.Itinerary)))
                             {
                                 component.ItemNumber = "IISNNAP248";
@@ -195,18 +213,21 @@ namespace CostToInvoiceButton
 
                             component.Airport = item.Airport.Replace("-", "_");
                             //component.ItemNumber = getFBOItemNumber(Convert.ToInt32(item.Itinerary));
-                            component.ItemNumber = "AIPRTFE0101";
-                            if (!String.IsNullOrEmpty(component.ItemNumber))
+                            if (ClientName.Contains("NETJETS"))
                             {
-                                component = GetComponentData(component);
-                                if (!String.IsNullOrEmpty(component.ItemDescription))
+                                component.ItemNumber = "AIPRTFE0101";
+                                if (!String.IsNullOrEmpty(component.ItemNumber))
                                 {
-                                    component.Incident = IncidentID;
-                                    component.Itinerary = Convert.ToInt32(item.Itinerary);
-                                    component.Categories = GetCategories(component.ItemNumber, component.Airport);
-                                    component.Componente = "1";
-                                    component.ParentPaxId = IncidentID;
-                                    InsertComponent(component);
+                                    component = GetComponentData(component);
+                                    if (!String.IsNullOrEmpty(component.ItemDescription))
+                                    {
+                                        component.Incident = IncidentID;
+                                        component.Itinerary = Convert.ToInt32(item.Itinerary);
+                                        component.Categories = GetCategories(component.ItemNumber, component.Airport);
+                                        component.Componente = "1";
+                                        component.ParentPaxId = IncidentID;
+                                        InsertComponent(component);
+                                    }
                                 }
                             }
                             if (!AirportOpen24(Convert.ToInt32(item.Itinerary)))
@@ -745,7 +766,7 @@ namespace CostToInvoiceButton
                 ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
                 APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
                 clientInfoHeader.AppID = "Query Example";
-                String queryString = "SELECT ID,ItemNumber,ItemDescription,Airport,IDProveedor,Costo,Precio,InternalInvoice,Itinerary,Paquete,Componente,Informativo,ParentPaxID,Categories,fuel_id,CategoriaRoyalty FROM CO.Services WHERE Incident =" + IncidentID + " ORDER BY ID ASC, Itinerary ASC, ParentPaxId ASC";
+                String queryString = "SELECT ID,ItemNumber,ItemDescription,Airport,IDProveedor,Costo,Precio,InternalInvoice,Itinerary,Paquete,Componente,Informativo,ParentPaxID,Categories,fuel_id,CobroParticipacionNj,ParticipacionCobro FROM CO.Services WHERE Incident =" + IncidentID + " ORDER BY ID ASC, Itinerary ASC, ParentPaxId ASC";
                 clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 10000, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
                 foreach (CSVTable table in queryCSV.CSVTables)
                 {
@@ -771,7 +792,8 @@ namespace CostToInvoiceButton
                         service.ParentPax = substrings[12];
                         service.Categorias = substrings[13];
                         service.FuelId = substrings[14];
-                        service.RoyaltyItem = substrings[15];
+                        service.CobroParticipacionNj = substrings[15];
+                        service.ParticipacionCobro = substrings[16];
                         services.Add(service);
                     }
                 }
@@ -791,7 +813,7 @@ namespace CostToInvoiceButton
                 ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
                 APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
                 clientInfoHeader.AppID = "Query Example";
-                String queryString = "SELECT ID FROM CO.Services  WHERE fuel_id IS NOT NULL AND Incident = " + IncidentID;
+                String queryString = "SELECT ID FROM CO.Services WHERE fuel_id NOT IN (0)  AND Incident = " + IncidentID;
                 clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 10000, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
                 if (queryCSV.CSVTables.Length > 0)
                 {
@@ -942,6 +964,7 @@ namespace CostToInvoiceButton
                  "</typ:findStructure>" +
                  "</soapenv:Body>" +
                  "</soapenv:Envelope>";
+                global.LogMessage(envelope);
                 byte[] byteArray = Encoding.UTF8.GetBytes(envelope);
                 byte[] toEncodeAsBytes = System.Text.ASCIIEncoding.ASCII.GetBytes("itotal" + ":" + "Oracle123");
                 string credentials = System.Convert.ToBase64String(toEncodeAsBytes);
@@ -986,6 +1009,7 @@ namespace CostToInvoiceButton
                                         if (nodeValue.LocalName == "ComponentItemNumber")
                                         {
                                             componentchild.ParentPaxId = component.ID;
+                                            componentchild.ServiceParent = component.ID;
                                             componentchild.Airport = component.Airport;
                                             componentchild.Incident = IncidentID;
                                             componentchild.Componente = "1";
@@ -1133,11 +1157,10 @@ namespace CostToInvoiceButton
                                                     if (nodeDeff.LocalName == "xxParticipacionCobro")
                                                     {
                                                         component.ParticipacionCobro = nodeDeff.InnerText == "SI" ? "1" : "0";
-                                                        component.CategoriaRoyalty = nodeDeff.InnerText == "SI" ? "1" : "0";
                                                     }
-                                                    if (nodeDeff.LocalName == "xxCategoriaRoyalty")
+                                                    if (nodeDeff.LocalName == "xxCobroParticipacionNj")
                                                     {
-                                                        //component.CategoriaRoyalty = nodeDeff.InnerText;
+                                                        component.CobroParticipacionNj = nodeDeff.InnerText == "SI" ? "1" : "0";
                                                     }
                                                     if (nodeDeff.LocalName == "xxPagos")
                                                     {
@@ -1192,13 +1215,22 @@ namespace CostToInvoiceButton
                 string body = "{";
                 body += "\"Airport\":\"" + component.Airport + "\",";
                 body += "\"ParentPaxId\":\"" + component.ParentPaxId + "\",";
-                if (String.IsNullOrEmpty(component.CategoriaRoyalty))
+               
+                if (!String.IsNullOrEmpty(component.ServiceParent.ToString()) && component.ServiceParent > 0)
                 {
-                    body += "\"CategoriaRoyalty\":null,";
+                    body += "\"Services\":";
+                    body += "{";
+                    body += "\"id\":" + component.ServiceParent + "";
+                    body += "},";
+                }
+
+                if (String.IsNullOrEmpty(component.CobroParticipacionNj))
+                {
+                    body += "\"CobroParticipacionNj\":null,";
                 }
                 else
                 {
-                    body += "\"CategoriaRoyalty\":\"" + component.CategoriaRoyalty + "\",";
+                    body += "\"CobroParticipacionNj\":\"" + component.CobroParticipacionNj + "\",";
                 }
                 if (String.IsNullOrEmpty(component.Categories))
                 {
@@ -1300,7 +1332,7 @@ namespace CostToInvoiceButton
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error en creación de child: " + ex.Message);
+                MessageBox.Show("Error en creación de child: " + ex.Message + "Det" + ex.StackTrace);
             }
 
         }

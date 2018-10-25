@@ -21,12 +21,15 @@ namespace CostToInvoiceButton
         public string ParentPax { get; set; }
         public string Categorias { get; set; }
         public string FuelId { get; set; }
-        public string RoyaltyItem { get; set; }
+        public string CobroParticipacionNj { get; set; }
+        public string ParticipacionCobro { get; set; }
+        
+
     }
     public class ComponentChild
     {
         public string Airport { get; set; }
-        public string CategoriaRoyalty { get; set; }
+        public string CobroParticipacionNj { get; set; }
         public string ClasificacionPagos { get; set; }
         public string Componente { get; set; }
         public string Costo { get; set; }
@@ -44,6 +47,7 @@ namespace CostToInvoiceButton
         public int ParentPaxId { get; set; }
         public int FuelId { get; set; }
         public string Categories { get; set; }
+        public int ServiceParent { get; set; }
     }
     public class Link
     {
@@ -110,7 +114,7 @@ namespace CostToInvoiceButton
         public CreatedByAccount CreatedByAccount { get; set; }
         public UpdatedByAccount UpdatedByAccount { get; set; }
         public string Airport { get; set; }
-        public object CategoriaRoyalty { get; set; }
+        public object CobroParticipacionNj { get; set; }
         public object ClasificacionPagos { get; set; }
         public string Componente { get; set; }
         public object Costo { get; set; }

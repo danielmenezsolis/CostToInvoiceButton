@@ -7,6 +7,7 @@ using RightNow.AddIns.Common;
 using System;
 using System.AddIn;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -35,6 +36,7 @@ namespace CostToInvoiceButton
         public string DepartureAirportIncident { get; set; }
         public string SRType { get; set; }
 
+
         public WorkspaceRibbonAddIn(bool inDesignMode, IRecordContext RecordContext, IGlobalContext globalContext)
         {
             if (inDesignMode == false)
@@ -42,6 +44,27 @@ namespace CostToInvoiceButton
                 global = globalContext;
                 recordContext = RecordContext;
                 this.inDesignMode = inDesignMode;
+                RecordContext.Saving += new CancelEventHandler(RecordContext_Saving);
+
+
+
+
+            }
+        }
+
+        private void RecordContext_Saving(object sender, CancelEventArgs e)
+        {
+            try
+            {
+                Init();
+
+
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("RecordContext_Saving" + ex.Message + " Det :" + ex.StackTrace);
+                throw ex;
             }
         }
         public new void Click()
@@ -365,6 +388,9 @@ namespace CostToInvoiceButton
                         ((TextBox)doubleScreen.Controls["txtInvoice"]).Visible = false;
                         ((System.Windows.Forms.Label)doubleScreen.Controls["lblInvoice"]).Text = "";
                     }
+                    UpdatePackageCost();
+
+
                     doubleScreen.ShowDialog();
                 }
             }
@@ -1870,6 +1896,115 @@ namespace CostToInvoiceButton
                 }
             }
             return cGroup;
+        }
+        public void UpdatePackageCost()
+        {
+            try
+            {
+                List<Services> services = new List<Services>();
+                ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
+                APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
+                clientInfoHeader.AppID = "Query Example";
+                String queryString = "SELECT ID,Services FROM CO.Services  WHERE Incident =" + IncidentID + "  AND Paquete = '1' Order BY Services.CreatedTime ASC";
+                clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 10000, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
+                foreach (CSVTable table in queryCSV.CSVTables)
+                {
+                    String[] rowData = table.Rows;
+                    foreach (String data in rowData)
+                    {
+                        Services service = new Services();
+                        Char delimiter = '|';
+                        string[] substrings = data.Split(delimiter);
+                        service.ID = substrings[0];
+                        service.ParentPax = substrings[1];
+                        services.Add(service);
+                    }
+                }
+                if (services.Count > 0)
+                {
+                    foreach (Services item in services)
+                    {
+                        double price = 0;
+                        double priceP = 0;
+                        double PriceCh = 0;
+                        if (!String.IsNullOrEmpty(item.ParentPax))
+                        {
+                            priceP = getPaxPrice(item.ParentPax);
+                            PriceCh = getPaxPrice(item.ID);
+                            price = PriceCh + priceP;
+                            UpdatePaxPrice(item.ID, PriceCh);
+                            UpdatePaxPrice(item.ParentPax, price);
+                        }
+                        else
+                        {
+                            price = getPaxPrice(item.ID);
+                            UpdatePaxPrice(item.ID, price);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message + " Det: " + ex.StackTrace);
+            }
+
+        }
+        public void UpdatePaxPrice(string id, double price)
+        {
+            try
+            {
+                var client = new RestClient("https://iccsmx.custhelp.com/");
+                var request = new RestRequest("/services/rest/connect/v1.4/CO.Services/" + id + "", Method.POST)
+                {
+                    RequestFormat = DataFormat.Json
+                };
+                var body = "{";
+                // Información de precios costos
+                body +=
+                    "\"Costo\":\"" + price + "\"";
+
+                body += "}";
+                global.LogMessage(body);
+                request.AddParameter("application/json", body, ParameterType.RequestBody);
+                // easily add HTTP Headers
+                request.AddHeader("Authorization", "Basic ZW9saXZhczpTaW5lcmd5KjIwMTg=");
+                request.AddHeader("X-HTTP-Method-Override", "PATCH");
+                request.AddHeader("OSvC-CREST-Application-Context", "Update Service {id}");
+                // execute the request
+                IRestResponse response = client.Execute(request);
+                var content = response.Content; // raw content as string
+                if (content == "")
+                {
+
+                }
+                else
+                {
+                    MessageBox.Show(response.Content);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message + " Det: " + ex.StackTrace);
+            }
+
+        }
+        public double getPaxPrice(string PaxId)
+        {
+            double price = 0;
+            ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
+            APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
+            clientInfoHeader.AppID = "Query Example";
+            String queryString = "SELECT SUM(TicketAmount) FROM CO.Payables WHERE Services.Incident =" + IncidentID + "  AND Services.Services = " + PaxId + " GROUP BY Services.Services   ";
+            clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 1, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
+            foreach (CSVTable table in queryCSV.CSVTables)
+            {
+                String[] rowData = table.Rows;
+                foreach (String data in rowData)
+                {
+                    price = String.IsNullOrEmpty(data) ? 0 : Convert.ToDouble(data);
+                }
+            }
+            return price;
         }
     }
     [AddIn("Invoice to Cost", Version = "1.0.0.0")]

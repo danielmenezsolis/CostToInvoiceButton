@@ -85,6 +85,7 @@ namespace CostToInvoiceButton
                     string FuelType = "";
                     string CateringDeliveryDate = "";
                     string AircraftCategory = "";
+                    string cClass = "";
                     Incident = (IIncident)recordContext.GetWorkspaceRecord(WorkspaceRecordType.Incident);
                     IList<ICfVal> IncCustomFieldList = Incident.CustomField;
                     if (IncCustomFieldList != null)
@@ -127,6 +128,7 @@ namespace CostToInvoiceButton
                     }
                     IncidentID = Incident.ID;
                     ICAO = getICAODesi(IncidentID);
+                    cClass = getCustomerClass(IncidentID);
                     SRType = GetSRType();
                     AircraftCategory = GetCargoGroup(ICAO);
                     ClientType = GetClientType();
@@ -151,6 +153,10 @@ namespace CostToInvoiceButton
                                 CreateAirNavICCS();
                             }
                         }
+                    }
+                    if (SRType == "GYCUSTODIA")
+                    {
+                        CreateDeposit();
                     }
                     servicios = GetListServices();
                     if (SRType == "FBO")
@@ -324,31 +330,27 @@ namespace CostToInvoiceButton
                                         InsertComponent(component);
                                     }
                                 }
-                                if (GetMinutesLeg(Convert.ToInt32(item.Itinerary)) >= 8)
-                                {
-                                    component.Airport = item.Airport.Replace("-", "_");
-                                    //component.ItemNumber = getFBOItemNumber(Convert.ToInt32(item.Itinerary));
-                                    component.ItemNumber = "OHANIAS0129";
-                                    if (!String.IsNullOrEmpty(component.ItemNumber))
-                                    {
-                                        component = GetComponentData(component);
-                                        if (!String.IsNullOrEmpty(component.ItemDescription))
-                                        {
-                                            component.Incident = IncidentID;
-                                            component.Itinerary = Convert.ToInt32(item.Itinerary);
-                                            component.Categories = GetCategories(component.ItemNumber, component.Airport);
-                                            component.MCreated = "1";
-                                            component.Componente = "0";
-                                            component.ParentPaxId = IncidentID;
-                                            InsertComponent(component);
-                                        }
-                                    }
-
-                                }
-
                             }
-
-
+                            if (GetMinutesLeg(Convert.ToInt32(item.Itinerary)) >= 8)
+                            {
+                                component.Airport = item.Airport.Replace("-", "_");
+                                //component.ItemNumber = getFBOItemNumber(Convert.ToInt32(item.Itinerary));
+                                component.ItemNumber = "OHANIAS0129";
+                                if (!String.IsNullOrEmpty(component.ItemNumber))
+                                {
+                                    component = GetComponentData(component);
+                                    if (!String.IsNullOrEmpty(component.ItemDescription))
+                                    {
+                                        component.Incident = IncidentID;
+                                        component.Itinerary = Convert.ToInt32(item.Itinerary);
+                                        component.Categories = GetCategories(component.ItemNumber, component.Airport);
+                                        component.MCreated = "1";
+                                        component.Componente = "0";
+                                        component.ParentPaxId = IncidentID;
+                                        InsertComponent(component);
+                                    }
+                                }
+                            }
                         }
                         servicios.Clear();
                         servicios = GetListServices();
@@ -378,6 +380,7 @@ namespace CostToInvoiceButton
                     ((TextBox)doubleScreen.Controls["txtCombustibleI"]).Text = CombustibleI;
                     ((TextBox)doubleScreen.Controls["txtClientInfo"]).Text = ClientType;
                     ((TextBox)doubleScreen.Controls["txtICAOD"]).Text = ICAO;
+                    ((TextBox)doubleScreen.Controls["txtCustomerClass"]).Text = cClass;
                     ((TextBox)doubleScreen.Controls["txtCargoGroup"]).Text = AircraftCategory;
                     ((TextBox)doubleScreen.Controls["txtCateringDDate"]).Text = CateringDeliveryDate;
                     ((TextBox)doubleScreen.Controls["txtArrivalIncident"]).Text = ArrivalAirportIncident;
@@ -399,6 +402,7 @@ namespace CostToInvoiceButton
                 MessageBox.Show("Error en Click: " + ex.Message + "Det" + ex.StackTrace);
             }
         }
+
         public bool Init()
         {
             try
@@ -788,6 +792,40 @@ namespace CostToInvoiceButton
                     if (!string.IsNullOrEmpty(component.ItemDescription))
                     {
                         InsertComponent(component);
+                    }
+                }
+            }
+        }
+        public void CreateDeposit()
+        {
+            ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
+            APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
+            clientInfoHeader.AppID = "Query Example";
+            String queryString = "SELECT COUNT(*) FROM CO.Services WHERE ItemNumber = 'DEPEGAR0358' AND Incident = " + IncidentID;
+            clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 1, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
+            foreach (CSVTable table in queryCSV.CSVTables)
+            {
+                String[] rowData = table.Rows;
+                foreach (String data in rowData)
+                {
+                    if (Convert.ToInt32(data) < 1)
+                    {
+                        Services service = new Services();
+                        Char delimiter = '|';
+                        string[] substrings = data.Split(delimiter);
+                        ComponentChild component = new ComponentChild();
+                        component.Airport = ArrivalAirportIncident;
+                        component.ItemNumber = "DEPEGAR0358";
+                        component.Incident = IncidentID;
+                        component.ParentPaxId = IncidentID;
+                        component.MCreated = "1";
+                        component.Componente = "0";
+                        component = GetComponentData(component);
+                        component.Categories = GetCategories(component.ItemNumber, component.Airport);
+                        if (!string.IsNullOrEmpty(component.ItemDescription))
+                        {
+                            InsertComponent(component);
+                        }
                     }
                 }
             }
@@ -1509,6 +1547,24 @@ namespace CostToInvoiceButton
                 MessageBox.Show("GetDepartureAirportIncident: " + ex.InnerException.ToString());
                 return "";
             }
+        }
+        public string getCustomerClass(int Incident)
+        {
+            string clase = "GENERALES";
+            ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
+            APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
+            clientInfoHeader.AppID = "Query Example";
+            String queryString = "SELECT CustomFields.c.clase FROM Incident WHERE ID =" + Incident;
+            clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 1, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
+            foreach (CSVTable table in queryCSV.CSVTables)
+            {
+                String[] rowData = table.Rows;
+                foreach (String data in rowData)
+                {
+                    clase = data;
+                }
+            }
+            return clase;
         }
         public string getICAODesi(int Incident)
         {

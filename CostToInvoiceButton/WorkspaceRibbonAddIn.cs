@@ -45,10 +45,6 @@ namespace CostToInvoiceButton
                 recordContext = RecordContext;
                 this.inDesignMode = inDesignMode;
                 RecordContext.Saving += new CancelEventHandler(RecordContext_Saving);
-
-
-
-
             }
         }
 
@@ -57,9 +53,6 @@ namespace CostToInvoiceButton
             try
             {
                 Init();
-
-
-
             }
             catch (Exception ex)
             {
@@ -157,6 +150,10 @@ namespace CostToInvoiceButton
                     if (SRType == "GYCUSTODIA")
                     {
                         CreateDeposit();
+                    }
+                    if (SRType == "SENEAM")
+                    {
+                        CreateOvers();
                     }
                     servicios = GetListServices();
                     if (SRType == "FBO")
@@ -500,6 +497,23 @@ namespace CostToInvoiceButton
 
             return air;
         }
+        public string getAirportById(int airportId)
+        {
+            string air = "";
+            ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
+            APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
+            clientInfoHeader.AppID = "Query Example";
+            String queryString = "SELECT LookupName FROM CO.Airports WHERE ID = " + airportId.ToString();
+            clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 1, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
+            foreach (CSVTable table in queryCSV.CSVTables)
+            {
+                String[] rowData = table.Rows;
+                foreach (String data in rowData) { 
+                    air = data.Replace("-", "_");
+                }
+            }
+            return air;
+        }
         public double GetLitersSum(int FuelingId)
         {
             double sum = 0;
@@ -826,6 +840,44 @@ namespace CostToInvoiceButton
                         {
                             InsertComponent(component);
                         }
+                    }
+                }
+            }
+        }
+        public void CreateOvers()
+        {
+            ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
+            APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
+            clientInfoHeader.AppID = "Query Example";
+            String queryString = "SELECT Type,Cost,Time,Amount,Departure FROM CO.SENEAMOvers WHERE Incident = " + IncidentID;
+            clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 1, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
+            foreach (CSVTable table in queryCSV.CSVTables)
+            {
+                String[] rowData = table.Rows;
+                foreach (String data in rowData)
+                {
+                    Char delimiter = '|';
+                    string[] substrings = data.Split(delimiter);
+                    string iNumber = "OSSEIAS0185";
+                    if (substrings[0] == "2")
+                    {
+                        iNumber = "AFVLEAP257";
+                    }
+                    Services service = new Services();
+                    ComponentChild component = new ComponentChild();
+                    component.Airport = getAirportById(Convert.ToInt32(substrings[4]));
+                    component.ItemNumber = iNumber;
+                    component.Incident = IncidentID;
+                    component.ParentPaxId = IncidentID;
+                    component.MCreated = "1";
+                    component.Componente = "0";
+                    component.Costo = substrings[1];
+                    component.Precio = substrings[3];
+                    component = GetComponentData(component);
+                    component.Categories = GetCategories(component.ItemNumber, component.Airport);
+                    if (!string.IsNullOrEmpty(component.ItemDescription))
+                    {
+                        InsertComponent(component);
                     }
                 }
             }

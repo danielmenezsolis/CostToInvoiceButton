@@ -512,6 +512,7 @@ namespace CostToInvoiceButton
                     air = data.Replace("-", "_");
                 }
             }
+            MessageBox.Show("Airport: " + air);
             return air;
         }
         public double GetLitersSum(int FuelingId)
@@ -849,7 +850,7 @@ namespace CostToInvoiceButton
             ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
             APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
             clientInfoHeader.AppID = "Query Example";
-            String queryString = "SELECT Type,Cost,Time,Amount,Departure FROM CO.SENEAMOvers WHERE Incident = " + IncidentID;
+            String queryString = "SELECT Type,Cost,Time,Amount FROM CO.SENEAMOvers WHERE Incident = " + IncidentID;
             clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 1, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
             foreach (CSVTable table in queryCSV.CSVTables)
             {
@@ -865,7 +866,7 @@ namespace CostToInvoiceButton
                     }
                     Services service = new Services();
                     ComponentChild component = new ComponentChild();
-                    component.Airport = getAirportById(Convert.ToInt32(substrings[4]));
+                    component.Airport = "MTS_ITEM";
                     component.ItemNumber = iNumber;
                     component.Incident = IncidentID;
                     component.ParentPaxId = IncidentID;
@@ -1196,26 +1197,34 @@ namespace CostToInvoiceButton
                                           "<typ1:conjunction>And</typ1:conjunction>" +
                                           "<typ1:upperCaseCompare>true</typ1:upperCaseCompare>" +
                                           "<typ1:attribute>OrganizationCode</typ1:attribute>" +
-                                          "<typ1:operator>=</typ1:operator>" +
-                                          "<typ1:value>IO_AEREO_" + component.Airport + "</typ1:value>" +
-                                          "</typ1:item>" +
-                                          /*  "<typ1:item>" +
-                                      "<typ1:conjunction>And</typ1:conjunction>" +
-                                      "<typ1:upperCaseCompare>true</typ1:upperCaseCompare>" +
-                                      "<typ1:attribute>ItemCategory</typ1:attribute>" +
-                                      "<typ1:nested>" +
-                                      "<typ1:group>" +
-                                      "<typ1:item>" +
-                                      "<typ1:conjunction>And</typ1:conjunction>" +
-                                      "<typ1:upperCaseCompare>true</typ1:upperCaseCompare>" +
-                                      "<typ1:attribute>CategoryName</typ1:attribute>" +
-                                      "<typ1:operator>=</typ1:operator>" +
-                                      "<typ1:value>FCC</typ1:value>" +
-                                      "</typ1:item>" +
-                                      "</typ1:group>" +
-                                      "</typ1:nested>" +
-                                      "</typ1:item>" +*/
-                                          "</typ1:group>" +
+                                           "<typ1:operator>=</typ1:operator>";
+                if (component.Airport == "MTS_ITEM")
+                {
+                    envelope += "<typ1:value>MTS_ITEM</typ1:value>";
+                }
+                else
+                {
+                    envelope += "<typ1:value>IO_AEREO_" + component.Airport + "</typ1:value>";
+                }
+                envelope += "</typ1:item>" +
+
+               /*  "<typ1:item>" +
+           "<typ1:conjunction>And</typ1:conjunction>" +
+           "<typ1:upperCaseCompare>true</typ1:upperCaseCompare>" +
+           "<typ1:attribute>ItemCategory</typ1:attribute>" +
+           "<typ1:nested>" +
+           "<typ1:group>" +
+           "<typ1:item>" +
+           "<typ1:conjunction>And</typ1:conjunction>" +
+           "<typ1:upperCaseCompare>true</typ1:upperCaseCompare>" +
+           "<typ1:attribute>CategoryName</typ1:attribute>" +
+           "<typ1:operator>=</typ1:operator>" +
+           "<typ1:value>FCC</typ1:value>" +
+           "</typ1:item>" +
+           "</typ1:group>" +
+           "</typ1:nested>" +
+           "</typ1:item>" +*/
+               "</typ1:group>" +
                                           "</typ1:filter>" +
                                           "<typ1:findAttribute>ItemDescription</typ1:findAttribute>" +
                                           "<typ1:findAttribute>ItemDFF</typ1:findAttribute>" +
@@ -1900,7 +1909,7 @@ namespace CostToInvoiceButton
                                "<typ1:fetchStart>0</typ1:fetchStart>" +
                                "<typ1:fetchSize>-1</typ1:fetchSize>" +
                                "<typ1:filter>" +
-                                   "<typ1:group>" +
+                                   "<typ1:group>" + 
                                        "<typ1:item>" +
                                            "<typ1:conjunction>And</typ1:conjunction>" +
                                            "<typ1:upperCaseCompare>true</typ1:upperCaseCompare>" +
@@ -1912,9 +1921,15 @@ namespace CostToInvoiceButton
                                            "<typ1:conjunction>And</typ1:conjunction>" +
                                            "<typ1:upperCaseCompare>true</typ1:upperCaseCompare>" +
                                            "<typ1:attribute>OrganizationCode</typ1:attribute>" +
-                                           "<typ1:operator>=</typ1:operator>" +
-                                           "<typ1:value>IO_AEREO_" + Airport + "</typ1:value>" +
-                                       "</typ1:item>" +
+                                           "<typ1:operator>=</typ1:operator>";
+                                           if (Airport == "MTS_ITEM")
+                                            {
+                                                envelope += "<typ1:value>MTS_ITEM</typ1:value>";
+                                            } else
+                                            {
+                                                envelope += "<typ1:value>IO_AEREO_" + Airport + "</typ1:value>";
+                                            }
+                                           envelope += "</typ1:item>" +
                                    "</typ1:group>" +
                                "</typ1:filter>" +
                                "<typ1:findAttribute>ItemCategory</typ1:findAttribute>" +

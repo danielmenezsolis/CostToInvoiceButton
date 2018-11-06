@@ -59,7 +59,7 @@
       <HintPath>..\packages\RestSharp.106.3.1\lib\net452\RestSharp.dll</HintPath>
     </Reference>
     <Reference Include="RightNow.AddIns.AddInViews">
-      <HintPath>..\..\..\..\AppData\Roaming\RightNow_Technologies\iccsmx\18.8.1271.262\AddInPipeline\AddInViews\RightNow.AddIns.AddInViews.dll</HintPath>
+      <HintPath>..\..\..\..\..\AppData\Roaming\RightNow_Technologies\iccsmx\18.8.1272.262\AddInPipeline\AddInViews\RightNow.AddIns.AddInViews.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.AddIn">
@@ -88,6 +88,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ClaseFinanzas.cs" />
+    <Compile Include="ClaseRecargos.cs" />
     <Compile Include="Connected Services\SOAPICCS\Reference.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

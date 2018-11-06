@@ -22,7 +22,6 @@ namespace CostToInvoiceButton
 {
     public partial class DoubleScreen : Form
     {
-
         private IRecordContext recordContext { get; set; }
         private IGlobalContext global { get; set; }
         public List<WHours> WHoursList { get; set; }
@@ -83,10 +82,12 @@ namespace CostToInvoiceButton
 
                         if (txtItemNumber.Text == "SOMFEAP325" || txtItemNumber.Text == "SOMFEAP260")
                         {
-                            double utilidad = GetUtilidadPercentage(txtUtilidad.Text) / 100;
+                            double utilidad = GetSeneamPercentage(txtSemeam.Text) / 100;
                             double costo = Convert.ToDouble(txtCost.Text);
-
-                            txtPrice.Text = Math.Round((costo + (costo * utilidad)), 4).ToString();
+                            double precio = costo * utilidad;
+                            precio += costo;
+                            precio = Math.Round(precio, 4);
+                            txtPrice.Text = precio.ToString();
                         }
                     }
                     if (lblSrType.Text == "FBO" || lblSrType.Text == "FCC")
@@ -1718,7 +1719,7 @@ namespace CostToInvoiceButton
                 return 0;
             }
         }
-        private double GetUtilidadPercentage(string Utilidad)
+        private double GetSeneamPercentage(string Utilidad)
         {
             try
             {
@@ -1727,9 +1728,7 @@ namespace CostToInvoiceButton
                 string User = Encoding.UTF8.GetString(Convert.FromBase64String("aW1wbGVtZW50YWRvcg=="));
                 string Pass = Encoding.UTF8.GetString(Convert.FromBase64String("U2luZXJneSoyMDE4"));
                 client.Authenticator = new HttpBasicAuthenticator("servicios", "Sinergy*2018");
-
-                //string definicion = "?totalResults=false&q={str_item_number:'" + dataGridServicios.Rows[e.RowIndex].Cells[1].FormattedValue.ToString().Trim() + "',str_icao_iata_code:'" + airtport + "'}";
-                string definicion = "?q={str_tipo:'UTILIDAD',str_categoria:'" + Utilidad + "'} ";
+                string definicion = "?q={str_tipo:'SENEAM',str_categoria:'" + Utilidad + "'} ";
                 var request = new RestRequest("rest/v6/customCategorias/" + definicion, Method.GET);
                 IRestResponse response = client.Execute(request);
                 ClaseParaCategorias.RootObject rootObjectCat = JsonConvert.DeserializeObject<ClaseParaCategorias.RootObject>(response.Content);
@@ -1752,6 +1751,37 @@ namespace CostToInvoiceButton
             }
 
 
+        }
+        private double GetUtilidadPercentage(string Utilidad)
+        {
+            try
+            {
+                double amount = 0;
+                var client = new RestClient("https://iccs.bigmachines.com/");
+                string User = Encoding.UTF8.GetString(Convert.FromBase64String("aW1wbGVtZW50YWRvcg=="));
+                string Pass = Encoding.UTF8.GetString(Convert.FromBase64String("U2luZXJneSoyMDE4"));
+                client.Authenticator = new HttpBasicAuthenticator("servicios", "Sinergy*2018");
+                string definicion = "?q={str_tipo:'UTILIDAD',str_categoria:'" + Utilidad + "'} ";
+                var request = new RestRequest("rest/v6/customCategorias/" + definicion, Method.GET);
+                IRestResponse response = client.Execute(request);
+                ClaseParaCategorias.RootObject rootObjectCat = JsonConvert.DeserializeObject<ClaseParaCategorias.RootObject>(response.Content);
+                if (rootObjectCat.items.Count > 0)
+                {
+                    amount = rootObjectCat.items[0].flo_value;
+                }
+                else
+                {
+                    amount = 0;
+                }
+
+                return amount;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.InnerException.ToString());
+                return 0;
+
+            }
         }
         private double GetCombCents(string Combustible)
         {
@@ -1795,8 +1825,6 @@ namespace CostToInvoiceButton
                 string User = Encoding.UTF8.GetString(Convert.FromBase64String("aW1wbGVtZW50YWRvcg=="));
                 string Pass = Encoding.UTF8.GetString(Convert.FromBase64String("U2luZXJneSoyMDE4"));
                 client.Authenticator = new HttpBasicAuthenticator("servicios", "Sinergy*2018");
-
-                //string definicion = "?totalResults=false&q={str_item_number:'" + dataGridServicios.Rows[e.RowIndex].Cells[1].FormattedValue.ToString().Trim() + "',str_icao_iata_code:'" + airtport + "'}";
                 string definicion = "?q={str_tipo:'FUEL_I',str_categoria:'" + Combustible + "'} ";
                 var request = new RestRequest("rest/v6/customCategorias/" + definicion, Method.GET);
                 IRestResponse response = client.Execute(request);
@@ -1809,18 +1837,13 @@ namespace CostToInvoiceButton
                 {
                     amount = 0;
                 }
-
                 return amount;
             }
             catch (Exception ex)
             {
                 MessageBox.Show(ex.InnerException.ToString());
                 return 0;
-
             }
-
-
-
         }
         private string GetFuelDataCharge(int idFueling)
         {
@@ -1842,12 +1865,10 @@ namespace CostToInvoiceButton
                         String[] substrings = data.Split(delimiter);
                         MessageBox.Show(substrings[0] + " " + substrings[1]);
                         Fueling = DateTime.Parse(substrings[0] + " " + substrings[1]).ToString();
-
                     }
                 }
                 return Fueling;
             }
-
             catch (Exception ex)
             {
                 MessageBox.Show("GetFuelDataCharge" + ex.Message + "Det:" + ex.StackTrace);
@@ -1874,7 +1895,6 @@ namespace CostToInvoiceButton
                 }
                 return Math.Round(sum, 4);
             }
-
             catch (Exception ex)
             {
                 MessageBox.Show("GetTicketSumCatA" + ex.Message + "Det:" + ex.StackTrace);
@@ -1901,7 +1921,6 @@ namespace CostToInvoiceButton
                 }
                 return Fueling;
             }
-
             catch (Exception ex)
             {
                 MessageBox.Show("GetGalones" + ex.Message + "Det:" + ex.StackTrace);
@@ -2727,111 +2746,6 @@ namespace CostToInvoiceButton
                 return 0;
             }
         }
-
-
-        static void getINPC()
-        {
-            try
-            {
-                string envelope = "<soap:Envelope " +
-               "	xmlns:soap=\"http://www.w3.org/2003/05/soap-envelope\"" +
-    "	xmlns:pub=\"http://xmlns.oracle.com/oxp/service/PublicReportService\">" +
-      "<soap:Header/>" +
-    "	<soap:Body>" +
-    "		<pub:runReport>" +
-    "			<pub:reportRequest>" +
-    "			<pub:attributeFormat>xml</pub:attributeFormat>" +
-    "				<pub:attributeLocale>en</pub:attributeLocale>" +
-    "				<pub:attributeTemplate>default</pub:attributeTemplate>" +
-                "<pub:parameterNameValues>" +
-                    "<pub:item>" +
-                        "<pub:name>P_PERIODO</pub:name>" +
-                        "<pub:values>" +
-                            "<pub:item></pub:item>" +
-                        "</pub:values>" +
-                    "</pub:item>" +
-                    "<pub:item>" +
-                        "<pub:name>P_PERIOD_START</pub:name>" +
-                        "<pub:values>" +
-                            "<pub:item>2018-02-01</pub:item>" +
-                        "</pub:values>" +
-                    "</pub:item>" +
-                    "<pub:item>" +
-                        "<pub:name>P_PERIOD_END</pub:name>" +
-                        "<pub:values>" +
-                            "<pub:item>2018-06-30</pub:item>" +
-                        "</pub:values>" +
-                    "</pub:item>" +
-                "</pub:parameterNameValues>" +
-    "				<pub:reportAbsolutePath>Custom/Integracion/XX_ASSET_PRICE_INDEX_REP.xdo</pub:reportAbsolutePath>" +
-    "				<pub:sizeOfDataChunkDownload>-1</pub:sizeOfDataChunkDownload>" +
-    "			</pub:reportRequest>" +
-    "		</pub:runReport>" +
-    "	</soap:Body>" +
-    "</soap:Envelope>";
-                byte[] byteArray = Encoding.UTF8.GetBytes(envelope);
-                // Construct the base 64 encoded string used as credentials for the service call
-                byte[] toEncodeAsBytes = ASCIIEncoding.ASCII.GetBytes("itotal" + ":" + "Oracle123");
-                string credentials = Convert.ToBase64String(toEncodeAsBytes);
-                // Create HttpWebRequest connection to the service
-                HttpWebRequest request =
-                 (HttpWebRequest)WebRequest.Create("https://egqy-test.fa.us6.oraclecloud.com:443/xmlpserver/services/ExternalReportWSSService");
-                // Configure the request content type to be xml, HTTP method to be POST, and set the content length
-                request.Method = "POST";
-
-                request.ContentType = "application/soap+xml; charset=UTF-8;action=\"\"";
-                request.ContentLength = byteArray.Length;
-                // Configure the request to use basic authentication, with base64 encoded user name and password, to invoke the service.
-                request.Headers.Add("Authorization", "Basic " + credentials);
-                // Set the SOAP action to be invoked; while the call works without this, the value is expected to be set based as per standards
-                //request.Headers.Add("SOAPAction", "http://xmlns.oracle.com/apps/cdm/foundation/parties/organizationService/applicationModule/findOrganizationProfile");
-                // Write the xml payload to the request
-                Stream dataStream = request.GetRequestStream();
-                dataStream.Write(byteArray, 0, byteArray.Length);
-                dataStream.Close();
-                // Write the xml payload to the request
-                XDocument doc;
-                XmlDocument docu = new XmlDocument();
-                string result;
-                using (WebResponse response = request.GetResponse())
-                {
-                    using (Stream stream = response.GetResponseStream())
-                    {
-                        doc = XDocument.Load(stream);
-                        result = doc.ToString();
-                        XmlDocument xmlDoc = new XmlDocument();
-                        xmlDoc.LoadXml(result);
-                        XmlNamespaceManager nms = new XmlNamespaceManager(xmlDoc.NameTable);
-                        nms.AddNamespace("env", "http://schemas.xmlsoap.org/soap/envelope/");
-                        nms.AddNamespace("ns2", "http://xmlns.oracle.com/oxp/service/PublicReportService");
-
-                        XmlNode desiredNode = xmlDoc.SelectSingleNode("//ns2:runReportReturn", nms);
-                        if (desiredNode.HasChildNodes)
-                        {
-                            for (int i = 0; i < desiredNode.ChildNodes.Count; i++)
-                            {
-                                if (desiredNode.ChildNodes[i].LocalName == "reportBytes")
-                                {
-                                    byte[] data = Convert.FromBase64String(desiredNode.ChildNodes[i].InnerText);
-                                    string decodedString = Encoding.UTF8.GetString(data);
-                                    XmlTextReader reader = new XmlTextReader(new System.IO.StringReader(decodedString));
-                                    reader.Read();
-                                    XmlSerializer serializer = new XmlSerializer(typeof(DATA_DS_INPC));
-                                    DATA_DS_INPC res = (DATA_DS_INPC)serializer.Deserialize(reader);
-                                }
-                            }
-                        }
-
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.StackTrace);
-            }
-        }
-
-
 
     }
     public class ItiPrices

@@ -2,6 +2,7 @@
 using MoreLinq;
 using Newtonsoft.Json;
 using RestSharp;
+using RestSharp.Authenticators;
 using RightNow.AddIns.AddInViews;
 using RightNow.AddIns.Common;
 using System;
@@ -17,12 +18,14 @@ using System.Text;
 using System.Windows.Forms;
 using System.Xml;
 using System.Xml.Linq;
+using System.Xml.Serialization;
 
 namespace CostToInvoiceButton
 {
     public class WorkspaceRibbonAddIn : Panel, IWorkspaceRibbonButton
     {
         DoubleScreen doubleScreen;
+        public static List<G_1_INPC> INPC { get; set; }
         public List<RootObject> InsertedServices { get; set; }
         private IRecordContext recordContext { get; set; }
         private IGlobalContext global { get; set; }
@@ -384,6 +387,8 @@ namespace CostToInvoiceButton
                     ((TextBox)doubleScreen.Controls["txtCateringDDate"]).Text = CateringDeliveryDate;
                     ((TextBox)doubleScreen.Controls["txtArrivalIncident"]).Text = ArrivalAirportIncident;
                     ((TextBox)doubleScreen.Controls["txtDepartureIncident"]).Text = DepartureAirportIncident;
+
+                    ((TextBox)doubleScreen.Controls["txtSemeam"]).Text = SeneamCat;
 
                     ((TextBox)doubleScreen.Controls["txtCreationIncidentDate"]).Text = incidentCreation.ToString();
 
@@ -875,7 +880,6 @@ namespace CostToInvoiceButton
                 return false;
             }
         }
-
         public string GetSeneamRequiredDate()
         {
             try
@@ -906,7 +910,6 @@ namespace CostToInvoiceButton
                 return "";
             }
         }
-
         public string GetSeneamPresDate()
         {
             try
@@ -938,6 +941,11 @@ namespace CostToInvoiceButton
             }
         }
 
+        static IEnumerable<DateTime> monthsBetween(DateTime d0, DateTime d1)
+        {
+            return Enumerable.Range(0, (d1.Year - d0.Year) * 12 + (d1.Month - d0.Month + 1))
+                             .Select(m => new DateTime(d0.Year, d0.Month, 1).AddMonths(m));
+        }
 
         public void CreateOvers()
         {
@@ -945,10 +953,40 @@ namespace CostToInvoiceButton
             APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
             clientInfoHeader.AppID = "Query Example";
             String queryString = "SELECT Type,Cost,Time,Amount FROM CO.SENEAMOvers WHERE Incident = " + IncidentID;
+
+            double factorA = 0;
+            double tRec = 0;
+
             if (SENEAMNot())
             {
+                //FECHAS
                 string Required = GetSeneamRequiredDate();
                 string Presentation = GetSeneamPresDate();
+
+                //MessageBox.Show("Fecha Required: " + Required.ToString());
+                //MessageBox.Show("Fecha Presentation: " + Presentation.ToString());
+
+                //INPC'S
+                getINPC(Required, Presentation);
+                Dictionary<string, string> INPCSs = new Dictionary<string, string>();
+                foreach (var item in INPC)
+                {
+                    INPCSs.Add(item.PERIOD_NAME, item.PRICE_INDEX_VALUE);
+                    //MessageBox.Show("Periodo: " + item.PERIOD_NAME + "   Valor INPC: " + item.PRICE_INDEX_VALUE);
+                }
+                factorA = Convert.ToDouble(INPCSs.First().Value) / Convert.ToDouble(INPCSs.Last().Value);
+                //MessageBox.Show("Factor A: " + factorA);
+
+                //TASA DE RECARGO
+                double sumaRec = 0;
+                IEnumerable<DateTime> meses = monthsBetween(DateTime.Parse(Required), DateTime.Parse(Presentation));
+                foreach (var mes in meses)
+                {
+                    sumaRec += GetTasaAnual(mes.Year.ToString());
+                    //MessageBox.Show("sumaRec actual: " + sumaRec.ToString());
+                }
+                tRec = sumaRec;
+                //MessageBox.Show("sumaRec total: " + sumaRec.ToString());
             }
 
             clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 100, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
@@ -973,7 +1011,17 @@ namespace CostToInvoiceButton
                     component.MCreated = "1";
                     component.Componente = "0";
                     component.Costo = substrings[1];
-                    component.Precio = substrings[3];
+                    if (factorA > 0 || tRec > 0)
+                    {
+                        double pricef = Convert.ToDouble(substrings[3]);
+                        pricef = (factorA * pricef);
+                        pricef = pricef + ((pricef * tRec) / 100);
+                        component.Precio = Math.Round(pricef,4).ToString();
+                    }
+                    else
+                    {
+                        component.Precio = substrings[3];
+                    }
                     component = GetComponentData(component);
                     component.Categories = GetCategories(component.ItemNumber, component.Airport);
                     if (!string.IsNullOrEmpty(component.ItemDescription))
@@ -983,12 +1031,42 @@ namespace CostToInvoiceButton
                 }
             }
         }
+        private double GetTasaAnual(string ano)
+        {
+            try
+            {
+                double tasa = 0;
+                var client = new RestClient("https://iccs.bigmachines.com/");
+                string User = Encoding.UTF8.GetString(Convert.FromBase64String("aW1wbGVtZW50YWRvcg=="));
+                string Pass = Encoding.UTF8.GetString(Convert.FromBase64String("U2luZXJneSoyMDE4"));
+                client.Authenticator = new HttpBasicAuthenticator("servicios", "Sinergy*2018");
+                string definicion = "?totalResults=true&q={inicio_tasa:'" + ano + "'}";
+                var request = new RestRequest("rest/v6/customRecargos_Seneam/" + definicion, Method.GET);
+                IRestResponse response = client.Execute(request);
+                ClaseRecargos.RootObject rootObjectCat = JsonConvert.DeserializeObject<ClaseRecargos.RootObject>(response.Content);
+                if (rootObjectCat.items.Count > 0)
+                {
+                    tasa = rootObjectCat.items[0].tasa_recargo;
+                }
+                else
+                {
+                    tasa = 0;
+                }
+
+                return tasa;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.InnerException.ToString());
+                return 0;
+            }
+        }
         public void CreateSENEAMFee()
         {
             ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
             APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
             clientInfoHeader.AppID = "Query Example";
-            String queryString = "SELECT Type, SUM(Amount) FROM CO.SENEAMOvers WHERE Incident = " + IncidentID;
+            String queryString = "SELECT ItemNumber, SUM(Precio) FROM CO.Services WHERE Incident = " + IncidentID + " AND (ItemNumber = 'OSSEIAS0185' OR ItemNumber = 'AFVLEAP257')";
             clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 1, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
             foreach (CSVTable table in queryCSV.CSVTables)
             {
@@ -998,7 +1076,7 @@ namespace CostToInvoiceButton
                     Char delimiter = '|';
                     string[] substrings = data.Split(delimiter);
                     string iNumber = "SOMFEAP325";
-                    if (substrings[0] == "2")
+                    if (substrings[0] == "AFVLEAP257")
                     {
                         iNumber = "SOMFEAP260";
                     }
@@ -1011,6 +1089,7 @@ namespace CostToInvoiceButton
                     component.MCreated = "1";
                     component.Componente = "0";
                     component.Costo = substrings[1];
+                    component.Precio = substrings[1];
                     component = GetComponentData(component);
                     component.Categories = GetCategories(component.ItemNumber, component.Airport);
                     if (!string.IsNullOrEmpty(component.ItemDescription))
@@ -2267,6 +2346,102 @@ namespace CostToInvoiceButton
             }
             return price;
         }
+
+        static void getINPC(string fechaI, string fechaF)
+        {
+            try
+            {
+                string envelope = "<soap:Envelope " +
+               "	xmlns:soap=\"http://www.w3.org/2003/05/soap-envelope\"" +
+    "	xmlns:pub=\"http://xmlns.oracle.com/oxp/service/PublicReportService\">" +
+      "<soap:Header/>" +
+    "	<soap:Body>" +
+    "		<pub:runReport>" +
+    "			<pub:reportRequest>" +
+    "			<pub:attributeFormat>xml</pub:attributeFormat>" +
+    "				<pub:attributeLocale>en</pub:attributeLocale>" +
+    "				<pub:attributeTemplate>default</pub:attributeTemplate>" +
+                "<pub:parameterNameValues>" +
+                    "<pub:item>" +
+                        "<pub:name>P_PERIOD_START</pub:name>" +
+                        "<pub:values>" +
+                            "<pub:item>"+ fechaI +"</pub:item>" +
+                        "</pub:values>" +
+                    "</pub:item>" +
+                    "<pub:item>" +
+                        "<pub:name>P_PERIOD_END</pub:name>" +
+                        "<pub:values>" +
+                            "<pub:item>" + fechaF + "</pub:item>" +
+                        "</pub:values>" +
+                    "</pub:item>" +
+                "</pub:parameterNameValues>" +
+    "				<pub:reportAbsolutePath>Custom/Integracion/XX_ASSET_PRICE_INDEX_REP.xdo</pub:reportAbsolutePath>" +
+    "				<pub:sizeOfDataChunkDownload>-1</pub:sizeOfDataChunkDownload>" +
+    "			</pub:reportRequest>" +
+    "		</pub:runReport>" +
+    "	</soap:Body>" +
+    "</soap:Envelope>";
+                byte[] byteArray = Encoding.UTF8.GetBytes(envelope);
+                // Construct the base 64 encoded string used as credentials for the service call
+                byte[] toEncodeAsBytes = ASCIIEncoding.ASCII.GetBytes("itotal" + ":" + "Oracle123");
+                string credentials = Convert.ToBase64String(toEncodeAsBytes);
+                // Create HttpWebRequest connection to the service
+                HttpWebRequest request =
+                 (HttpWebRequest)WebRequest.Create("https://egqy-test.fa.us6.oraclecloud.com:443/xmlpserver/services/ExternalReportWSSService");
+                // Configure the request content type to be xml, HTTP method to be POST, and set the content length
+                request.Method = "POST";
+                request.ContentType = "application/soap+xml; charset=UTF-8;action=\"\"";
+                request.ContentLength = byteArray.Length;
+                // Configure the request to use basic authentication, with base64 encoded user name and password, to invoke the service.
+                request.Headers.Add("Authorization", "Basic " + credentials);
+                // Set the SOAP action to be invoked; while the call works without this, the value is expected to be set based as per standards
+                //request.Headers.Add("SOAPAction", "http://xmlns.oracle.com/apps/cdm/foundation/parties/organizationService/applicationModule/findOrganizationProfile");
+                // Write the xml payload to the request
+                Stream dataStream = request.GetRequestStream();
+                dataStream.Write(byteArray, 0, byteArray.Length);
+                dataStream.Close();
+                // Write the xml payload to the request
+                XDocument doc;
+                XmlDocument docu = new XmlDocument();
+                string result;
+                using (WebResponse response = request.GetResponse())
+                {
+                    using (Stream stream = response.GetResponseStream())
+                    {
+                        doc = XDocument.Load(stream);
+                        result = doc.ToString();
+                        XmlDocument xmlDoc = new XmlDocument();
+                        xmlDoc.LoadXml(result);
+                        XmlNamespaceManager nms = new XmlNamespaceManager(xmlDoc.NameTable);
+                        nms.AddNamespace("env", "http://schemas.xmlsoap.org/soap/envelope/");
+                        nms.AddNamespace("ns2", "http://xmlns.oracle.com/oxp/service/PublicReportService");
+
+                        XmlNode desiredNode = xmlDoc.SelectSingleNode("//ns2:runReportReturn", nms);
+                        if (desiredNode.HasChildNodes)
+                        {
+                            for (int i = 0; i < desiredNode.ChildNodes.Count; i++)
+                            {
+                                if (desiredNode.ChildNodes[i].LocalName == "reportBytes")
+                                {
+                                    byte[] data = Convert.FromBase64String(desiredNode.ChildNodes[i].InnerText);
+                                    string decodedString = Encoding.UTF8.GetString(data);
+                                    XmlTextReader reader = new XmlTextReader(new System.IO.StringReader(decodedString));
+                                    reader.Read();
+                                    XmlSerializer serializer = new XmlSerializer(typeof(DATA_DS_INPC));
+                                    DATA_DS_INPC res = (DATA_DS_INPC)serializer.Deserialize(reader);
+                                    INPC = res.G_N_INPC.G_1_INPC;
+                                }
+                            }
+                        }
+
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.StackTrace);
+            }
+        }
     }
     [AddIn("Invoice to Cost", Version = "1.0.0.0")]
     public class WorkspaceRibbonButtonFactory : IWorkspaceRibbonButtonFactory
@@ -2299,4 +2474,3 @@ namespace CostToInvoiceButton
         }
     }
 }
-

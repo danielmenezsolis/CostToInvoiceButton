@@ -85,7 +85,7 @@ namespace CostToInvoiceButton
                             double utilidad = GetSeneamPercentage(txtSemeam.Text) / 100;
                             double costo = Convert.ToDouble(txtCost.Text);
                             double precio = costo * utilidad;
-                            precio += costo;
+                            txtCost.Text = "0";
                             precio = Math.Round(precio, 4);
                             txtPrice.Text = precio.ToString();
                         }

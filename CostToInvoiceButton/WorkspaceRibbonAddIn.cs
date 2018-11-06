@@ -385,11 +385,11 @@ namespace CostToInvoiceButton
                     ((TextBox)doubleScreen.Controls["txtArrivalIncident"]).Text = ArrivalAirportIncident;
                     ((TextBox)doubleScreen.Controls["txtDepartureIncident"]).Text = DepartureAirportIncident;
 
-                    ((TextBox)doubleScreen.Controls["txtCreationIncidentDate"]).Text = incidentCreation.ToString(); 
+                    ((TextBox)doubleScreen.Controls["txtCreationIncidentDate"]).Text = incidentCreation.ToString();
 
                     ((ComboBox)doubleScreen.Controls["cboCurrency"]).Text = SRType == "FUEL" ? "MXN" : GetCurrency();
 
-                    
+
                     UpdatePackageCost();
                     doubleScreen.ShowDialog();
                 }
@@ -846,12 +846,111 @@ namespace CostToInvoiceButton
                 }
             }
         }
+        public bool SENEAMNot()
+        {
+            try
+            {
+                bool not = false;
+                ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
+                APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
+                clientInfoHeader.AppID = "Query Example";
+                String queryString = "SELECT CustomFields.c.seneamfeetype.name FROM Incident WHERE ID =" + IncidentID;
+                clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 1, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
+                if (queryCSV.CSVTables.Length > 0)
+                {
+                    foreach (CSVTable table in queryCSV.CSVTables)
+                    {
+                        String[] rowData = table.Rows;
+                        foreach (String data in rowData)
+                        {
+                            not = data == "Notification" ? true : false;
+                        }
+                    }
+                }
+                return not;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("SENEAMNot:" + ex.Message + "Det: " + ex.StackTrace);
+                return false;
+            }
+        }
+
+        public string GetSeneamRequiredDate()
+        {
+            try
+            {
+                string required = "";
+                ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
+                APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
+                clientInfoHeader.AppID = "Query Example";
+                String queryString = "SELECT CustomFields.c.period FROM Incident WHERE ID =" + IncidentID;
+                clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 1, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
+                if (queryCSV.CSVTables.Length > 0)
+                {
+                    foreach (CSVTable table in queryCSV.CSVTables)
+                    {
+                        String[] rowData = table.Rows;
+                        foreach (String data in rowData)
+                        {
+                            required = data;
+                        }
+                    }
+                }
+                return required;
+            }
+            catch (Exception ex)
+            {
+
+                MessageBox.Show("SENEAMNot:" + ex.Message + "Det: " + ex.StackTrace);
+                return "";
+            }
+        }
+
+        public string GetSeneamPresDate()
+        {
+            try
+            {
+                string presentation = "";
+                ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
+                APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
+                clientInfoHeader.AppID = "Query Example";
+                String queryString = "SELECT CustomFields.c.presentationdate FROM Incident WHERE ID =" + IncidentID;
+                clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 1, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
+                if (queryCSV.CSVTables.Length > 0)
+                {
+                    foreach (CSVTable table in queryCSV.CSVTables)
+                    {
+                        String[] rowData = table.Rows;
+                        foreach (String data in rowData)
+                        {
+                            presentation = data;
+                        }
+                    }
+                }
+                return presentation;
+            }
+            catch (Exception ex)
+            {
+
+                MessageBox.Show("SENEAMNot:" + ex.Message + "Det: " + ex.StackTrace);
+                return "";
+            }
+        }
+
+
         public void CreateOvers()
         {
             ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
             APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
             clientInfoHeader.AppID = "Query Example";
             String queryString = "SELECT Type,Cost,Time,Amount FROM CO.SENEAMOvers WHERE Incident = " + IncidentID;
+            if (SENEAMNot())
+            {
+                string Required = GetSeneamRequiredDate();
+                string Presentation = GetSeneamPresDate();
+            }
+
             clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 100, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
             foreach (CSVTable table in queryCSV.CSVTables)
             {

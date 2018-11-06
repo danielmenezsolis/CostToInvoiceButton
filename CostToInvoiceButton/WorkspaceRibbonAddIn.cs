@@ -81,6 +81,7 @@ namespace CostToInvoiceButton
                     string cClass = "";
                     Incident = (IIncident)recordContext.GetWorkspaceRecord(WorkspaceRecordType.Incident);
                     IList<ICfVal> IncCustomFieldList = Incident.CustomField;
+                    DateTime? incidentCreation = Incident.Created;
                     if (IncCustomFieldList != null)
                     {
                         foreach (ICfVal inccampos in IncCustomFieldList)
@@ -382,7 +383,12 @@ namespace CostToInvoiceButton
                     ((TextBox)doubleScreen.Controls["txtCateringDDate"]).Text = CateringDeliveryDate;
                     ((TextBox)doubleScreen.Controls["txtArrivalIncident"]).Text = ArrivalAirportIncident;
                     ((TextBox)doubleScreen.Controls["txtDepartureIncident"]).Text = DepartureAirportIncident;
+
+                    ((TextBox)doubleScreen.Controls["txtCreationIncidentDate"]).Text = incidentCreation.ToString(); 
+
                     ((ComboBox)doubleScreen.Controls["cboCurrency"]).Text = SRType == "FUEL" ? "MXN" : GetCurrency();
+
+                    
                     UpdatePackageCost();
                     doubleScreen.ShowDialog();
                 }

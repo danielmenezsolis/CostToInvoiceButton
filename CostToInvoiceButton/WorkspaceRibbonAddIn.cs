@@ -383,14 +383,7 @@ namespace CostToInvoiceButton
                     ((TextBox)doubleScreen.Controls["txtArrivalIncident"]).Text = ArrivalAirportIncident;
                     ((TextBox)doubleScreen.Controls["txtDepartureIncident"]).Text = DepartureAirportIncident;
                     ((ComboBox)doubleScreen.Controls["cboCurrency"]).Text = SRType == "FUEL" ? "MXN" : GetCurrency();
-                    if (SRType == "CATERING")
-                    {
-                        ((TextBox)doubleScreen.Controls["txtInvoice"]).Visible = false;
-                        ((System.Windows.Forms.Label)doubleScreen.Controls["lblInvoice"]).Text = "";
-                    }
                     UpdatePackageCost();
-
-
                     doubleScreen.ShowDialog();
                 }
             }
@@ -508,7 +501,8 @@ namespace CostToInvoiceButton
             foreach (CSVTable table in queryCSV.CSVTables)
             {
                 String[] rowData = table.Rows;
-                foreach (String data in rowData) { 
+                foreach (String data in rowData)
+                {
                     air = data.Replace("-", "_");
                 }
             }
@@ -1909,7 +1903,7 @@ namespace CostToInvoiceButton
                                "<typ1:fetchStart>0</typ1:fetchStart>" +
                                "<typ1:fetchSize>-1</typ1:fetchSize>" +
                                "<typ1:filter>" +
-                                   "<typ1:group>" + 
+                                   "<typ1:group>" +
                                        "<typ1:item>" +
                                            "<typ1:conjunction>And</typ1:conjunction>" +
                                            "<typ1:upperCaseCompare>true</typ1:upperCaseCompare>" +
@@ -1922,24 +1916,25 @@ namespace CostToInvoiceButton
                                            "<typ1:upperCaseCompare>true</typ1:upperCaseCompare>" +
                                            "<typ1:attribute>OrganizationCode</typ1:attribute>" +
                                            "<typ1:operator>=</typ1:operator>";
-                                           if (Airport == "MTS_ITEM")
-                                            {
-                                                envelope += "<typ1:value>MTS_ITEM</typ1:value>";
-                                            } else
-                                            {
-                                                envelope += "<typ1:value>IO_AEREO_" + Airport + "</typ1:value>";
-                                            }
-                                           envelope += "</typ1:item>" +
-                                   "</typ1:group>" +
-                               "</typ1:filter>" +
-                               "<typ1:findAttribute>ItemCategory</typ1:findAttribute>" +
-                           "</typ:findCriteria>" +
-                           "<typ:findControl>" +
-                               "<typ1:retrieveAllTranslations>true</typ1:retrieveAllTranslations>" +
-                           "</typ:findControl>" +
-                       "</typ:findItem>" +
-                    "</soapenv:Body>" +
-                    "</soapenv:Envelope>";
+                if (Airport == "MTS_ITEM")
+                {
+                    envelope += "<typ1:value>MTS_ITEM</typ1:value>";
+                }
+                else
+                {
+                    envelope += "<typ1:value>IO_AEREO_" + Airport + "</typ1:value>";
+                }
+                envelope += "</typ1:item>" +
+        "</typ1:group>" +
+    "</typ1:filter>" +
+    "<typ1:findAttribute>ItemCategory</typ1:findAttribute>" +
+"</typ:findCriteria>" +
+"<typ:findControl>" +
+    "<typ1:retrieveAllTranslations>true</typ1:retrieveAllTranslations>" +
+"</typ:findControl>" +
+"</typ:findItem>" +
+"</soapenv:Body>" +
+"</soapenv:Envelope>";
 
                 byte[] byteArray = Encoding.UTF8.GetBytes(envelope);
                 byte[] toEncodeAsBytes = System.Text.ASCIIEncoding.ASCII.GetBytes("itotal" + ":" + "Oracle123");

@@ -58,24 +58,8 @@
             this.txtQty = new System.Windows.Forms.TextBox();
             this.txtPrice = new System.Windows.Forms.TextBox();
             this.txtItemNumber = new System.Windows.Forms.TextBox();
-            this.txtInvoice = new System.Windows.Forms.TextBox();
             this.BtnAdd = new System.Windows.Forms.Button();
-            this.lblInvoice = new System.Windows.Forms.Label();
             this.dataGridInvoice = new System.Windows.Forms.DataGridView();
-            this.InvoiceNumber = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Item = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Vendor = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Quantity = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Cost = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Price = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Amount = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.IdService = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Currency = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Itinerary = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.RoyaltyItem = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.ParticipacionCobro = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.EditColumn = new System.Windows.Forms.DataGridViewButtonColumn();
-            this.DeleteColumn = new System.Windows.Forms.DataGridViewButtonColumn();
             this.label10 = new System.Windows.Forms.Label();
             this.label11 = new System.Windows.Forms.Label();
             this.label12 = new System.Windows.Forms.Label();
@@ -126,6 +110,19 @@
             this.txtCargoGroup = new System.Windows.Forms.TextBox();
             this.txtParticipacionCobro = new System.Windows.Forms.TextBox();
             this.txtCustomerClass = new System.Windows.Forms.TextBox();
+            this.Item = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Vendor = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Quantity = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Cost = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Price = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Amount = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.IdService = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Currency = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Itinerary = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.RoyaltyItem = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.ParticipacionCobro = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.EditColumn = new System.Windows.Forms.DataGridViewButtonColumn();
+            this.DeleteColumn = new System.Windows.Forms.DataGridViewButtonColumn();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridSuppliers)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridServicios)).BeginInit();
@@ -375,17 +372,9 @@
             this.txtItemNumber.Location = new System.Drawing.Point(97, 362);
             this.txtItemNumber.Name = "txtItemNumber";
             this.txtItemNumber.ReadOnly = true;
-            this.txtItemNumber.Size = new System.Drawing.Size(216, 20);
+            this.txtItemNumber.Size = new System.Drawing.Size(219, 20);
             this.txtItemNumber.TabIndex = 20;
             this.txtItemNumber.TabStop = false;
-            // 
-            // txtInvoice
-            // 
-            this.txtInvoice.Location = new System.Drawing.Point(97, 414);
-            this.txtInvoice.MaxLength = 2;
-            this.txtInvoice.Name = "txtInvoice";
-            this.txtInvoice.Size = new System.Drawing.Size(42, 20);
-            this.txtInvoice.TabIndex = 19;
             // 
             // BtnAdd
             // 
@@ -396,15 +385,6 @@
             this.BtnAdd.Text = "Add";
             this.BtnAdd.UseVisualStyleBackColor = true;
             this.BtnAdd.Click += new System.EventHandler(this.BtnAdd_Click);
-            // 
-            // lblInvoice
-            // 
-            this.lblInvoice.AutoSize = true;
-            this.lblInvoice.Location = new System.Drawing.Point(3, 421);
-            this.lblInvoice.Name = "lblInvoice";
-            this.lblInvoice.Size = new System.Drawing.Size(82, 13);
-            this.lblInvoice.TabIndex = 39;
-            this.lblInvoice.Text = "Invoice Number";
             // 
             // dataGridInvoice
             // 
@@ -426,7 +406,6 @@
             this.dataGridInvoice.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle5;
             this.dataGridInvoice.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dataGridInvoice.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
-            this.InvoiceNumber,
             this.Item,
             this.Vendor,
             this.Quantity,
@@ -467,112 +446,6 @@
             this.dataGridInvoice.TabIndex = 40;
             this.dataGridInvoice.TabStop = false;
             this.dataGridInvoice.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridInvoice_CellContentClick);
-            // 
-            // InvoiceNumber
-            // 
-            this.InvoiceNumber.Frozen = true;
-            this.InvoiceNumber.HeaderText = "Invoice Number";
-            this.InvoiceNumber.Name = "InvoiceNumber";
-            this.InvoiceNumber.Width = 98;
-            // 
-            // Item
-            // 
-            this.Item.Frozen = true;
-            this.Item.HeaderText = "Item";
-            this.Item.Name = "Item";
-            this.Item.Width = 52;
-            // 
-            // Vendor
-            // 
-            this.Vendor.Frozen = true;
-            this.Vendor.HeaderText = "Vendor";
-            this.Vendor.Name = "Vendor";
-            this.Vendor.Width = 66;
-            // 
-            // Quantity
-            // 
-            this.Quantity.Frozen = true;
-            this.Quantity.HeaderText = "Quantity";
-            this.Quantity.Name = "Quantity";
-            this.Quantity.Width = 71;
-            // 
-            // Cost
-            // 
-            this.Cost.Frozen = true;
-            this.Cost.HeaderText = "Cost";
-            this.Cost.Name = "Cost";
-            this.Cost.Width = 53;
-            // 
-            // Price
-            // 
-            this.Price.Frozen = true;
-            this.Price.HeaderText = "Price";
-            this.Price.Name = "Price";
-            this.Price.Width = 56;
-            // 
-            // Amount
-            // 
-            this.Amount.Frozen = true;
-            this.Amount.HeaderText = "Total Amount";
-            this.Amount.Name = "Amount";
-            this.Amount.Width = 87;
-            // 
-            // IdService
-            // 
-            this.IdService.Frozen = true;
-            this.IdService.HeaderText = "Service ID";
-            this.IdService.Name = "IdService";
-            this.IdService.Visible = false;
-            this.IdService.Width = 76;
-            // 
-            // Currency
-            // 
-            this.Currency.Frozen = true;
-            this.Currency.HeaderText = "Currency";
-            this.Currency.Name = "Currency";
-            this.Currency.ReadOnly = true;
-            this.Currency.Width = 74;
-            // 
-            // Itinerary
-            // 
-            this.Itinerary.Frozen = true;
-            this.Itinerary.HeaderText = "Itinerary";
-            this.Itinerary.Name = "Itinerary";
-            this.Itinerary.ReadOnly = true;
-            this.Itinerary.Width = 69;
-            // 
-            // RoyaltyItem
-            // 
-            this.RoyaltyItem.Frozen = true;
-            this.RoyaltyItem.HeaderText = "CobroParticipacionNj";
-            this.RoyaltyItem.Name = "RoyaltyItem";
-            this.RoyaltyItem.ReadOnly = true;
-            this.RoyaltyItem.Width = 131;
-            // 
-            // ParticipacionCobro
-            // 
-            this.ParticipacionCobro.Frozen = true;
-            this.ParticipacionCobro.HeaderText = "ParticipacionCobro";
-            this.ParticipacionCobro.Name = "ParticipacionCobro";
-            this.ParticipacionCobro.Width = 121;
-            // 
-            // EditColumn
-            // 
-            this.EditColumn.Frozen = true;
-            this.EditColumn.HeaderText = "Edit";
-            this.EditColumn.Name = "EditColumn";
-            this.EditColumn.Text = "Edit";
-            this.EditColumn.UseColumnTextForButtonValue = true;
-            this.EditColumn.Visible = false;
-            this.EditColumn.Width = 31;
-            // 
-            // DeleteColumn
-            // 
-            this.DeleteColumn.HeaderText = "Delete";
-            this.DeleteColumn.Name = "DeleteColumn";
-            this.DeleteColumn.Text = "Delete";
-            this.DeleteColumn.UseColumnTextForButtonValue = true;
-            this.DeleteColumn.Width = 44;
             // 
             // label10
             // 
@@ -628,7 +501,7 @@
             // label16
             // 
             this.label16.AutoSize = true;
-            this.label16.Location = new System.Drawing.Point(152, 421);
+            this.label16.Location = new System.Drawing.Point(3, 421);
             this.label16.Name = "label16";
             this.label16.Size = new System.Drawing.Size(49, 13);
             this.label16.TabIndex = 48;
@@ -637,7 +510,7 @@
             // txtCurrency
             // 
             this.txtCurrency.Enabled = false;
-            this.txtCurrency.Location = new System.Drawing.Point(771, 388);
+            this.txtCurrency.Location = new System.Drawing.Point(687, 336);
             this.txtCurrency.MaxLength = 5;
             this.txtCurrency.Name = "txtCurrency";
             this.txtCurrency.ReadOnly = true;
@@ -838,9 +711,9 @@
             this.cboCurrency.Items.AddRange(new object[] {
             "MXN",
             "USD"});
-            this.cboCurrency.Location = new System.Drawing.Point(207, 413);
+            this.cboCurrency.Location = new System.Drawing.Point(97, 413);
             this.cboCurrency.Name = "cboCurrency";
-            this.cboCurrency.Size = new System.Drawing.Size(106, 21);
+            this.cboCurrency.Size = new System.Drawing.Size(139, 21);
             this.cboCurrency.TabIndex = 73;
             this.cboCurrency.SelectedIndexChanged += new System.EventHandler(this.cboCurrency_SelectedIndexChanged);
             // 
@@ -989,6 +862,105 @@
             this.txtCustomerClass.Size = new System.Drawing.Size(39, 20);
             this.txtCustomerClass.TabIndex = 91;
             // 
+            // Item
+            // 
+            this.Item.Frozen = true;
+            this.Item.HeaderText = "Item";
+            this.Item.Name = "Item";
+            this.Item.Width = 52;
+            // 
+            // Vendor
+            // 
+            this.Vendor.Frozen = true;
+            this.Vendor.HeaderText = "Vendor";
+            this.Vendor.Name = "Vendor";
+            this.Vendor.Width = 66;
+            // 
+            // Quantity
+            // 
+            this.Quantity.Frozen = true;
+            this.Quantity.HeaderText = "Quantity";
+            this.Quantity.Name = "Quantity";
+            this.Quantity.Width = 71;
+            // 
+            // Cost
+            // 
+            this.Cost.Frozen = true;
+            this.Cost.HeaderText = "Cost";
+            this.Cost.Name = "Cost";
+            this.Cost.Width = 53;
+            // 
+            // Price
+            // 
+            this.Price.Frozen = true;
+            this.Price.HeaderText = "Price";
+            this.Price.Name = "Price";
+            this.Price.Width = 56;
+            // 
+            // Amount
+            // 
+            this.Amount.Frozen = true;
+            this.Amount.HeaderText = "Total Amount";
+            this.Amount.Name = "Amount";
+            this.Amount.Width = 95;
+            // 
+            // IdService
+            // 
+            this.IdService.Frozen = true;
+            this.IdService.HeaderText = "Service ID";
+            this.IdService.Name = "IdService";
+            this.IdService.Visible = false;
+            this.IdService.Width = 82;
+            // 
+            // Currency
+            // 
+            this.Currency.Frozen = true;
+            this.Currency.HeaderText = "Currency";
+            this.Currency.Name = "Currency";
+            this.Currency.ReadOnly = true;
+            this.Currency.Width = 74;
+            // 
+            // Itinerary
+            // 
+            this.Itinerary.Frozen = true;
+            this.Itinerary.HeaderText = "Itinerary";
+            this.Itinerary.Name = "Itinerary";
+            this.Itinerary.ReadOnly = true;
+            this.Itinerary.Width = 69;
+            // 
+            // RoyaltyItem
+            // 
+            this.RoyaltyItem.Frozen = true;
+            this.RoyaltyItem.HeaderText = "CobroParticipacionNj";
+            this.RoyaltyItem.Name = "RoyaltyItem";
+            this.RoyaltyItem.ReadOnly = true;
+            this.RoyaltyItem.Width = 131;
+            // 
+            // ParticipacionCobro
+            // 
+            this.ParticipacionCobro.Frozen = true;
+            this.ParticipacionCobro.HeaderText = "ParticipacionCobro";
+            this.ParticipacionCobro.Name = "ParticipacionCobro";
+            this.ParticipacionCobro.Width = 121;
+            // 
+            // EditColumn
+            // 
+            this.EditColumn.Frozen = true;
+            this.EditColumn.HeaderText = "Edit";
+            this.EditColumn.Name = "EditColumn";
+            this.EditColumn.Text = "Edit";
+            this.EditColumn.UseColumnTextForButtonValue = true;
+            this.EditColumn.Visible = false;
+            this.EditColumn.Width = 31;
+            // 
+            // DeleteColumn
+            // 
+            this.DeleteColumn.HeaderText = "Delete";
+            this.DeleteColumn.Name = "DeleteColumn";
+            this.DeleteColumn.Text = "Delete";
+            this.DeleteColumn.UseColumnTextForButtonValue = true;
+            this.DeleteColumn.Width = 44;
+            // 
             // DoubleScreen
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1046,7 +1018,6 @@
             this.Controls.Add(this.label11);
             this.Controls.Add(this.label10);
             this.Controls.Add(this.dataGridInvoice);
-            this.Controls.Add(this.lblInvoice);
             this.Controls.Add(this.txtIdService);
             this.Controls.Add(this.label7);
             this.Controls.Add(this.label6);
@@ -1062,7 +1033,6 @@
             this.Controls.Add(this.txtQty);
             this.Controls.Add(this.txtPrice);
             this.Controls.Add(this.txtItemNumber);
-            this.Controls.Add(this.txtInvoice);
             this.Controls.Add(this.BtnAdd);
             this.Controls.Add(this.dataGridServicios);
             this.Controls.Add(this.menuStrip1);
@@ -1107,9 +1077,7 @@
         private System.Windows.Forms.TextBox txtQty;
         private System.Windows.Forms.TextBox txtPrice;
         private System.Windows.Forms.TextBox txtItemNumber;
-        private System.Windows.Forms.TextBox txtInvoice;
         private System.Windows.Forms.Button BtnAdd;
-        private System.Windows.Forms.Label lblInvoice;
         private System.Windows.Forms.DataGridView dataGridInvoice;
         private System.Windows.Forms.Label label10;
         private System.Windows.Forms.Label label11;
@@ -1159,7 +1127,8 @@
         private System.Windows.Forms.Label lblCurrencyCost;
         private System.Windows.Forms.TextBox txtCateringDDate;
         private System.Windows.Forms.TextBox txtCargoGroup;
-        private System.Windows.Forms.DataGridViewTextBoxColumn InvoiceNumber;
+        private System.Windows.Forms.TextBox txtParticipacionCobro;
+        private System.Windows.Forms.TextBox txtCustomerClass;
         private System.Windows.Forms.DataGridViewTextBoxColumn Item;
         private System.Windows.Forms.DataGridViewTextBoxColumn Vendor;
         private System.Windows.Forms.DataGridViewTextBoxColumn Quantity;
@@ -1173,7 +1142,5 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn ParticipacionCobro;
         private System.Windows.Forms.DataGridViewButtonColumn EditColumn;
         private System.Windows.Forms.DataGridViewButtonColumn DeleteColumn;
-        private System.Windows.Forms.TextBox txtParticipacionCobro;
-        private System.Windows.Forms.TextBox txtCustomerClass;
     }
 }

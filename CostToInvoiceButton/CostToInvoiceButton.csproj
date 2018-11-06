@@ -58,9 +58,8 @@
     <Reference Include="RestSharp">
       <HintPath>..\packages\RestSharp.106.3.1\lib\net452\RestSharp.dll</HintPath>
     </Reference>
-    <Reference Include="RightNow.AddIns.AddInViews, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\AppData\Roaming\RightNow_Technologies\iccsmx\18.8.1272.262\AddInPipeline\AddInViews\RightNow.AddIns.AddInViews.dll</HintPath>
+    <Reference Include="RightNow.AddIns.AddInViews">
+      <HintPath>..\..\..\..\AppData\Roaming\RightNow_Technologies\iccsmx\18.8.1272.262\AddInPipeline\AddInViews\RightNow.AddIns.AddInViews.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.AddIn">

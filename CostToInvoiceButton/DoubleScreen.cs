@@ -65,7 +65,7 @@ namespace CostToInvoiceButton
                     txtParticipacionCobro.Text = dataGridServicios.Rows[e.RowIndex].Cells[16].FormattedValue.ToString().Trim();
                     string airtport = dataGridServicios.Rows[e.RowIndex].Cells[3].FormattedValue.ToString().Trim();
                     txtAirport.Text = "IO_AEREO_" + airtport.Replace("-", "_").Trim();
-                    txtInvoice.Text = dataGridServicios.Rows[e.RowIndex].Cells[7].FormattedValue.ToString().Trim();
+
                     /*
                     if (lblSrType.Text == "PERMISOS")
                     {
@@ -95,7 +95,7 @@ namespace CostToInvoiceButton
                     }
                     if (lblSrType.Text == "CATERING")
                     {
-                        txtInvoice.Text = "1";
+
                     }
                     txtCategorias.Text = dataGridServicios.Rows[e.RowIndex].Cells[13].FormattedValue.ToString().Trim();
                     if (String.IsNullOrEmpty(dataGridServicios.Rows[e.RowIndex].Cells[5].FormattedValue.ToString()))
@@ -340,7 +340,7 @@ namespace CostToInvoiceButton
                         if (ValidateRows())
                         {
                             double amount = Math.Round((Convert.ToDouble(txtPrice.Text) * Convert.ToInt32(txtQty.Text)), 4);
-                            dataGridInvoice.Rows.Add(txtInvoice.Text, txtItem.Text, cboSuppliers.Text, txtQty.Text, txtCost.Text, txtPrice.Text, amount, txtIdService.Text, cboCurrency.Text, txtItinerary.Text, txtCobroParticipacionNj.Text, txtParticipacionCobro.Text);
+                            dataGridInvoice.Rows.Add(txtItem.Text, cboSuppliers.Text, txtQty.Text, txtCost.Text, txtPrice.Text, amount, txtIdService.Text, cboCurrency.Text, txtItinerary.Text, txtCobroParticipacionNj.Text, txtParticipacionCobro.Text);
                             ClearTxtBoxes();
                         }
                         else
@@ -1184,25 +1184,13 @@ namespace CostToInvoiceButton
             try
             {
                 bool res = true;
-
-                if (!IsNumber(txtQty.Text) || txtQty.Text == "0")
+                if (!IsFloatValue(txtQty.Text) || txtQty.Text == "0")
                 {
                     res = false;
                 }
                 if (!IsFloatValue(txtPrice.Text))
                 {
                     res = false;
-                }
-                if (!IsNumber(txtInvoice.Text) || string.IsNullOrEmpty(txtInvoice.Text))
-                {
-                    res = false;
-                }
-                else
-                {
-                    if (Convert.ToInt32(txtInvoice.Text) >= 10 || Convert.ToInt32(txtInvoice.Text) == 0)
-                    {
-                        res = false;
-                    }
                 }
                 if (!IsFloatValue(txtCost.Text))
                 {
@@ -1256,7 +1244,7 @@ namespace CostToInvoiceButton
             txtAmount.Text = "0";
             txtCost.Text = "";
             txtIdService.Text = "";
-            txtInvoice.Text = "";
+
             txtItem.Text = "";
             txtItemNumber.Text = "";
             txtPrice.Text = "";
@@ -1265,7 +1253,7 @@ namespace CostToInvoiceButton
         }
         public bool IsFloatValue(string text)
         {
-            Regex regex = new Regex(@"^\d*\.?\d{1,2}$");
+            Regex regex = new Regex(@"^[0-9]*(?:\.[0-9]*)?$");
             return regex.IsMatch(text);
         }
         public bool IsNumber(string text)

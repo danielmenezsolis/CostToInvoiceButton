@@ -2714,6 +2714,112 @@ namespace CostToInvoiceButton
                 return 0;
             }
         }
+
+
+        static void getINPC()
+        {
+            try
+            {
+                string envelope = "<soap:Envelope " +
+               "	xmlns:soap=\"http://www.w3.org/2003/05/soap-envelope\"" +
+    "	xmlns:pub=\"http://xmlns.oracle.com/oxp/service/PublicReportService\">" +
+      "<soap:Header/>" +
+    "	<soap:Body>" +
+    "		<pub:runReport>" +
+    "			<pub:reportRequest>" +
+    "			<pub:attributeFormat>xml</pub:attributeFormat>" +
+    "				<pub:attributeLocale>en</pub:attributeLocale>" +
+    "				<pub:attributeTemplate>default</pub:attributeTemplate>" +
+                "<pub:parameterNameValues>" +
+                    "<pub:item>" +
+                        "<pub:name>P_PERIODO</pub:name>" +
+                        "<pub:values>" +
+                            "<pub:item></pub:item>" +
+                        "</pub:values>" +
+                    "</pub:item>" +
+                    "<pub:item>" +
+                        "<pub:name>P_PERIOD_START</pub:name>" +
+                        "<pub:values>" +
+                            "<pub:item>2018-02-01</pub:item>" +
+                        "</pub:values>" +
+                    "</pub:item>" +
+                    "<pub:item>" +
+                        "<pub:name>P_PERIOD_END</pub:name>" +
+                        "<pub:values>" +
+                            "<pub:item>2018-06-30</pub:item>" +
+                        "</pub:values>" +
+                    "</pub:item>" +
+                "</pub:parameterNameValues>" +
+    "				<pub:reportAbsolutePath>Custom/Integracion/XX_ASSET_PRICE_INDEX_REP.xdo</pub:reportAbsolutePath>" +
+    "				<pub:sizeOfDataChunkDownload>-1</pub:sizeOfDataChunkDownload>" +
+    "			</pub:reportRequest>" +
+    "		</pub:runReport>" +
+    "	</soap:Body>" +
+    "</soap:Envelope>";
+                byte[] byteArray = Encoding.UTF8.GetBytes(envelope);
+                // Construct the base 64 encoded string used as credentials for the service call
+                byte[] toEncodeAsBytes = ASCIIEncoding.ASCII.GetBytes("itotal" + ":" + "Oracle123");
+                string credentials = Convert.ToBase64String(toEncodeAsBytes);
+                // Create HttpWebRequest connection to the service
+                HttpWebRequest request =
+                 (HttpWebRequest)WebRequest.Create("https://egqy-test.fa.us6.oraclecloud.com:443/xmlpserver/services/ExternalReportWSSService");
+                // Configure the request content type to be xml, HTTP method to be POST, and set the content length
+                request.Method = "POST";
+
+                request.ContentType = "application/soap+xml; charset=UTF-8;action=\"\"";
+                request.ContentLength = byteArray.Length;
+                // Configure the request to use basic authentication, with base64 encoded user name and password, to invoke the service.
+                request.Headers.Add("Authorization", "Basic " + credentials);
+                // Set the SOAP action to be invoked; while the call works without this, the value is expected to be set based as per standards
+                //request.Headers.Add("SOAPAction", "http://xmlns.oracle.com/apps/cdm/foundation/parties/organizationService/applicationModule/findOrganizationProfile");
+                // Write the xml payload to the request
+                Stream dataStream = request.GetRequestStream();
+                dataStream.Write(byteArray, 0, byteArray.Length);
+                dataStream.Close();
+                // Write the xml payload to the request
+                XDocument doc;
+                XmlDocument docu = new XmlDocument();
+                string result;
+                using (WebResponse response = request.GetResponse())
+                {
+                    using (Stream stream = response.GetResponseStream())
+                    {
+                        doc = XDocument.Load(stream);
+                        result = doc.ToString();
+                        XmlDocument xmlDoc = new XmlDocument();
+                        xmlDoc.LoadXml(result);
+                        XmlNamespaceManager nms = new XmlNamespaceManager(xmlDoc.NameTable);
+                        nms.AddNamespace("env", "http://schemas.xmlsoap.org/soap/envelope/");
+                        nms.AddNamespace("ns2", "http://xmlns.oracle.com/oxp/service/PublicReportService");
+
+                        XmlNode desiredNode = xmlDoc.SelectSingleNode("//ns2:runReportReturn", nms);
+                        if (desiredNode.HasChildNodes)
+                        {
+                            for (int i = 0; i < desiredNode.ChildNodes.Count; i++)
+                            {
+                                if (desiredNode.ChildNodes[i].LocalName == "reportBytes")
+                                {
+                                    byte[] data = Convert.FromBase64String(desiredNode.ChildNodes[i].InnerText);
+                                    string decodedString = Encoding.UTF8.GetString(data);
+                                    XmlTextReader reader = new XmlTextReader(new System.IO.StringReader(decodedString));
+                                    reader.Read();
+                                    XmlSerializer serializer = new XmlSerializer(typeof(DATA_DS_INPC));
+                                    DATA_DS_INPC res = (DATA_DS_INPC)serializer.Deserialize(reader);
+                                }
+                            }
+                        }
+
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.StackTrace);
+            }
+        }
+
+
+
     }
     public class ItiPrices
     {

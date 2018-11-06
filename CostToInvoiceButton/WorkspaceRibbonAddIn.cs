@@ -155,6 +155,7 @@ namespace CostToInvoiceButton
                     if (SRType == "SENEAM")
                     {
                         CreateOvers();
+                        CreateSENEAMFee();
                     }
                     servicios = GetListServices();
                     if (SRType == "FBO")
@@ -851,7 +852,7 @@ namespace CostToInvoiceButton
             APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
             clientInfoHeader.AppID = "Query Example";
             String queryString = "SELECT Type,Cost,Time,Amount FROM CO.SENEAMOvers WHERE Incident = " + IncidentID;
-            clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 1, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
+            clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 100, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
             foreach (CSVTable table in queryCSV.CSVTables)
             {
                 String[] rowData = table.Rows;
@@ -874,6 +875,43 @@ namespace CostToInvoiceButton
                     component.Componente = "0";
                     component.Costo = substrings[1];
                     component.Precio = substrings[3];
+                    component = GetComponentData(component);
+                    component.Categories = GetCategories(component.ItemNumber, component.Airport);
+                    if (!string.IsNullOrEmpty(component.ItemDescription))
+                    {
+                        InsertComponent(component);
+                    }
+                }
+            }
+        }
+        public void CreateSENEAMFee()
+        {
+            ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
+            APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
+            clientInfoHeader.AppID = "Query Example";
+            String queryString = "SELECT Type, SUM(Amount) FROM CO.SENEAMOvers WHERE Incident = " + IncidentID;
+            clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 1, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
+            foreach (CSVTable table in queryCSV.CSVTables)
+            {
+                String[] rowData = table.Rows;
+                foreach (String data in rowData)
+                {
+                    Char delimiter = '|';
+                    string[] substrings = data.Split(delimiter);
+                    string iNumber = "SOMFEAP325";
+                    if (substrings[0] == "2")
+                    {
+                        iNumber = "SOMFEAP260";
+                    }
+                    Services service = new Services();
+                    ComponentChild component = new ComponentChild();
+                    component.Airport = "MTS_ITEM";
+                    component.ItemNumber = iNumber;
+                    component.Incident = IncidentID;
+                    component.ParentPaxId = IncidentID;
+                    component.MCreated = "1";
+                    component.Componente = "0";
+                    component.Costo = substrings[1];
                     component = GetComponentData(component);
                     component.Categories = GetCategories(component.ItemNumber, component.Airport);
                     if (!string.IsNullOrEmpty(component.ItemDescription))

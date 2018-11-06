@@ -76,6 +76,19 @@ namespace CostToInvoiceButton
                     
                     }
                     */
+                    if (lblSrType.Text == "SENEAM")
+                    {
+                        txtCost.Text = dataGridServicios.Rows[e.RowIndex].Cells[5].FormattedValue.ToString();
+                        txtPrice.Text = dataGridServicios.Rows[e.RowIndex].Cells[6].FormattedValue.ToString();
+
+                        if (txtItemNumber.Text == "SOMFEAP325" || txtItemNumber.Text == "SOMFEAP260")
+                        {
+                            double utilidad = GetUtilidadPercentage(txtUtilidad.Text) / 100;
+                            double costo = Convert.ToDouble(txtCost.Text);
+
+                            txtPrice.Text = Math.Round((costo + (costo * utilidad)), 4).ToString();
+                        }
+                    }
                     if (lblSrType.Text == "FBO" || lblSrType.Text == "FCC")
                     {
                         txtFuelDateCharge.Text = GetFuelDataCharge(String.IsNullOrEmpty(dataGridServicios.Rows[e.RowIndex].Cells[14].FormattedValue.ToString()) ? 0 : Convert.ToInt32(dataGridServicios.Rows[e.RowIndex].Cells[14].FormattedValue.ToString()));

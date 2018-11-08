@@ -104,6 +104,9 @@ namespace CostToInvoiceButton
                         txtFuelDateCharge.Text = GetFuelDataCharge(String.IsNullOrEmpty(dataGridServicios.Rows[e.RowIndex].Cells[14].FormattedValue.ToString()) ? 0 : Convert.ToInt32(dataGridServicios.Rows[e.RowIndex].Cells[14].FormattedValue.ToString()));
                         txtGalones.Text = GetGalones(String.IsNullOrEmpty(dataGridServicios.Rows[e.RowIndex].Cells[14].FormattedValue.ToString()) ? 0 : Convert.ToInt32(dataGridServicios.Rows[e.RowIndex].Cells[14].FormattedValue.ToString()));
                         int Arrival = GetArrivalFuelAirport();
+
+
+
                         getArrivalHours(Arrival, txtFuelDateCharge.Text.Substring(0, 10), txtFuelDateCharge.Text.Substring(0, 10));
                         txtMainHour.Text = GetMainHourFBOFCC(txtFuelDateCharge.Text, txtFuelDateCharge.Text);
                     }
@@ -146,7 +149,7 @@ namespace CostToInvoiceButton
                             double b;
                             if (double.TryParse(txtCost.Text, out b))
                             {
-                                txtPrice.Text = GetFuelPrice();
+                                txtPrice.Text = GetFuelPrice().ToString();
                             }
 
                         }
@@ -162,7 +165,7 @@ namespace CostToInvoiceButton
                             double b;
                             if (double.TryParse(txtCost.Text, out b))
                             {
-                                txtPrice.Text = GetFuelPrice();
+                                txtPrice.Text = GetFuelPrice().ToString();
                             }
                         }
                     }
@@ -353,7 +356,7 @@ namespace CostToInvoiceButton
                     {
                         if (ValidateRows())
                         {
-                            double amount = Math.Round((Convert.ToDouble(txtPrice.Text) * Convert.ToInt32(txtQty.Text)), 4);
+                            double amount = Math.Round((Convert.ToDouble(txtPrice.Text) * Convert.ToDouble(txtQty.Text)), 4);
                             dataGridInvoice.Rows.Add(txtItem.Text, cboSuppliers.Text, txtQty.Text, txtCost.Text, txtPrice.Text, amount, txtIdService.Text, cboCurrency.Text, txtItinerary.Text, txtCobroParticipacionNj.Text, txtParticipacionCobro.Text);
                             ClearTxtBoxes();
                         }
@@ -381,7 +384,18 @@ namespace CostToInvoiceButton
         {
             try
             {
+                if ((IsFloatValue(txtQty.Text) && IsFloatValue(txtCost.Text)) && (!string.IsNullOrEmpty(txtQty.Text) && !string.IsNullOrEmpty(txtCost.Text)))
+                {
+                    if (lblSrType.Text == "FBO")
+                    {
+                        txtPrice.Text = Math.Round(((double.Parse(txtQty.Text) * double.Parse(txtCost.Text)) * 1.30), 4).ToString();
+                    }
+                    else
+                    {
+                        txtPrice.Text = Math.Round((double.Parse(txtQty.Text) * double.Parse(txtCost.Text)), 4).ToString();
+                    }
 
+                }
             }
             catch (Exception ex)
             {
@@ -488,30 +502,22 @@ namespace CostToInvoiceButton
         {
             try
             {
-
+                double pricefinal = 0;
                 if (lblSrType.Text == "CATERING")
                 {
                     cboCurrency.Text = "MXN";
 
                     if (txtUtilidad.Text == "A")
                     {
-                        /*if (txtCost.Text != "0" && !String.IsNullOrEmpty(txtCost.Text))
-                        {*/
-
-                        txtPrice.Text = txtCost.Text;
+                        pricefinal = double.Parse(txtCost.Text);
                         if (lblCurrencyPrice.Text == "USD")
                         {
-                            //MessageBox.Show("TipoA USD");
                             double rate = getExchangeRate(DateTime.Parse(txtCateringDDate.Text));
-                            //MessageBox.Show("Tipo de Cambio:" + rate.ToString());
                             double precio = Convert.ToDouble(txtPrice.Text);
-                            //MessageBox.Show("Precio:" + precio.ToString());
                             precio = precio / rate;
-                            //MessageBox.Show("Precio/Tipode Cambio:" + precio.ToString());
-                            txtPrice.Text = Math.Round(precio, 4).ToString();
+                            pricefinal = Math.Round(precio, 4);
                         }
-                        //}
-                        //txtPrice.Text = GetPrices().ToString();
+
                     }
                     else
                     {
@@ -521,7 +527,7 @@ namespace CostToInvoiceButton
                             double utilidad = GetUtilidadPercentage(txtUtilidad.Text) / 100;
 
                             precio = precio + (precio * utilidad);
-                            txtPrice.Text = Math.Round(precio, 4).ToString();
+                            pricefinal = Math.Round(precio, 4);
 
                             if (lblCurrencyPrice.Text == "USD")
                             {
@@ -532,7 +538,7 @@ namespace CostToInvoiceButton
                                 // MessageBox.Show("Precio:" + precio.ToString());
                                 precio = precio / rate;
                                 //MessageBox.Show("Precio/Tipode Cambio:" + precio.ToString());
-                                txtPrice.Text = Math.Round(precio, 4).ToString();
+                                pricefinal = Math.Round(precio, 4);
                             }
                         }
                     }
@@ -542,11 +548,11 @@ namespace CostToInvoiceButton
 
                     if (txtItemNumber.Text == "ASFIEAP357")
                     {
-                        txtPrice.Text = GetFBOPrice().ToString();
+                        pricefinal = GetFBOPrice();
                     }
                     if (IsFloatValue(txtCost.Text))
                     {
-                        txtPrice.Text = Math.Round((Convert.ToDouble(txtCost.Text) * 1.30), 4).ToString();
+                        pricefinal = Math.Round((Convert.ToDouble(txtCost.Text) * 1.30), 4);
                     }
                 }
                 if (lblSrType.Text == "FUEL")
@@ -556,7 +562,7 @@ namespace CostToInvoiceButton
                         double b;
                         if (double.TryParse(txtCost.Text, out b))
                         {
-                            txtPrice.Text = GetFuelPrice();
+                            pricefinal = GetFuelPrice();
                         }
 
                     }
@@ -567,7 +573,7 @@ namespace CostToInvoiceButton
                     {
                         cboCurrency.Text = "USD";
                         DateTime date = DateTime.Parse(txtATA.Text);
-                        txtPrice.Text = ((Convert.ToDouble(txtCost.Text) + (Convert.ToDouble(txtCost.Text) * GetUtilidadPercentage(txtUtilidad.Text) / 100)) / getExchangeRate(date)).ToString();
+                        pricefinal = ((Convert.ToDouble(txtCost.Text) + (Convert.ToDouble(txtCost.Text) * GetUtilidadPercentage(txtUtilidad.Text) / 100)) / getExchangeRate(date));
                     }
 
                     if (txtItemNumber.Text == "ASECSAS0073")
@@ -575,13 +581,22 @@ namespace CostToInvoiceButton
                         if (IsNumber(txtCost.Text))
                         {
                             double minutehour = GetMinutesLeg();
-                            txtPrice.Text = Math.Round((Convert.ToDouble(txtCost.Text) * minutehour), 4).ToString();
+                            pricefinal = Math.Round((Convert.ToDouble(txtCost.Text) * minutehour), 4);
                         }
                     }
 
                     if (isComponent())
                     {
-                        txtPrice.Text = "0";
+                        pricefinal = 0;
+                    }
+                }
+                txtPrice.Text = pricefinal.ToString();
+                if (!string.IsNullOrEmpty(txtQty.Text) && IsFloatValue(txtQty.Text))
+                {
+                    txtPrice.Text = (pricefinal * double.Parse(txtQty.Text)).ToString();
+                    if (lblSrType.Text == "FBO")
+                    {
+                        txtPrice.Text = ((double.Parse(txtCost.Text) * double.Parse(txtQty.Text)) * 1.30).ToString();
                     }
                 }
             }
@@ -701,7 +716,7 @@ namespace CostToInvoiceButton
 
             return prices;
         }
-        public string GetFuelPrice()
+        public double GetFuelPrice()
         {
             try
             {
@@ -739,12 +754,12 @@ namespace CostToInvoiceButton
                 galonrate = galonrate * galones;
                 //MessageBox.Show("Costo total : " + galonrate);
 
-                return Math.Round((galonrate), 4).ToString();
+                return Math.Round((galonrate), 4);
             }
             catch (Exception ex)
             {
                 MessageBox.Show("GetFuelPrice: " + ex.Message + "Det:" + ex.StackTrace);
-                return "";
+                return 0;
             }
         }
         public bool Init()
@@ -898,9 +913,11 @@ namespace CostToInvoiceButton
                     {
                         Char delimiter = '|';
                         String[] substrings = data.Split(delimiter);
-                        txtATA.Text = DateTimeOffset.Parse(substrings[0]).ToString();
-                        txtATD.Text = DateTimeOffset.Parse(substrings[1]).ToString();
-                        getArrivalHours(String.IsNullOrEmpty(substrings[2]) ? 0 : Convert.ToInt32(substrings[2]), substrings[0].Substring(0, 10), substrings[1].Substring(0, 10));
+                        txtATA.Text = DateTime.Parse(substrings[0]).ToLocalTime().ToString();
+                        txtATD.Text = DateTime.Parse(substrings[1]).ToLocalTime().ToString();
+
+
+                        getArrivalHours(Convert.ToInt32(substrings[2]), substrings[0].Substring(0, 10), substrings[1].Substring(0, 10));
                         txtArrivalAiport.Text = substrings[3];
                         txtLimit.Text = getGrupoLogLimit(String.IsNullOrEmpty(substrings[2]) ? 0 : Convert.ToInt32(substrings[2]));
 
@@ -943,7 +960,7 @@ namespace CostToInvoiceButton
                 return 0;
             }
         }
-        private void getArrivalHours(int Arrival, string Open, string Close)
+        private void getArrivalHours(int Arrival, string AtaDate, string ATDDate)
         {
             try
             {
@@ -961,8 +978,8 @@ namespace CostToInvoiceButton
                         WHours hours = new WHours();
                         Char delimiter = '|';
                         String[] substrings = data.Split(delimiter);
-                        hours.Opens = DateTime.Parse(Open + " " + substrings[0].Trim());
-                        hours.Closes = DateTime.Parse(Close + " " + substrings[1].Trim());
+                        hours.Opens = DateTime.Parse(AtaDate + " " + substrings[0].Trim());
+                        hours.Closes = DateTime.Parse(ATDDate + " " + substrings[1].Trim());
                         switch (substrings[2].Trim())
                         {
                             case "1":
@@ -1864,7 +1881,7 @@ namespace CostToInvoiceButton
                         Char delimiter = '|';
                         String[] substrings = data.Split(delimiter);
                         MessageBox.Show(substrings[0] + " " + substrings[1]);
-                        Fueling = DateTime.Parse(substrings[0] + " " + substrings[1]).ToString();
+                        Fueling = DateTime.Parse(substrings[0] + " " + substrings[1]).ToLocalTime().ToString();
                     }
                 }
                 return Fueling;

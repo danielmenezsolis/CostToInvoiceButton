@@ -104,10 +104,8 @@ namespace CostToInvoiceButton
                         txtFuelDateCharge.Text = GetFuelDataCharge(String.IsNullOrEmpty(dataGridServicios.Rows[e.RowIndex].Cells[14].FormattedValue.ToString()) ? 0 : Convert.ToInt32(dataGridServicios.Rows[e.RowIndex].Cells[14].FormattedValue.ToString()));
                         txtGalones.Text = GetGalones(String.IsNullOrEmpty(dataGridServicios.Rows[e.RowIndex].Cells[14].FormattedValue.ToString()) ? 0 : Convert.ToInt32(dataGridServicios.Rows[e.RowIndex].Cells[14].FormattedValue.ToString()));
                         int Arrival = GetArrivalFuelAirport();
-
-
-
-                        getArrivalHours(Arrival, txtFuelDateCharge.Text.Substring(0, 10), txtFuelDateCharge.Text.Substring(0, 10));
+                        DateTime fuel = DateTime.Parse(txtFuelDateCharge.Text);
+                        getArrivalHours(Arrival, fuel.ToString("yyyy-MM-dd"), fuel.ToString("yyyy-MM-dd"));
                         txtMainHour.Text = GetMainHourFBOFCC(txtFuelDateCharge.Text, txtFuelDateCharge.Text);
                     }
                     if (lblSrType.Text == "CATERING")
@@ -917,7 +915,7 @@ namespace CostToInvoiceButton
                         txtATD.Text = DateTime.Parse(substrings[1]).ToLocalTime().ToString();
 
 
-                        getArrivalHours(Convert.ToInt32(substrings[2]), substrings[0].Substring(0, 10), substrings[1].Substring(0, 10));
+                        getArrivalHours(Convert.ToInt32(substrings[2]), DateTime.Parse(substrings[0]).ToLocalTime().ToString("yyyy-MM-dd"), DateTime.Parse(substrings[1]).ToLocalTime().ToString("yyyy-MM-dd"));
                         txtArrivalAiport.Text = substrings[3];
                         txtLimit.Text = getGrupoLogLimit(String.IsNullOrEmpty(substrings[2]) ? 0 : Convert.ToInt32(substrings[2]));
 
@@ -964,6 +962,7 @@ namespace CostToInvoiceButton
         {
             try
             {
+                MessageBox.Show("Ata:" + AtaDate + "ATD: " + ATDDate);
                 ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
                 APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
                 clientInfoHeader.AppID = "Query Example";
@@ -980,6 +979,8 @@ namespace CostToInvoiceButton
                         String[] substrings = data.Split(delimiter);
                         hours.Opens = DateTime.Parse(AtaDate + " " + substrings[0].Trim());
                         hours.Closes = DateTime.Parse(ATDDate + " " + substrings[1].Trim());
+
+                        MessageBox.Show("OPEN:" + hours.Opens.ToString() + "CLOSE: " + hours.Closes.ToString() + "OPENZULU: " + substrings[0].Trim() + "CLOSESZULU: " + substrings[1].Trim());
                         switch (substrings[2].Trim())
                         {
                             case "1":

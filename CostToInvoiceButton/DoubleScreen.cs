@@ -169,10 +169,10 @@ namespace CostToInvoiceButton
                     }
                     if ((lblSrType.Text == "FBO" && (txtItemNumber.Text == "ASFIEAP357" || txtItemNumber.Text == "AIPRTFE0101")) || (lblSrType.Text == "FCC" && txtItemNumber.Text == "AIPRTFE0101"))
                     {
-                        int indice = 11;
+                        int indice = 10;
                         if (txtItemNumber.Text == "AIPRTFE0101")
                         {
-                            indice = 10;
+                            indice = 9;
                         }
                         double pricesum = 0;
                         int arrival = GetArrivalAirport(Convert.ToInt32(txtItinerary.Text));
@@ -715,8 +715,6 @@ namespace CostToInvoiceButton
 
             foreach (DataGridViewRow dgvRenglon in dataGridServicios.Rows)
             {
-
-
             }
 
             return prices;

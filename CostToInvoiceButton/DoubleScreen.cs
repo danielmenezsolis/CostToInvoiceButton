@@ -413,56 +413,63 @@ namespace CostToInvoiceButton
         }
         private void saveToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (!validateFBOFee())
+            try
             {
-                int i = 0;
-                if (dataGridInvoice.Rows.Count == 0)
+
+                if (validateFBOFee())
                 {
-                    MessageBox.Show("Cannot be saved if there is no data");
-                }
-                else
-                {
-                    foreach (DataGridViewRow dgvRenglon in dataGridInvoice.Rows)
+                    int i = 0;
+                    if (dataGridInvoice.Rows.Count == 0)
                     {
-                        var client = new RestClient("https://iccsmx.custhelp.com/");
-                        var request = new RestRequest("/services/rest/connect/v1.4/CO.Services/" + dgvRenglon.Cells[7].Value.ToString() + "", Method.POST)
+                        MessageBox.Show("Cannot be saved if there is no data");
+                    }
+                    else
+                    {
+                        foreach (DataGridViewRow dgvRenglon in dataGridInvoice.Rows)
                         {
-                            RequestFormat = DataFormat.Json
-                        };
-                        var body = "{";
-                        // Información de precios costos
-                        body += "\"Precio\":\"" + dgvRenglon.Cells[5].Value.ToString() + "\"," +
-                            "\"Costo\":\"" + dgvRenglon.Cells[4].Value.ToString() + "\"," +
-                            "\"InternalInvoice\":" + Convert.ToInt32(dgvRenglon.Cells[0].Value.ToString()) + "";
-                        if (!String.IsNullOrEmpty(dgvRenglon.Cells[2].Value.ToString()))
-                        {
-                            body += ",\"IDProveedor\":\"" + dgvRenglon.Cells[2].Value.ToString() + "\"";
-                        }
-                        body += "}";
-                        request.AddParameter("application/json", body, ParameterType.RequestBody);
-                        // easily add HTTP Headers
-                        request.AddHeader("Authorization", "Basic ZW9saXZhczpTaW5lcmd5KjIwMTg=");
-                        request.AddHeader("X-HTTP-Method-Override", "PATCH");
-                        request.AddHeader("OSvC-CREST-Application-Context", "Update Service {id}");
-                        // execute the request
-                        IRestResponse response = client.Execute(request);
-                        var content = response.Content; // raw content as string
-                        if (content == "")
-                        {
-                            i = i + 1;
-                        }
-                        else
-                        {
-                            MessageBox.Show(response.Content);
+                            var client = new RestClient("https://iccsmx.custhelp.com/");
+                            var request = new RestRequest("/services/rest/connect/v1.4/CO.Services/" + dgvRenglon.Cells[6].Value.ToString() + "", Method.POST)
+                            {
+                                RequestFormat = DataFormat.Json
+                            };
+                            var body = "{";
+                            // Información de precios costos
+                            body += "\"Precio\":\"" + dgvRenglon.Cells[4].Value.ToString() + "\"," +
+                                "\"Costo\":\"" + dgvRenglon.Cells[3].Value.ToString() + "\",";
+                            if (!String.IsNullOrEmpty(dgvRenglon.Cells[1].Value.ToString()))
+                            {
+                                body += "\"IDProveedor\":\"" + dgvRenglon.Cells[1].Value.ToString() + "\"";
+                            }
+                            body += "}";
+                            global.LogMessage(body);
+
+                            request.AddParameter("application/json", body, ParameterType.RequestBody);
+                            request.AddHeader("Authorization", "Basic ZW9saXZhczpTaW5lcmd5KjIwMTg=");
+                            request.AddHeader("X-HTTP-Method-Override", "PATCH");
+                            request.AddHeader("OSvC-CREST-Application-Context", "Update Service {id}");
+                            IRestResponse response = client.Execute(request);
+                            var content = response.Content;
+                            if (content == "")
+                            {
+                                i = i + 1;
+                            }
+                            else
+                            {
+                                MessageBox.Show(response.Content);
+                            }
                         }
                     }
-                }
-                if (i > 0)
-                {
-                    MessageBox.Show("Data saved");
+                    if (i > 0)
+                    {
+                        MessageBox.Show("Data saved");
+                    }
                 }
             }
-            //this.Close();
+            catch (Exception ex)
+            {
+                MessageBox.Show("saveToolStripMenuItem_Click" + ex.Message + "Det: " + ex.StackTrace);
+            }
+
         }
         private void btnDelete_Click(object sender, EventArgs e)
         {
@@ -873,27 +880,35 @@ namespace CostToInvoiceButton
         }
         public bool validateFBOFee()
         {
-            bool vali = true;
-            List<ItiPrices> itiPrices = new List<ItiPrices>();
-            itiPrices = getInvoiceItineraries();
-            double pricecompare = 0;
-            foreach (var item in itiPrices)
+            try
             {
-                foreach (DataGridViewRow dgvRenglon in dataGridInvoice.Rows)
+                bool vali = true;
+                List<ItiPrices> itiPrices = new List<ItiPrices>();
+                itiPrices = getInvoiceItineraries();
+                double pricecompare = 0;
+                foreach (var item in itiPrices)
                 {
-                    int itinerarycompare = Convert.ToInt32(dgvRenglon.Cells[9].Value);
-                    if (lblSrType.Text == "FBO" && dgvRenglon.Cells[1].Value.ToString().Contains("LOGISTIC / LOGISTICA") && item.Itinerarie == itinerarycompare)
+                    foreach (DataGridViewRow dgvRenglon in dataGridInvoice.Rows)
                     {
-                        pricecompare = +Convert.ToDouble(dgvRenglon.Cells[5].Value);
+                        int itinerarycompare = Convert.ToInt32(dgvRenglon.Cells[8].Value);
+                        if (lblSrType.Text == "FBO" && dgvRenglon.Cells[0].Value.ToString().Contains("LOGISTIC / LOGISTICA") && item.Itinerarie == itinerarycompare)
+                        {
+                            pricecompare = +Convert.ToDouble(dgvRenglon.Cells[4].Value);
+                        }
+                    }
+                    if (item.Limit < pricecompare)
+                    {
+                        vali = false;
+                        MessageBox.Show("The prices of Logistic Fee excedees Flight Logistic Limit in Itinerary:" + item.Itinerarie.ToString());
                     }
                 }
-                if (item.Limit < pricecompare)
-                {
-                    vali = false;
-                    MessageBox.Show("The prices of Logistic Fee excedees Flight Logistic Limit in Itinerary:" + item.Itinerarie.ToString());
-                }
+                return vali;
             }
-            return vali;
+            catch (Exception ex)
+            {
+                MessageBox.Show("validateFBOFee" + ex.Message + "DEtalle: " + ex.StackTrace);
+                return false;
+            }
         }
         private void GetItineraryHours(int Itinerary)
         {
@@ -913,12 +928,9 @@ namespace CostToInvoiceButton
                         String[] substrings = data.Split(delimiter);
                         txtATA.Text = DateTime.Parse(substrings[0]).ToLocalTime().ToString();
                         txtATD.Text = DateTime.Parse(substrings[1]).ToLocalTime().ToString();
-
-
                         getArrivalHours(Convert.ToInt32(substrings[2]), DateTime.Parse(substrings[0]).ToLocalTime().ToString("yyyy-MM-dd"), DateTime.Parse(substrings[1]).ToLocalTime().ToString("yyyy-MM-dd"));
                         txtArrivalAiport.Text = substrings[3];
                         txtLimit.Text = getGrupoLogLimit(String.IsNullOrEmpty(substrings[2]) ? 0 : Convert.ToInt32(substrings[2]));
-
                         txtAirportFee.Text = getAirportCollectionFee(String.IsNullOrEmpty(substrings[2]) ? 0 : Convert.ToInt32(substrings[2]));
                         txtCateringCollection.Text = getAirportCateringCollectionFee(String.IsNullOrEmpty(substrings[2]) ? 0 : Convert.ToInt32(substrings[2]));
                         txtCollectionDeduction.Text = getAirportCollectionDeductionFee(String.IsNullOrEmpty(substrings[2]) ? 0 : Convert.ToInt32(substrings[2]));
@@ -962,7 +974,6 @@ namespace CostToInvoiceButton
         {
             try
             {
-                MessageBox.Show("Ata:" + AtaDate + "ATD: " + ATDDate);
                 ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
                 APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
                 clientInfoHeader.AppID = "Query Example";
@@ -979,8 +990,6 @@ namespace CostToInvoiceButton
                         String[] substrings = data.Split(delimiter);
                         hours.Opens = DateTime.Parse(AtaDate + " " + substrings[0].Trim());
                         hours.Closes = DateTime.Parse(ATDDate + " " + substrings[1].Trim());
-
-                        MessageBox.Show("OPEN:" + hours.Opens.ToString() + "CLOSE: " + hours.Closes.ToString() + "OPENZULU: " + substrings[0].Trim() + "CLOSESZULU: " + substrings[1].Trim());
                         switch (substrings[2].Trim())
                         {
                             case "1":
@@ -1260,15 +1269,24 @@ namespace CostToInvoiceButton
         }
         public List<ItiPrices> getInvoiceItineraries()
         {
-            List<ItiPrices> itineraries = new List<ItiPrices>();
-            foreach (DataGridViewRow dgvRenglon in dataGridInvoice.Rows)
+            try
             {
-                ItiPrices itiPrices = new ItiPrices();
-                itiPrices.Itinerarie = String.IsNullOrEmpty(dgvRenglon.Cells[9].Value.ToString()) ? 0 : Convert.ToInt32(dgvRenglon.Cells[9].Value);
-                itiPrices.Limit = getGrupoLogLimitItinerary(itiPrices.Itinerarie);
-                itineraries.Add(itiPrices);
+                List<ItiPrices> itineraries = new List<ItiPrices>();
+                foreach (DataGridViewRow dgvRenglon in dataGridInvoice.Rows)
+                {
+                    ItiPrices itiPrices = new ItiPrices();
+                    itiPrices.Itinerarie = String.IsNullOrEmpty(dgvRenglon.Cells[8].Value.ToString()) ? 0 : Convert.ToInt32(dgvRenglon.Cells[8].Value);
+                    itiPrices.Limit = getGrupoLogLimitItinerary(itiPrices.Itinerarie);
+                    itineraries.Add(itiPrices);
+                }
+                return itineraries.DistinctBy(x => x.Itinerarie).ToList();
             }
-            return itineraries.DistinctBy(x => x.Itinerarie).ToList();
+            catch (Exception ex)
+            {
+                MessageBox.Show("getInvoiceItineraries" + ex.Message + "DEtalle: " + ex.StackTrace);
+                return null;
+            }
+
         }
 
         private void ClearTxtBoxes()
@@ -1721,8 +1739,7 @@ namespace CostToInvoiceButton
                 }
                 if (lblSrType.Text == "FBO" && price == 0)
                 {
-                    price = Math.Round(Convert.ToDouble(txtCost.Text) * 1.30);
-                    txtPrice.Text = Math.Round((Convert.ToDouble(txtCost.Text) * 1.30), 4).ToString();
+                    price = Math.Round(((double.Parse(txtQty.Text) * double.Parse(txtCost.Text)) * 1.30), 4);
                 }
                 if (isComponent())
                 {
@@ -1881,7 +1898,6 @@ namespace CostToInvoiceButton
                     {
                         Char delimiter = '|';
                         String[] substrings = data.Split(delimiter);
-                        MessageBox.Show(substrings[0] + " " + substrings[1]);
                         Fueling = DateTime.Parse(substrings[0] + " " + substrings[1]).ToLocalTime().ToString();
                     }
                 }

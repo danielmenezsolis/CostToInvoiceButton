@@ -83,7 +83,7 @@ namespace CostToInvoiceButton
                         if (txtItemNumber.Text == "SOMFEAP325" || txtItemNumber.Text == "SOMFEAP260")
                         {
                             double utilidad = GetSeneamPercentage(txtSemeam.Text) / 100;
-                            double costo = Convert.ToDouble(txtCost.Text);
+                            double costo = String.IsNullOrEmpty(txtPrice.Text) ? 0 : Convert.ToDouble(txtPrice.Text);
                             double precio = costo * utilidad;
                             txtCost.Text = "0";
                             precio = Math.Round(precio, 4);
@@ -120,12 +120,15 @@ namespace CostToInvoiceButton
                         {
                             cboCurrency.Text = Currency;
                         }
+                        if (txtItemNumber.Text == "SOMFEAP325" || txtItemNumber.Text == "SOMFEAP260")
+                        {
+                            txtCost.Text = "0";
+                        }
                     }
                     else
                     {
                         txtCost.Text = dataGridServicios.Rows[e.RowIndex].Cells[5].FormattedValue.ToString();
                     }
-
                     if (String.IsNullOrEmpty(dataGridServicios.Rows[e.RowIndex].Cells[6].FormattedValue.ToString()))
                     {
                         if (lblSrType.Text != "FUEL")
@@ -149,7 +152,6 @@ namespace CostToInvoiceButton
                             {
                                 txtPrice.Text = GetFuelPrice().ToString();
                             }
-
                         }
                         else
                         {
@@ -176,40 +178,40 @@ namespace CostToInvoiceButton
                         }
                         double pricesum = 0;
                         int arrival = GetArrivalAirport(Convert.ToInt32(txtItinerary.Text));
-                        // MessageBox.Show("ID de aeropuerto: " + arrival.ToString());
+                        MessageBox.Show("ID de aeropuerto: " + arrival.ToString());
                         double catcollectionfee = Convert.ToDouble(getAirportCateringCollectionFee(arrival)) / 100;
-                        // MessageBox.Show("ID de CatCollFee: " + catcollectionfee.ToString());
+                        MessageBox.Show("ID de CatCollFee: " + catcollectionfee.ToString());
                         double airportfee = Convert.ToDouble(getAirportCollectionFee(arrival)) / 100;
-                        //MessageBox.Show("ID de AirCollFee: " + airportfee.ToString());
+                        MessageBox.Show("ID de AirCollFee: " + airportfee.ToString());
                         double deductionfee = Convert.ToDouble(getAirportCollectionDeductionFee(arrival)) / 100;
-                        // MessageBox.Show("ID de DedCollFee: " + deductionfee.ToString());
+                        MessageBox.Show("ID de DedCollFee: " + deductionfee.ToString());
                         foreach (DataGridViewRow dgvRenglon in dataGridInvoice.Rows)
                         {
-                            int itinerarycompare = Convert.ToInt32(dgvRenglon.Cells[9].Value);
+                            int itinerarycompare = Convert.ToInt32(dgvRenglon.Cells[8].Value);
                             double price = Convert.ToDouble(dgvRenglon.Cells[5].Value);
                             double fee = 0;
                             double dfee = 0;
 
                             if (Convert.ToInt32(txtItinerary.Text) == itinerarycompare)
                             {
-                                if (dgvRenglon.Cells[indice].Value.ToString() == "1" && dgvRenglon.Cells[1].Value.ToString().Contains("CATERING"))
+                                if (dgvRenglon.Cells[indice].Value.ToString() == "1" && dgvRenglon.Cells[0].Value.ToString().Contains("CATERING"))
                                 {
                                     fee = price * catcollectionfee;
-                                    //MessageBox.Show("Item de Catering");
+                                    MessageBox.Show("Item de Catering");
                                 }
-                                if (dgvRenglon.Cells[indice].Value.ToString() == "1" && !dgvRenglon.Cells[1].Value.ToString().Contains("CATERING"))
+                                if (dgvRenglon.Cells[indice].Value.ToString() == "1" && !dgvRenglon.Cells[0].Value.ToString().Contains("CATERING"))
                                 {
                                     fee = price * airportfee;
-                                    // MessageBox.Show("Item normal");
+                                    MessageBox.Show("Item normal");
                                 }
-                                // MessageBox.Show("ItemFee: " + fee.ToString());
+                                MessageBox.Show("ItemFee: " + fee.ToString());
                                 dfee = fee * deductionfee;
-                                //  MessageBox.Show("ItemDedFee: " + dfee.ToString());
+                                MessageBox.Show("ItemDedFee: " + dfee.ToString());
                                 pricesum = pricesum + (fee - dfee);
                             }
-                            //MessageBox.Show("AFeeActual: " + pricesum.ToString());
+                            MessageBox.Show("AFeeActual: " + pricesum.ToString());
                         }
-                        // MessageBox.Show("AFeeTotal: " + pricesum.ToString());
+                        MessageBox.Show("AFeeTotal: " + pricesum.ToString());
                         txtPrice.Text = Math.Round((pricesum), 4).ToString();
                         txtPrice.Enabled = false;
                         txtCost.Enabled = false;
@@ -415,7 +417,6 @@ namespace CostToInvoiceButton
         {
             try
             {
-
                 if (validateFBOFee())
                 {
                     int i = 0;
@@ -508,6 +509,11 @@ namespace CostToInvoiceButton
             try
             {
                 double pricefinal = 0;
+                if (txtItemNumber.Text == "SOMFEAP325" || txtItemNumber.Text == "SOMFEAP260")
+                {
+                    pricefinal = Convert.ToDouble(txtPrice.Text);
+                }
+
                 if (lblSrType.Text == "CATERING")
                 {
                     cboCurrency.Text = "MXN";
@@ -550,12 +556,7 @@ namespace CostToInvoiceButton
                 }
                 if (lblSrType.Text == "FBO")
                 {
-
-                    if (txtItemNumber.Text == "ASFIEAP357")
-                    {
-                        pricefinal = GetFBOPrice();
-                    }
-                    if (IsFloatValue(txtCost.Text))
+                    if (IsFloatValue(txtCost.Text) && txtItemNumber.Text != "ASFIEAP357")
                     {
                         pricefinal = Math.Round((Convert.ToDouble(txtCost.Text) * 1.30), 4);
                     }
@@ -596,14 +597,15 @@ namespace CostToInvoiceButton
                     }
                 }
                 txtPrice.Text = pricefinal.ToString();
-                if (!string.IsNullOrEmpty(txtQty.Text) && IsFloatValue(txtQty.Text))
+                /*
+                 * if (!string.IsNullOrEmpty(txtQty.Text) && IsFloatValue(txtQty.Text))
                 {
                     txtPrice.Text = (pricefinal * double.Parse(txtQty.Text)).ToString();
                     if (lblSrType.Text == "FBO")
                     {
                         txtPrice.Text = ((double.Parse(txtCost.Text) * double.Parse(txtQty.Text)) * 1.30).ToString();
                     }
-                }
+                }*/
             }
             catch (Exception ex)
             {
@@ -707,17 +709,6 @@ namespace CostToInvoiceButton
                 global.LogMessage("GetMinutesLeg: " + ex.Message + "Det: " + ex.StackTrace);
                 return 0;
             }
-        }
-
-        public double GetFBOPrice()
-        {
-            double prices = 2;
-
-            foreach (DataGridViewRow dgvRenglon in dataGridServicios.Rows)
-            {
-            }
-
-            return prices;
         }
         public double GetFuelPrice()
         {
@@ -888,16 +879,16 @@ namespace CostToInvoiceButton
                 {
                     foreach (DataGridViewRow dgvRenglon in dataGridInvoice.Rows)
                     {
-                        int itinerarycompare = Convert.ToInt32(dgvRenglon.Cells[8].Value);
+                        int itinerarycompare = String.IsNullOrEmpty(dgvRenglon.Cells[8].Value.ToString()) ? 0 : Convert.ToInt32(dgvRenglon.Cells[8].Value);
                         if (lblSrType.Text == "FBO" && dgvRenglon.Cells[0].Value.ToString().Contains("LOGISTIC / LOGISTICA") && item.Itinerarie == itinerarycompare)
                         {
-                            pricecompare = +Convert.ToDouble(dgvRenglon.Cells[4].Value);
+                            pricecompare = pricecompare + Convert.ToDouble(dgvRenglon.Cells[4].Value);
                         }
                     }
                     if (item.Limit < pricecompare)
                     {
                         vali = false;
-                        MessageBox.Show("The prices of Logistic Fee excedees Flight Logistic Limit in Itinerary:" + item.Itinerarie.ToString());
+                        MessageBox.Show("The prices of Logistic Fee excedees Flight Logistic Limit in Itinerary: " + item.Itinerarie.ToString());
                     }
                 }
                 return vali;
@@ -1098,7 +1089,6 @@ namespace CostToInvoiceButton
                                                     sup.Name = item.PARTY_NAME;
                                                     sups.Add(sup);
                                                 }
-
                                             }
                                         }
                                     }
@@ -1767,7 +1757,7 @@ namespace CostToInvoiceButton
                 ClaseParaCategorias.RootObject rootObjectCat = JsonConvert.DeserializeObject<ClaseParaCategorias.RootObject>(response.Content);
                 if (rootObjectCat.items.Count > 0)
                 {
-                    amount = rootObjectCat.items[0].flo_value;
+                    amount = Convert.ToDouble(rootObjectCat.items[0].flo_value.ToString());
                 }
                 else
                 {

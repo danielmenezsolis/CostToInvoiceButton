@@ -37,7 +37,7 @@ namespace CostToInvoiceButton
         public IIncident Incident { get; set; }
         public int IncidentID { get; set; }
         public string ArrivalAirportIncident { get; set; }
-        public string DepartureAirportIncident { get; set; }
+        public string DepartureAirportIncident { get; set; } 
         public string SRType { get; set; }
 
 
@@ -1002,19 +1002,17 @@ namespace CostToInvoiceButton
                 IEnumerable<DateTime> meses = monthsBetween(DateTime.Parse(Required), DateTime.Parse(Presentation));
                 if (tipo == "2")
                 {
-                    meses = meses.Where(u => u.Month != DateTime.Parse(Required).Month);
+                    meses = meses.Exclude(0,1);
                 }
-
                 foreach (var mes in meses)
                 {
                     sumaRec += GetTasaAnual(mes.Year.ToString());
-                    MessageBox.Show("Mes, anio: " + mes.Month.ToString() + " " + mes.Year.ToString());
-                    MessageBox.Show("sumaRec actual: " + sumaRec.ToString());
+                    //MessageBox.Show("Mes, anio: " + mes.Month.ToString() + " " + mes.Year.ToString());
+                    //MessageBox.Show("sumaRec actual: " + sumaRec.ToString());
                 }
                 tRec = sumaRec;
                 MessageBox.Show("sumaRec total: " + sumaRec.ToString());
             }
-
             clientInfoHeader = new ClientInfoHeader();
             aPIAccessRequest = new APIAccessRequestHeader();
             clientInfoHeader.AppID = "Query Example";
@@ -1043,13 +1041,16 @@ namespace CostToInvoiceButton
                     component.Costo = substrings[1];
                     if (factorA > 0 || tRec > 0)
                     {
-                        double pricef = Convert.ToDouble(substrings[3]);
+                        string priced = substrings[3];
+                        double pricef = String.IsNullOrEmpty(priced) ? 0 : Convert.ToDouble(priced);
                         pricef = (factorA * pricef) - pricef;
                         if (pricef <= 0)
                         {
                             pricef = 1;
                         }
+                        MessageBox.Show("actualización: " + pricef.ToString());
                         pricef = Convert.ToDouble(substrings[3]) + pricef;
+                        MessageBox.Show("no se que es: " + pricef.ToString());
                         double recargos = pricef * (tRec / 100);
                         MessageBox.Show("recargos: " + recargos.ToString());
                         pricef = pricef + recargos;

@@ -436,10 +436,10 @@ namespace CostToInvoiceButton
                             var body = "{";
                             // Información de precios costos
                             body += "\"Precio\":\"" + dgvRenglon.Cells[4].Value.ToString() + "\"," +
-                                "\"Costo\":\"" + dgvRenglon.Cells[3].Value.ToString() + "\",";
+                                "\"Costo\":\"" + dgvRenglon.Cells[3].Value.ToString() + "\"";
                             if (!String.IsNullOrEmpty(dgvRenglon.Cells[1].Value.ToString()))
                             {
-                                body += "\"IDProveedor\":\"" + dgvRenglon.Cells[1].Value.ToString() + "\"";
+                                body += ",\"IDProveedor\":\"" + dgvRenglon.Cells[1].Value.ToString() + "\"";
                             }
                             body += "}";
                             global.LogMessage(body);
@@ -2769,6 +2769,10 @@ namespace CostToInvoiceButton
             }
         }
 
+        private void txtUOM_TextChanged(object sender, EventArgs e)
+        {
+
+        }
     }
     public class ItiPrices
     {

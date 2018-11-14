@@ -920,6 +920,7 @@
             this.txtUOM.Name = "txtUOM";
             this.txtUOM.Size = new System.Drawing.Size(39, 20);
             this.txtUOM.TabIndex = 86;
+            this.txtUOM.TextChanged += new System.EventHandler(this.txtUOM_TextChanged);
             // 
             // lblCurrencyCost
             // 

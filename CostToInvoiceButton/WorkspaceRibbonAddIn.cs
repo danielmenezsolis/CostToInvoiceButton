@@ -37,7 +37,7 @@ namespace CostToInvoiceButton
         public IIncident Incident { get; set; }
         public int IncidentID { get; set; }
         public string ArrivalAirportIncident { get; set; }
-        public string DepartureAirportIncident { get; set; } 
+        public string DepartureAirportIncident { get; set; }
         public string SRType { get; set; }
 
 
@@ -444,7 +444,9 @@ namespace CostToInvoiceButton
                 ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
                 APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
                 clientInfoHeader.AppID = "Query Example";
-                String queryString = "SELECT (Date_Diff(ATA_ZUTC,ATD_ZUTC)/60) FROM CO.Itinerary WHERE ID =" + Itinerarie + "";
+                //String queryString = "SELECT (Date_Diff(ATA_ZUTC,ATD_ZUTC)/60) FROM CO.Itinerary WHERE ID =" + Itinerarie + "";
+                String queryString = "SELECT ATA,ATATime,ATD,ATDTime  FROM CO.Itinerary WHERE ID =" + Itinerarie + "";
+
                 global.LogMessage(queryString);
                 clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 1, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
                 foreach (CSVTable table in queryCSV.CSVTables)
@@ -452,7 +454,12 @@ namespace CostToInvoiceButton
                     String[] rowData = table.Rows;
                     foreach (String data in rowData)
                     {
-                        minutes = Convert.ToDouble(data);
+                        Char delimiter = '|';
+                        string[] substrings = data.Split(delimiter);
+                        DateTime ATA = DateTime.Parse(substrings[0] + " " + substrings[1]);
+                        DateTime ATD = DateTime.Parse(substrings[2] + " " + substrings[3]);
+                        minutes = (ATD - ATA).TotalMinutes;
+                        //minutes = Convert.ToDouble(data);
                     }
                 }
 
@@ -629,23 +636,33 @@ namespace CostToInvoiceButton
         }
         public bool AirportOpen24(int Itinerarie)
         {
-            bool open = true;
-
-            ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
-            APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
-            clientInfoHeader.AppID = "Query Example";
-            String queryString = "SELECT ArrivalAirport.HoursOpen24 FROM Co.Itinerary  WHERE ID =" + Itinerarie;
-            clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 1, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
-            foreach (CSVTable table in queryCSV.CSVTables)
+            try
             {
-                String[] rowData = table.Rows;
-                foreach (String data in rowData)
-                {
-                    open = data == "1" ? true : false;
-                }
-            }
+                bool open = true;
 
-            return open;
+                ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
+                APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
+                clientInfoHeader.AppID = "Query Example";
+                String queryString = "SELECT ArrivalAirport.HoursOpen24 FROM Co.Itinerary  WHERE ID =" + Itinerarie;
+                clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 1, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
+                foreach (CSVTable table in queryCSV.CSVTables)
+                {
+                    String[] rowData = table.Rows;
+                    foreach (String data in rowData)
+                    {
+                        open = data == "1" ? true : false;
+                    }
+                }
+
+                return open;
+            }
+            catch (Exception ex)
+            {
+
+                MessageBox.Show("AirportOpen24: " + ex.Message + "Detail: " + ex.StackTrace);
+
+                return false;
+            }
         }
         public int getArrivalAirport(int Itinerarie)
         {
@@ -710,14 +727,16 @@ namespace CostToInvoiceButton
                 ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
                 APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
                 clientInfoHeader.AppID = "Query Example";
-                String queryString = "SELECT ATA_ZUTC FROM Co.Itinerary WHERE ID = " + Itinerarie;
+                String queryString = "SELECT ATA,ATATime FROM Co.Itinerary WHERE ID = " + Itinerarie;
                 clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 1, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
                 foreach (CSVTable table in queryCSV.CSVTables)
                 {
                     String[] rowData = table.Rows;
                     foreach (String data in rowData)
                     {
-                        ATA = data;
+                        Char delimiter = '|';
+                        string[] substrings = data.Split(delimiter);
+                        ATA = substrings[0] + " " + substrings[1];
                     }
                 }
                 return DateTime.Parse(ATA);
@@ -736,14 +755,16 @@ namespace CostToInvoiceButton
                 ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
                 APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
                 clientInfoHeader.AppID = "Query Example";
-                String queryString = "SELECT ATA_ZUTC FROM Co.Itinerary WHERE ID = " + Itinerarie;
+                String queryString = "SELECT  ATD,ATDTime FROM Co.Itinerary WHERE ID = " + Itinerarie;
                 clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 1, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
                 foreach (CSVTable table in queryCSV.CSVTables)
                 {
                     String[] rowData = table.Rows;
                     foreach (String data in rowData)
                     {
-                        ATD = data;
+                        Char delimiter = '|';
+                        string[] substrings = data.Split(delimiter);
+                        ATD = substrings[0] + " " + substrings[1];
                     }
                 }
                 return DateTime.Parse(ATD);
@@ -994,7 +1015,7 @@ namespace CostToInvoiceButton
                 MessageBox.Show("INPC1 = " + inpc1.ToString());
                 MessageBox.Show("INPC2 = " + inpc2.ToString());
 
-                factorA = inpc2/inpc1;
+                factorA = inpc2 / inpc1;
                 MessageBox.Show("factorA = " + factorA.ToString());
 
                 //TASA DE RECARGO
@@ -1002,7 +1023,7 @@ namespace CostToInvoiceButton
                 IEnumerable<DateTime> meses = monthsBetween(DateTime.Parse(Required), DateTime.Parse(Presentation));
                 if (tipo == "2")
                 {
-                    meses = meses.Exclude(0,1);
+                    meses = meses.Exclude(0, 1);
                 }
                 foreach (var mes in meses)
                 {
@@ -1055,7 +1076,7 @@ namespace CostToInvoiceButton
                         MessageBox.Show("recargos: " + recargos.ToString());
                         pricef = pricef + recargos;
                         MessageBox.Show("pricef total: " + pricef.ToString());
-                        component.Precio = Math.Round(pricef,4).ToString();
+                        component.Precio = Math.Round(pricef, 4).ToString();
                     }
                     else
                     {
@@ -1147,6 +1168,7 @@ namespace CostToInvoiceButton
                 APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
                 clientInfoHeader.AppID = "Query Example";
                 String queryString = "SELECT ID,ItemNumber,ItemDescription,Airport,IDProveedor,Costo,Precio,InternalInvoice,Itinerary,Paquete,Componente,Informativo,ParentPaxID,Categories,fuel_id,CobroParticipacionNj,ParticipacionCobro FROM CO.Services WHERE Incident =" + IncidentID + " AND Informativo = '0' And  (Componente IS NULL OR Componente  = '0') ORDER BY ID ASC, Itinerary ASC, ParentPaxId ASC";
+                global.LogMessage(queryString);
                 clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 10000, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
                 foreach (CSVTable table in queryCSV.CSVTables)
                 {
@@ -2495,7 +2517,7 @@ namespace CostToInvoiceButton
                     "<pub:item>" +
                         "<pub:name>P_PERIOD_START</pub:name>" +
                         "<pub:values>" +
-                            "<pub:item>"+ fechaI +"</pub:item>" +
+                            "<pub:item>" + fechaI + "</pub:item>" +
                         "</pub:values>" +
                     "</pub:item>" +
                     "<pub:item>" +

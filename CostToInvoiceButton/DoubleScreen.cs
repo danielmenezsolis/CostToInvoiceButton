@@ -77,16 +77,39 @@ namespace CostToInvoiceButton
                     */
                     if (lblSrType.Text == "SENEAM")
                     {
-                        txtCost.Text = dataGridServicios.Rows[e.RowIndex].Cells[5].FormattedValue.ToString();
-                        txtPrice.Text = dataGridServicios.Rows[e.RowIndex].Cells[6].FormattedValue.ToString();
+                        cboCurrency.Text = "USD";
+                        double tipoCambio = getExchangeRate(DateTime.Today);
+
+                        double cost = String.IsNullOrEmpty(dataGridServicios.Rows[e.RowIndex].Cells[5].Value.ToString()) ? 0 : Convert.ToDouble(dataGridServicios.Rows[e.RowIndex].Cells[5].FormattedValue);
+                        if (cost >= tipoCambio)
+                        {
+                            cost = Math.Round(cost / tipoCambio, 4);
+                        }
+                        txtCost.Text = cost.ToString();
+
+                        double pri = String.IsNullOrEmpty(dataGridServicios.Rows[e.RowIndex].Cells[6].Value.ToString()) ? 0 : Convert.ToDouble(dataGridServicios.Rows[e.RowIndex].Cells[6].FormattedValue);
+                        if (pri >= tipoCambio)
+                        {
+                            pri = Math.Round(pri / tipoCambio, 4);
+                        }
+                        txtPrice.Text = pri.ToString();
+
+                        /*
+                        int qty = Convert.ToInt32(pri / cost);
+                        txtQty.Text = qty.ToString();
+                        */
 
                         if (txtItemNumber.Text == "SOMFEAP325" || txtItemNumber.Text == "SOMFEAP260")
                         {
-                            double utilidad = GetSeneamPercentage(txtSemeam.Text) / 100;
-                            double costo = String.IsNullOrEmpty(txtPrice.Text) ? 0 : Convert.ToDouble(txtPrice.Text);
-                            double precio = costo * utilidad;
+                            double costo = String.IsNullOrEmpty(dataGridServicios.Rows[e.RowIndex].Cells[6].Value.ToString()) ? 0 : Convert.ToDouble(dataGridServicios.Rows[e.RowIndex].Cells[6].FormattedValue);
+                            double precio = costo;
                             txtCost.Text = "0";
-                            precio = Math.Round(precio, 4);
+
+                            if (precio >= tipoCambio)
+                            {
+                                precio = precio / tipoCambio;
+                            }
+                            precio = Math.Round(precio, 2);
                             txtPrice.Text = precio.ToString();
                         }
                     }
@@ -319,6 +342,11 @@ namespace CostToInvoiceButton
                             txtPrice.Text = Math.Round(utilidad, 4).ToString();
                         }
                     }
+
+                    if (lblSrType.Text == "SENEAM")
+                    {
+                        cboCurrency.Text = "USD";
+                    }
                     if (txtCost.Text == "0")
                     {
                         cboCurrency.Text = "MXN";
@@ -521,19 +549,15 @@ namespace CostToInvoiceButton
 
                 if (lblSrType.Text == "CATERING")
                 {
-                    cboCurrency.Text = "MXN";
+                    cboCurrency.Text = "USD";
 
                     if (txtUtilidad.Text == "A")
                     {
                         pricefinal = double.Parse(txtCost.Text);
-                        if (lblCurrencyPrice.Text == "USD")
-                        {
-                            double rate = getExchangeRate(DateTime.Parse(txtCateringDDate.Text));
-                            double precio = Convert.ToDouble(txtPrice.Text);
-                            precio = precio / rate;
-                            pricefinal = Math.Round(precio, 4);
-                        }
 
+                        double rate = getExchangeRate(DateTime.Parse(txtCateringDDate.Text));
+                        pricefinal = pricefinal / rate;
+                        pricefinal = Math.Round(pricefinal, 4);
                     }
                     else
                     {
@@ -547,13 +571,9 @@ namespace CostToInvoiceButton
 
                             if (lblCurrencyPrice.Text == "USD")
                             {
-                                // MessageBox.Show("OtroTipo USD");
                                 double rate = getExchangeRate(DateTime.Parse(txtCateringDDate.Text));
-                                // MessageBox.Show("Tipo de Cambio:" + rate.ToString());
                                 precio = Convert.ToDouble(txtPrice.Text);
-                                // MessageBox.Show("Precio:" + precio.ToString());
                                 precio = precio / rate;
-                                //MessageBox.Show("Precio/Tipode Cambio:" + precio.ToString());
                                 pricefinal = Math.Round(precio, 4);
                             }
                         }
@@ -2558,7 +2578,7 @@ namespace CostToInvoiceButton
             catch (Exception ex)
             {
                 MessageBox.Show("GetMTOWPrice: " + ex.Message + "Det:" + ex.StackTrace);
-                return "";
+                return "0";
             }
         }
         private bool isFBOPrice()

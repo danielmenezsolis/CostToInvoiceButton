@@ -39,6 +39,7 @@ namespace CostToInvoiceButton
         public string ArrivalAirportIncident { get; set; }
         public string DepartureAirportIncident { get; set; }
         public string SRType { get; set; }
+        public string SENCat { get; set; }
 
 
         public WorkspaceRibbonAddIn(bool inDesignMode, IRecordContext RecordContext, IGlobalContext globalContext)
@@ -113,6 +114,7 @@ namespace CostToInvoiceButton
                             if (inccampos.CfId == 81)
                             {
                                 SeneamCat = inccampos.ValStr;
+                                SENCat = inccampos.ValStr;
                             }
                             if (inccampos.CfId == 82)
                             {
@@ -963,7 +965,7 @@ namespace CostToInvoiceButton
                 ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
                 APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
                 clientInfoHeader.AppID = "Query Example";
-                String queryString = "SELECT CreatedTime  FROM Incident WHERE ID =" + IncidentID;
+                String queryString = "SELECT CustomFields.c.presentationdate FROM Incident WHERE ID =" + IncidentID;
                 clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 1, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
                 if (queryCSV.CSVTables.Length > 0)
                 {
@@ -1020,7 +1022,10 @@ namespace CostToInvoiceButton
                 {
                     //FECHAS
                     string Required = GetSeneamRequiredDate();
+                    MessageBox.Show("Required = " + Required.ToString());
+
                     string Presentation = GetSeneamPresDate();
+                    MessageBox.Show("Presentation = " + Presentation.ToString());
 
                     //INPC'S
                     double inpc1 = 0;
@@ -1029,8 +1034,14 @@ namespace CostToInvoiceButton
                     string fecha1 = DateTime.Parse(Required).ToString("MMM-yy");
                     string fecha2 = DateTime.Parse(Presentation).ToString("MMM-yy");
 
-                    fecha1 = fecha1.Remove(3, 1);
-                    fecha2 = fecha2.Remove(3, 1);
+                    if (fecha1.Contains(","))
+                    {
+                        fecha1 = fecha1.Remove(3, 1);
+                    }
+                    if (fecha2.Contains(","))
+                    {
+                        fecha2 = fecha2.Remove(3, 1);
+                    }
 
                     inpc1 = getMonthINPC(fecha1.ToUpper());
                     inpc2 = getMonthINPC(fecha2.ToUpper());
@@ -1061,7 +1072,7 @@ namespace CostToInvoiceButton
                 aPIAccessRequest = new APIAccessRequestHeader();
                 clientInfoHeader.AppID = "Query Example";
                 queryString = "SELECT Type,Cost,Time,Amount FROM CO.SENEAMOvers WHERE Incident = " + IncidentID;
-                clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 100, "|", false, false, out queryCSV, out FileData);
+                clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 1, "|", false, false, out queryCSV, out FileData);
                 foreach (CSVTable table in queryCSV.CSVTables)
                 {
                     String[] rowData = table.Rows;
@@ -1151,10 +1162,11 @@ namespace CostToInvoiceButton
         }
         public void CreateSENEAMFee()
         {
+            double feeper = GetSeneamPercentage(SENCat);
             ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
             APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
             clientInfoHeader.AppID = "Query Example";
-            String queryString = "SELECT ItemNumber, SUM(Precio) FROM CO.Services WHERE Incident = " + IncidentID + " AND (ItemNumber = 'OSSEIAS0185' OR ItemNumber = 'AFVLEAP257')";
+            String queryString = "SELECT ItemNumber, SUM(Precio)*(" + feeper + "/100) FROM CO.Services WHERE Incident = " + IncidentID + " AND (ItemNumber = 'OSSEIAS0185' OR ItemNumber = 'AFVLEAP257')";
             clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 1, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
             foreach (CSVTable table in queryCSV.CSVTables)
             {
@@ -1185,6 +1197,36 @@ namespace CostToInvoiceButton
                         InsertComponent(component);
                     }
                 }
+            }
+        }
+        private double GetSeneamPercentage(string Utilidad)
+        {
+            try
+            {
+                double amount = 0;
+                var client = new RestClient("https://iccs.bigmachines.com/");
+                string User = Encoding.UTF8.GetString(Convert.FromBase64String("aW1wbGVtZW50YWRvcg=="));
+                string Pass = Encoding.UTF8.GetString(Convert.FromBase64String("U2luZXJneSoyMDE4"));
+                client.Authenticator = new HttpBasicAuthenticator("servicios", "Sinergy*2018");
+                string definicion = "?q={str_tipo:'SENEAM',str_categoria:'" + Utilidad + "'} ";
+                var request = new RestRequest("rest/v6/customCategorias/" + definicion, Method.GET);
+                IRestResponse response = client.Execute(request);
+                ClaseParaCategorias.RootObject rootObjectCat = JsonConvert.DeserializeObject<ClaseParaCategorias.RootObject>(response.Content);
+                if (rootObjectCat.items.Count > 0)
+                {
+                    amount = Convert.ToDouble(rootObjectCat.items[0].flo_value.ToString());
+                }
+                else
+                {
+                    amount = 0;
+                }
+
+                return amount;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.InnerException.ToString());
+                return 0;
             }
         }
         public List<Services> GetListServices()

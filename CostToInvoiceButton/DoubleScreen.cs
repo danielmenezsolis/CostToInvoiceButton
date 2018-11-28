@@ -1412,7 +1412,7 @@ namespace CostToInvoiceButton
                     // string definicion = "?totalResults=false&q={str_item_number:'" + dataGridServicios.Rows[e.RowIndex].Cells[1].FormattedValue.ToString().Trim() + "',str_icao_iata_code:'" + airtport + "'}";
                     if (lblSrType.Text == "FBO")
                     {
-                        definicion = "?totalResults=true&q={str_item_number:'" + txtItemNumber.Text + "',str_icao_iata_code:'" + txtAirport.Text + "',bol_int_fbo:1,$or:[{str_schedule_type:{$exists:false}},{str_schedule_type:'" + txtMainHour.Text + "'}],$or:[{str_aircraft_type:{$exists:false}},{str_aircraft_type:'" + txtICAOD.Text + "'}],$or:[{str_client_category:{$exists:false}},{str_client_category:'" + txtCustomerClass.Text + "'}]}";
+                        definicion = "?totalResults=true&q={str_item_number:'" + txtItemNumber.Text + "',str_icao_iata_code:'" + txtAirport.Text + "',bol_int_fbo:1,$or:[{str_schedule_type:{$exists:false}},{str_schedule_type:'" + txtMainHour.Text + "'}],$or:[{str_aircraft_type:{$exists:false}},{str_aircraft_type:'" + txtICAOD.Text + "'}],$or:[{str_client_category:{$exists:false}},{str_client_category:'" + txtCustomerClass.Text.Replace("&","%") + "'}]}";
                         if (txtCategorias.Text.Contains("AERO"))
                         {
                             definicion = "?totalResults=true&q={str_item_number:'" + txtItemNumber.Text + "',str_icao_iata_code:'" + txtAirport.Text + "',bol_int_fbo: 1,str_schedule_type:'" + txtMainHour.Text + "',$or:[{str_aircraft_type:'" + txtICAOD.Text + "'},{str_aircraft_type:{$exists:false}}],$or:[{str_ft_arrival:'" + arr_type.ToUpper() + "'},{str_ft_arrival:{$exists: false}}],$or:[{str_ft_depart:'" + dep_type.ToUpper() + "'},{str_ft_depart:{$exists: false}}],$or:[{str_client_category:{$exists:false}},{str_client_category:'" + txtCustomerClass.Text + "'}]}";
@@ -1453,7 +1453,7 @@ namespace CostToInvoiceButton
                         definicion = "?totalResults=true&q={str_item_number:'" + txtItemNumber.Text + "',str_icao_iata_code:'" + txtAirport.Text + "'} ";
                         if (txtCategorias.Text.Contains("AERO"))
                         {
-                            definicion = "?totalResults=true&q={str_item_number:'" + txtItemNumber.Text + "',str_icao_iata_code:'" + txtAirport.Text + "',bol_intat:1,str_schedule_type:'" + txtMainHour.Text + "',str_aircraft_type:'" + txtICAOD.Text + "',str_ft_arrival: '" + txtFromAirport.Text.ToUpper() + "', str_ft_depart: '" + txtToAirtport.Text.ToUpper() + "',$or:[{str_client_category:{$exists:false}},{str_client_category:'" + txtCustomerClass.Text + "'}]}";
+                            definicion = "?totalResults=true&q={str_item_number:'" + txtItemNumber.Text + "',str_icao_iata_code:'" + txtAirport.Text + "',bol_intat:1,str_schedule_type:'" + txtMainHour.Text + "',str_aircraft_type:'" + txtICAOD.Text + "',str_ft_arrival: '" + txtFromAirport.Text.ToUpper() + "', str_ft_depart: '" + txtToAirtport.Text.ToUpper() + "',$or:[{str_client_category:{$exists:false}},{str_client_category:'" + txtCustomerClass.Text.Replace("&", "%") + "'}]}";
                         }
                         if (txtItemNumber.Text == "IPFERPS0052")// || txtItemNumber.Text == "JFUEIAS0269" || txtItemNumber.Text == "AGASIAS0011" || txtItemNumber.Text == "JFUEIAS0010" || txtItemNumber.Text == "AFMURAS0016")
                         {
@@ -1632,7 +1632,7 @@ namespace CostToInvoiceButton
                 }
                 if (lblSrType.Text == "FBO")
                 {
-                    definicion = "?totalResults=true&q={str_item_number:'" + txtItemNumber.Text + "',str_icao_iata_code:'" + txtAirport.Text + "',bol_int_fbo:1,$or:[{str_schedule_type:{$exists:false}},{str_schedule_type:'" + txtMainHour.Text + "'}],$or:[{str_aircraft_type:{$exists:false}},{str_aircraft_type:'" + txtICAOD.Text + "'}],$or:[{str_client_category:{$exists:false}},{str_client_category:'" + txtCustomerClass.Text + "'}]}";
+                    definicion = "?totalResults=true&q={str_item_number:'" + txtItemNumber.Text + "',str_icao_iata_code:'" + txtAirport.Text + "',bol_int_fbo:1,$or:[{str_schedule_type:{$exists:false}},{str_schedule_type:'" + txtMainHour.Text + "'}],$or:[{str_aircraft_type:{$exists:false}},{str_aircraft_type:'" + txtICAOD.Text + "'}],$or:[{str_client_category:{$exists:false}},{str_client_category:'" + txtCustomerClass.Text.Replace("&", "%") + "'}]}";
                 }
                 if (lblSrType.Text == "FUEL")
                 {
@@ -1670,7 +1670,7 @@ namespace CostToInvoiceButton
                     }
                     if (txtCategorias.Text.Contains("AERO"))
                     {
-                        definicion += "str_item_number:'" + txtItemNumber.Text + "',str_icao_iata_code:'" + txtAirport.Text + "',bol_int_flight_cargo:1,str_schedule_type:'" + txtMainHour.Text + "',str_aircraft_type:'" + txtICAOD.Text + "',str_ft_arrival: '" + txtFromAirport.Text.ToUpper() + "', str_ft_depart: '" + txtToAirtport.Text.ToUpper() + "',$or:[{str_client_category:{$exists:false}},{str_client_category:'" + txtCustomerClass.Text + "'}]}";
+                        definicion += "str_item_number:'" + txtItemNumber.Text + "',str_icao_iata_code:'" + txtAirport.Text + "',bol_int_flight_cargo:1,str_schedule_type:'" + txtMainHour.Text + "',str_aircraft_type:'" + txtICAOD.Text + "',str_ft_arrival: '" + txtFromAirport.Text.ToUpper() + "', str_ft_depart: '" + txtToAirtport.Text.ToUpper() + "',$or:[{str_client_category:{$exists:false}},{str_client_category:'" + txtCustomerClass.Text.Replace("&", "%") + "'}]}";
                     }
                     else if (txtItemNumber.Text == "ASECSAS0073")
                     {
@@ -1679,7 +1679,7 @@ namespace CostToInvoiceButton
                     else if (txtItemNumber.Text == "IPFERPS0052")
                     {
                         //definicion = "?totalResults=true&q={str_item_number:'" + txtItemNumber.Text + "',str_icao_iata_code:'" + txtAirport.Text + "',str_aircraft_type:'" + txtICAOD.Text + "'}";
-                        definicion += "str_item_number:'" + txtItemNumber.Text + "',str_icao_iata_code:'" + txtAirport.Text + "',$or:[{str_ft_arrival:'" + arr_type.ToUpper() + "'},{str_ft_arrival:{$exists: false}}],$or:[{str_client_category:{$exists:false}},{str_client_category:'" + txtCustomerClass.Text + "'}]}";
+                        definicion += "str_item_number:'" + txtItemNumber.Text + "',str_icao_iata_code:'" + txtAirport.Text + "',$or:[{str_ft_arrival:'" + arr_type.ToUpper() + "'},{str_ft_arrival:{$exists: false}}],$or:[{str_client_category:{$exists:false}},{str_client_category:'" + txtCustomerClass.Text.Replace("&", "%") + "'}]}";
                     }
                     else if (txtItemNumber.Text == "OHANIAS0129")
                     {
@@ -1687,7 +1687,7 @@ namespace CostToInvoiceButton
                     }
                     else
                     {
-                        definicion += "str_item_number:'" + txtItemNumber.Text + "',str_icao_iata_code:'" + txtAirport.Text + "',bol_int_flight_cargo:1,str_schedule_type:'" + txtMainHour.Text + "',str_aircraft_type:'" + txtICAOD.Text + "',$or:[{str_client_category:{$exists:false}},{str_client_category:'" + txtCustomerClass.Text + "'}]}";
+                        definicion += "str_item_number:'" + txtItemNumber.Text + "',str_icao_iata_code:'" + txtAirport.Text + "',bol_int_flight_cargo:1,str_schedule_type:'" + txtMainHour.Text + "',str_aircraft_type:'" + txtICAOD.Text + "',$or:[{str_client_category:{$exists:false}},{str_client_category:'" + txtCustomerClass.Text.Replace("&", "%") + "'}]}";
                     }
                 }
                 global.LogMessage("GETPricesdef:" + definicion + "SRType:" + lblSrType.Text);

@@ -23,7 +23,9 @@ namespace CostToInvoiceButton
         public string FuelId { get; set; }
         public string CobroParticipacionNj { get; set; }
         public string ParticipacionCobro { get; set; }
-        
+        public string Site { get; set; }
+        public string Tax { get; set; }
+
 
     }
     public class ComponentChild
@@ -49,6 +51,7 @@ namespace CostToInvoiceButton
         public string Categories { get; set; }
         public int ServiceParent { get; set; }
         public string MCreated { get; set; }
+        public string Tax { get; set; }
     }
     public class Link
     {

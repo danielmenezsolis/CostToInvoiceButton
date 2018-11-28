@@ -319,6 +319,11 @@ namespace CostToInvoiceButton
                             txtPrice.Text = Math.Round(utilidad, 4).ToString();
                         }
                     }
+                    if (txtCost.Text == "0")
+                    {
+                        cboCurrency.Text = "MXN";
+                    }
+
                     getSuppliers();
                 }
             }

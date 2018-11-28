@@ -743,7 +743,7 @@ namespace CostToInvoiceButton
             }
             catch (Exception ex)
             {
-                MessageBox.Show("GetListServices: " + ex.Message + "Detail: " + ex.StackTrace);
+                MessageBox.Show("getATAItinerary: " + ex.Message + "Detail: " + ex.StackTrace);
                 return DateTime.Now;
             }
         }
@@ -755,7 +755,7 @@ namespace CostToInvoiceButton
                 ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
                 APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
                 clientInfoHeader.AppID = "Query Example";
-                String queryString = "SELECT  ATD,ATDTime FROM Co.Itinerary WHERE ID = " + Itinerarie;
+                String queryString = "SELECT ATD,ATDTime FROM Co.Itinerary WHERE ID = " + Itinerarie;
                 clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 1, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
                 foreach (CSVTable table in queryCSV.CSVTables)
                 {
@@ -767,100 +767,38 @@ namespace CostToInvoiceButton
                         ATD = substrings[0] + " " + substrings[1];
                     }
                 }
+
                 return DateTime.Parse(ATD);
             }
             catch (Exception ex)
             {
-                MessageBox.Show("GetListServices: " + ex.Message + "Detail: " + ex.StackTrace);
+                MessageBox.Show("getATAItinerary: " + ex.Message + "Detail: " + ex.StackTrace);
                 return DateTime.Now;
             }
         }
         public void CreateAirNavFee()
         {
-            ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
-            APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
-            clientInfoHeader.AppID = "Query Example";
-            String queryString = "SELECT SUM(Liters) Suma,date_trunc(VoucherDateTime,'day'),ID FROM CO.Fueling WHERE Incident = " + IncidentID + " AND ArrivalAirport.AirportUse.Name = 'Federal'  GROUP BY date_trunc(VoucherDateTime,'day')";
-            clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 10000, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
-            foreach (CSVTable table in queryCSV.CSVTables)
+            try
             {
-                String[] rowData = table.Rows;
-                foreach (String data in rowData)
+                ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
+                APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
+                clientInfoHeader.AppID = "Query Example";
+                String queryString = "SELECT SUM(Liters) Suma,date_trunc(VoucherDateTime,'day'),ID FROM CO.Fueling WHERE Incident = " + IncidentID + " AND ArrivalAirport.AirportUse.Name = 'Federal'  GROUP BY date_trunc(VoucherDateTime,'day')";
+                clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 10000, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
+                foreach (CSVTable table in queryCSV.CSVTables)
                 {
-                    Services service = new Services();
-                    Char delimiter = '|';
-                    string[] substrings = data.Split(delimiter);
-                    ComponentChild component = new ComponentChild();
-                    component.Airport = ArrivalAirportIncident;
-                    component.ItemNumber = "ANFERAS0013";
-                    component.Incident = IncidentID;
-                    component.ParentPaxId = IncidentID;
-                    component.FuelId = int.Parse(substrings[2]);
-                    component.MCreated = "1";
-                    component.Componente = "0";
-                    component = GetComponentData(component);
-                    component.Categories = GetCategories(component.ItemNumber, component.Airport);
-                    if (!string.IsNullOrEmpty(component.ItemDescription))
-                    {
-                        InsertComponent(component);
-                    }
-                }
-            }
-        }
-        public void CreateAirNavICCS()
-        {
-            ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
-            APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
-            clientInfoHeader.AppID = "Query Example";
-            String queryString = "SELECT SUM(Liters) Suma,date_trunc(VoucherDateTime,'day'),Id FROM CO.Fueling WHERE Incident = " + IncidentID + " AND ArrivalAirport.AirportUse.Name = 'Federal'  GROUP BY date_trunc(VoucherDateTime,'day')";
-            clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 10000, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
-            foreach (CSVTable table in queryCSV.CSVTables)
-            {
-                String[] rowData = table.Rows;
-                foreach (String data in rowData)
-                {
-                    Services service = new Services();
-                    Char delimiter = '|';
-                    string[] substrings = data.Split(delimiter);
-                    ComponentChild component = new ComponentChild();
-                    component.Airport = ArrivalAirportIncident;
-                    component.ItemNumber = "ANIASAS0015";
-                    component.Incident = IncidentID;
-                    component.ParentPaxId = IncidentID;
-                    component.FuelId = int.Parse(substrings[2]);
-                    component.Componente = "0";
-                    component.MCreated = "1";
-                    component = GetComponentData(component);
-                    component.Categories = GetCategories(component.ItemNumber, component.Airport);
-                    if (!string.IsNullOrEmpty(component.ItemDescription))
-                    {
-                        InsertComponent(component);
-                    }
-                }
-            }
-        }
-        public void CreateDeposit()
-        {
-            ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
-            APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
-            clientInfoHeader.AppID = "Query Example";
-            String queryString = "SELECT COUNT(*) FROM CO.Services WHERE ItemNumber = 'DEPEGAR0358' AND Incident = " + IncidentID;
-            clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 1, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
-            foreach (CSVTable table in queryCSV.CSVTables)
-            {
-                String[] rowData = table.Rows;
-                foreach (String data in rowData)
-                {
-                    if (Convert.ToInt32(data) < 1)
+                    String[] rowData = table.Rows;
+                    foreach (String data in rowData)
                     {
                         Services service = new Services();
                         Char delimiter = '|';
                         string[] substrings = data.Split(delimiter);
                         ComponentChild component = new ComponentChild();
                         component.Airport = ArrivalAirportIncident;
-                        component.ItemNumber = "DEPEGAR0358";
+                        component.ItemNumber = "ANFERAS0013";
                         component.Incident = IncidentID;
                         component.ParentPaxId = IncidentID;
+                        component.FuelId = int.Parse(substrings[2]);
                         component.MCreated = "1";
                         component.Componente = "0";
                         component = GetComponentData(component);
@@ -871,6 +809,90 @@ namespace CostToInvoiceButton
                         }
                     }
                 }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("getATAItinerary: " + ex.Message + "Detail: " + ex.StackTrace);
+            }
+        }
+        public void CreateAirNavICCS()
+        {
+            try
+            {
+                ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
+                APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
+                clientInfoHeader.AppID = "Query Example";
+                String queryString = "SELECT SUM(Liters) Suma,date_trunc(VoucherDateTime,'day'),Id FROM CO.Fueling WHERE Incident = " + IncidentID + " AND ArrivalAirport.AirportUse.Name = 'Federal'  GROUP BY date_trunc(VoucherDateTime,'day')";
+                clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 10000, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
+                foreach (CSVTable table in queryCSV.CSVTables)
+                {
+                    String[] rowData = table.Rows;
+                    foreach (String data in rowData)
+                    {
+                        Services service = new Services();
+                        Char delimiter = '|';
+                        string[] substrings = data.Split(delimiter);
+                        ComponentChild component = new ComponentChild();
+                        component.Airport = ArrivalAirportIncident;
+                        component.ItemNumber = "ANIASAS0015";
+                        component.Incident = IncidentID;
+                        component.ParentPaxId = IncidentID;
+                        component.FuelId = int.Parse(substrings[2]);
+                        component.Componente = "0";
+                        component.MCreated = "1";
+                        component = GetComponentData(component);
+                        component.Categories = GetCategories(component.ItemNumber, component.Airport);
+                        if (!string.IsNullOrEmpty(component.ItemDescription))
+                        {
+                            InsertComponent(component);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("CreateAirNavICCS: " + ex.Message + "Detail: " + ex.StackTrace);
+            }
+        }
+        public void CreateDeposit()
+        {
+            try
+            {
+                ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
+                APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
+                clientInfoHeader.AppID = "Query Example";
+                String queryString = "SELECT COUNT(*) FROM CO.Services WHERE ItemNumber = 'DEPEGAR0358' AND Incident = " + IncidentID;
+                clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 1, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
+                foreach (CSVTable table in queryCSV.CSVTables)
+                {
+                    String[] rowData = table.Rows;
+                    foreach (String data in rowData)
+                    {
+                        if (Convert.ToInt32(data) < 1)
+                        {
+                            Services service = new Services();
+                            Char delimiter = '|';
+                            string[] substrings = data.Split(delimiter);
+                            ComponentChild component = new ComponentChild();
+                            component.Airport = ArrivalAirportIncident;
+                            component.ItemNumber = "DEPEGAR0358";
+                            component.Incident = IncidentID;
+                            component.ParentPaxId = IncidentID;
+                            component.MCreated = "1";
+                            component.Componente = "0";
+                            component = GetComponentData(component);
+                            component.Categories = GetCategories(component.ItemNumber, component.Airport);
+                            if (!string.IsNullOrEmpty(component.ItemDescription))
+                            {
+                                InsertComponent(component);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("CreateAirNavICCS: " + ex.Message + "Detail: " + ex.StackTrace);
             }
         }
         public bool SENEAMNot()
@@ -928,7 +950,7 @@ namespace CostToInvoiceButton
             catch (Exception ex)
             {
 
-                MessageBox.Show("SENEAMNot:" + ex.Message + "Det: " + ex.StackTrace);
+                MessageBox.Show("GetSeneamRequiredDate:" + ex.Message + "Det: " + ex.StackTrace);
                 return "";
             }
         }
@@ -959,7 +981,7 @@ namespace CostToInvoiceButton
             catch (Exception ex)
             {
 
-                MessageBox.Show("SENEAMNot:" + ex.Message + "Det: " + ex.StackTrace);
+                MessageBox.Show("GetSeneamPresDate:" + ex.Message + "Det: " + ex.StackTrace);
                 return "";
             }
         }
@@ -972,123 +994,129 @@ namespace CostToInvoiceButton
 
         public void CreateOvers()
         {
-
-            string tipo = "";
-            ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
-            APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
-            clientInfoHeader.AppID = "Query Example";
-            String queryString = "SELECT Type FROM CO.SENEAMOvers WHERE Incident = " + IncidentID;
-            clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 1, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
-            foreach (CSVTable table in queryCSV.CSVTables)
+            try
             {
-                String[] rowData = table.Rows;
-                foreach (String data in rowData)
+                string tipo = "";
+                ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
+                APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
+                clientInfoHeader.AppID = "Query Example";
+                String queryString = "SELECT Type FROM CO.SENEAMOvers WHERE Incident = " + IncidentID;
+                clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 1, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
+                foreach (CSVTable table in queryCSV.CSVTables)
                 {
-                    Char delimiter = '|';
-                    string[] substrings = data.Split(delimiter);
-                    tipo = substrings[0];
-                }
-            }
-
-            double factorA = 0;
-            double tRec = 0;
-
-            if (SENEAMNot())
-            {
-                //FECHAS
-                string Required = GetSeneamRequiredDate();
-                string Presentation = GetSeneamPresDate();
-
-                //INPC'S
-                double inpc1 = 0;
-                double inpc2 = 0;
-
-                string fecha1 = DateTime.Parse(Required).ToString("MMM-yy");
-                string fecha2 = DateTime.Parse(Presentation).ToString("MMM-yy");
-
-                fecha1 = fecha1.Remove(3, 1);
-                fecha2 = fecha2.Remove(3, 1);
-
-                inpc1 = getMonthINPC(fecha1.ToUpper());
-                inpc2 = getMonthINPC(fecha2.ToUpper());
-
-                MessageBox.Show("INPC1 = " + inpc1.ToString());
-                MessageBox.Show("INPC2 = " + inpc2.ToString());
-
-                factorA = inpc2 / inpc1;
-                MessageBox.Show("factorA = " + factorA.ToString());
-
-                //TASA DE RECARGO
-                double sumaRec = 0;
-                IEnumerable<DateTime> meses = monthsBetween(DateTime.Parse(Required), DateTime.Parse(Presentation));
-                if (tipo == "2")
-                {
-                    meses = meses.Exclude(0, 1);
-                }
-                foreach (var mes in meses)
-                {
-                    sumaRec += GetTasaAnual(mes.Year.ToString());
-                    //MessageBox.Show("Mes, anio: " + mes.Month.ToString() + " " + mes.Year.ToString());
-                    //MessageBox.Show("sumaRec actual: " + sumaRec.ToString());
-                }
-                tRec = sumaRec;
-                MessageBox.Show("sumaRec total: " + sumaRec.ToString());
-            }
-            clientInfoHeader = new ClientInfoHeader();
-            aPIAccessRequest = new APIAccessRequestHeader();
-            clientInfoHeader.AppID = "Query Example";
-            queryString = "SELECT Type,Cost,Time,Amount FROM CO.SENEAMOvers WHERE Incident = " + IncidentID;
-            clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 100, "|", false, false, out queryCSV, out FileData);
-            foreach (CSVTable table in queryCSV.CSVTables)
-            {
-                String[] rowData = table.Rows;
-                foreach (String data in rowData)
-                {
-                    Char delimiter = '|';
-                    string[] substrings = data.Split(delimiter);
-                    string iNumber = "OSSEIAS0185";
-                    if (substrings[0] == "2")
+                    String[] rowData = table.Rows;
+                    foreach (String data in rowData)
                     {
-                        iNumber = "AFVLEAP257";
+                        Char delimiter = '|';
+                        string[] substrings = data.Split(delimiter);
+                        tipo = substrings[0];
                     }
-                    Services service = new Services();
-                    ComponentChild component = new ComponentChild();
-                    component.Airport = "MTS_ITEM";
-                    component.ItemNumber = iNumber;
-                    component.Incident = IncidentID;
-                    component.ParentPaxId = IncidentID;
-                    component.MCreated = "1";
-                    component.Componente = "0";
-                    component.Costo = substrings[1];
-                    if (factorA > 0 || tRec > 0)
+                }
+
+                double factorA = 0;
+                double tRec = 0;
+
+                if (SENEAMNot())
+                {
+                    //FECHAS
+                    string Required = GetSeneamRequiredDate();
+                    string Presentation = GetSeneamPresDate();
+
+                    //INPC'S
+                    double inpc1 = 0;
+                    double inpc2 = 0;
+
+                    string fecha1 = DateTime.Parse(Required).ToString("MMM-yy");
+                    string fecha2 = DateTime.Parse(Presentation).ToString("MMM-yy");
+
+                    fecha1 = fecha1.Remove(3, 1);
+                    fecha2 = fecha2.Remove(3, 1);
+
+                    inpc1 = getMonthINPC(fecha1.ToUpper());
+                    inpc2 = getMonthINPC(fecha2.ToUpper());
+
+                    MessageBox.Show("INPC1 = " + inpc1.ToString());
+                    MessageBox.Show("INPC2 = " + inpc2.ToString());
+
+                    factorA = inpc2 / inpc1;
+                    MessageBox.Show("factorA = " + factorA.ToString());
+
+                    //TASA DE RECARGO
+                    double sumaRec = 0;
+                    IEnumerable<DateTime> meses = monthsBetween(DateTime.Parse(Required), DateTime.Parse(Presentation));
+                    if (tipo == "2")
                     {
-                        string priced = substrings[3];
-                        double pricef = String.IsNullOrEmpty(priced) ? 0 : Convert.ToDouble(priced);
-                        pricef = (factorA * pricef) - pricef;
-                        if (pricef <= 0)
+                        meses = meses.Exclude(0, 1);
+                    }
+                    foreach (var mes in meses)
+                    {
+                        sumaRec += GetTasaAnual(mes.Year.ToString());
+                        //MessageBox.Show("Mes, anio: " + mes.Month.ToString() + " " + mes.Year.ToString());
+                        //MessageBox.Show("sumaRec actual: " + sumaRec.ToString());
+                    }
+                    tRec = sumaRec;
+                    MessageBox.Show("sumaRec total: " + sumaRec.ToString());
+                }
+                clientInfoHeader = new ClientInfoHeader();
+                aPIAccessRequest = new APIAccessRequestHeader();
+                clientInfoHeader.AppID = "Query Example";
+                queryString = "SELECT Type,Cost,Time,Amount FROM CO.SENEAMOvers WHERE Incident = " + IncidentID;
+                clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 100, "|", false, false, out queryCSV, out FileData);
+                foreach (CSVTable table in queryCSV.CSVTables)
+                {
+                    String[] rowData = table.Rows;
+                    foreach (String data in rowData)
+                    {
+                        Char delimiter = '|';
+                        string[] substrings = data.Split(delimiter);
+                        string iNumber = "OSSEIAS0185";
+                        if (substrings[0] == "2")
                         {
-                            pricef = 1;
+                            iNumber = "AFVLEAP257";
                         }
-                        MessageBox.Show("actualización: " + pricef.ToString());
-                        pricef = Convert.ToDouble(substrings[3]) + pricef;
-                        MessageBox.Show("no se que es: " + pricef.ToString());
-                        double recargos = pricef * (tRec / 100);
-                        MessageBox.Show("recargos: " + recargos.ToString());
-                        pricef = pricef + recargos;
-                        MessageBox.Show("pricef total: " + pricef.ToString());
-                        component.Precio = Math.Round(pricef, 4).ToString();
-                    }
-                    else
-                    {
-                        component.Precio = substrings[3];
-                    }
-                    component = GetComponentData(component);
-                    component.Categories = GetCategories(component.ItemNumber, component.Airport);
-                    if (!string.IsNullOrEmpty(component.ItemDescription))
-                    {
-                        InsertComponent(component);
+                        Services service = new Services();
+                        ComponentChild component = new ComponentChild();
+                        component.Airport = "MTS_ITEM";
+                        component.ItemNumber = iNumber;
+                        component.Incident = IncidentID;
+                        component.ParentPaxId = IncidentID;
+                        component.MCreated = "1";
+                        component.Componente = "0";
+                        component.Costo = substrings[1];
+                        if (factorA > 0 || tRec > 0)
+                        {
+                            string priced = substrings[3];
+                            double pricef = String.IsNullOrEmpty(priced) ? 0 : Convert.ToDouble(priced);
+                            pricef = (factorA * pricef) - pricef;
+                            if (pricef <= 0)
+                            {
+                                pricef = 1;
+                            }
+                            MessageBox.Show("actualización: " + pricef.ToString());
+                            pricef = Convert.ToDouble(substrings[3]) + pricef;
+                            MessageBox.Show("no se que es: " + pricef.ToString());
+                            double recargos = pricef * (tRec / 100);
+                            MessageBox.Show("recargos: " + recargos.ToString());
+                            pricef = pricef + recargos;
+                            MessageBox.Show("pricef total: " + pricef.ToString());
+                            component.Precio = Math.Round(pricef, 4).ToString();
+                        }
+                        else
+                        {
+                            component.Precio = substrings[3];
+                        }
+                        component = GetComponentData(component);
+                        component.Categories = GetCategories(component.ItemNumber, component.Airport);
+                        if (!string.IsNullOrEmpty(component.ItemDescription))
+                        {
+                            InsertComponent(component);
+                        }
                     }
                 }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("GetSeneamPresDate:" + ex.Message + "Det: " + ex.StackTrace);
             }
         }
         private double GetTasaAnual(string ano)
@@ -1167,7 +1195,7 @@ namespace CostToInvoiceButton
                 ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
                 APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
                 clientInfoHeader.AppID = "Query Example";
-                String queryString = "SELECT ID,ItemNumber,ItemDescription,Airport,IDProveedor,Costo,Precio,InternalInvoice,Itinerary,Paquete,Componente,Informativo,ParentPaxID,Categories,fuel_id,CobroParticipacionNj,ParticipacionCobro FROM CO.Services WHERE Incident =" + IncidentID + " AND Informativo = '0' And  (Componente IS NULL OR Componente  = '0') ORDER BY ID ASC, Itinerary ASC, ParentPaxId ASC";
+                String queryString = "SELECT ID,ItemNumber,ItemDescription,Airport,IDProveedor,Costo,Precio,InternalInvoice,Itinerary,Paquete,Componente,Informativo,ParentPaxID,Categories,fuel_id,CobroParticipacionNj,ParticipacionCobro,Site,IVA FROM CO.Services WHERE Incident =" + IncidentID + " AND Informativo = '0' AND (Componente IS NULL OR Componente  = '0') ORDER BY ID ASC, Itinerary ASC, ParentPaxId ASC";
                 global.LogMessage(queryString);
                 clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 10000, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
                 foreach (CSVTable table in queryCSV.CSVTables)
@@ -1196,6 +1224,8 @@ namespace CostToInvoiceButton
                         service.FuelId = substrings[14];
                         service.CobroParticipacionNj = substrings[15];
                         service.ParticipacionCobro = substrings[16];
+                        service.Site = substrings[17];
+                        service.Tax = substrings[18];
                         services.Add(service);
                     }
                 }
@@ -1559,6 +1589,11 @@ namespace CostToInvoiceButton
                                         {
                                             component.ItemDescription = nodeValue.InnerText.Trim().Replace("/", "");
                                         }
+                                        if (nodeValue.LocalName == "OutputTaxClassificationCodeValue")
+                                        {
+                                            component.Tax = nodeValue.InnerText;
+                                        }
+
                                         if (nodeValue.LocalName == "ItemDFF")
                                         {
                                             XmlNodeList nodeListDeff = nodeValue.ChildNodes;
@@ -1634,7 +1669,14 @@ namespace CostToInvoiceButton
                     body += "\"id\":" + component.ServiceParent + "";
                     body += "},";
                 }
-
+                if (String.IsNullOrEmpty(component.Tax))
+                {
+                    body += "\"IVA\":null,";
+                }
+                else
+                {
+                    body += "\"IVA\":\"" + component.Tax + "\",";
+                }
                 if (String.IsNullOrEmpty(component.CobroParticipacionNj))
                 {
                     body += "\"CobroParticipacionNj\":null,";
@@ -1888,39 +1930,55 @@ namespace CostToInvoiceButton
         }
         public string getCustomerClass(int Incident)
         {
-            string clase = "GENERALES";
-            ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
-            APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
-            clientInfoHeader.AppID = "Query Example";
-            String queryString = "SELECT CustomFields.c.clase FROM Incident WHERE ID =" + Incident;
-            clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 1, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
-            foreach (CSVTable table in queryCSV.CSVTables)
+            try
             {
-                String[] rowData = table.Rows;
-                foreach (String data in rowData)
+                string clase = "GENERALES";
+                ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
+                APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
+                clientInfoHeader.AppID = "Query Example";
+                String queryString = "SELECT CustomFields.c.clase FROM Incident WHERE ID =" + Incident;
+                clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 1, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
+                foreach (CSVTable table in queryCSV.CSVTables)
                 {
-                    clase = data;
+                    String[] rowData = table.Rows;
+                    foreach (String data in rowData)
+                    {
+                        clase = data;
+                    }
                 }
+                return clase;
             }
-            return clase;
+            catch (Exception ex)
+            {
+                MessageBox.Show("getCustomerClass" + ex.Message + "Det" + ex.StackTrace);
+                return " ";
+            }
         }
         public string getICAODesi(int Incident)
         {
-            string Icao = "";
-            ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
-            APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
-            clientInfoHeader.AppID = "Query Example";
-            String queryString = "SELECT CustomFields.co.Aircraft.AircraftType1.ICAODesignator  FROM Incident WHERE ID =" + Incident;
-            clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 1, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
-            foreach (CSVTable table in queryCSV.CSVTables)
+            try
             {
-                String[] rowData = table.Rows;
-                foreach (String data in rowData)
+                string Icao = "";
+                ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
+                APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
+                clientInfoHeader.AppID = "Query Example";
+                String queryString = "SELECT CustomFields.co.Aircraft.AircraftType1.ICAODesignator  FROM Incident WHERE ID =" + Incident;
+                clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 1, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
+                foreach (CSVTable table in queryCSV.CSVTables)
                 {
-                    Icao = data;
+                    String[] rowData = table.Rows;
+                    foreach (String data in rowData)
+                    {
+                        Icao = data;
+                    }
                 }
+                return Icao;
             }
-            return Icao;
+            catch (Exception ex)
+            {
+                MessageBox.Show("getICAODesi" + ex.Message + "Det" + ex.StackTrace);
+                return " ";
+            }
         }
         public string GetFuelType(int Incident)
         {
@@ -1944,7 +2002,7 @@ namespace CostToInvoiceButton
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.StackTrace);
+                MessageBox.Show("GetFuelType" + ex.Message + "Det" + ex.StackTrace);
                 return "0";
 
             }
@@ -2276,27 +2334,35 @@ namespace CostToInvoiceButton
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.StackTrace);
+                MessageBox.Show("GetCategories:" + ex.Message + " Det: " + ex.StackTrace);
                 return "";
             }
         }
         public string GetCargoGroup(string strIcao)
         {
-            string cGroup = "";
-            ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
-            APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
-            clientInfoHeader.AppID = "Query Example";
-            String queryString = "SELECT CargoGroup.LookupName FROM CO.AircraftType WHERE ICAODesignator = '" + strIcao + "'";
-            clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 1, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
-            foreach (CSVTable table in queryCSV.CSVTables)
+            try
             {
-                String[] rowData = table.Rows;
-                foreach (String data in rowData)
+                string cGroup = "";
+                ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
+                APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
+                clientInfoHeader.AppID = "Query Example";
+                String queryString = "SELECT CargoGroup.LookupName FROM CO.AircraftType WHERE ICAODesignator = '" + strIcao + "'";
+                clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 1, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
+                foreach (CSVTable table in queryCSV.CSVTables)
                 {
-                    cGroup = data;
+                    String[] rowData = table.Rows;
+                    foreach (String data in rowData)
+                    {
+                        cGroup = data;
+                    }
                 }
+                return cGroup;
             }
-            return cGroup;
+            catch (Exception ex)
+            {
+                MessageBox.Show("GetCargoGroup:" + ex.Message + " Det: " + ex.StackTrace);
+                return "";
+            }
         }
         public void UpdatePackageCost()
         {
@@ -2385,27 +2451,35 @@ namespace CostToInvoiceButton
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message + " Det: " + ex.StackTrace);
+                MessageBox.Show("UpdatePaxPrice:" + ex.Message + " Det: " + ex.StackTrace);
             }
 
         }
         public double getPaxPrice(string PaxId)
         {
-            double price = 0;
-            ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
-            APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
-            clientInfoHeader.AppID = "Query Example";
-            String queryString = "SELECT SUM(TicketAmount) FROM CO.Payables WHERE Services.Incident =" + IncidentID + "  AND Services.Services = " + PaxId + " GROUP BY Services.Services   ";
-            clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 1, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
-            foreach (CSVTable table in queryCSV.CSVTables)
+            try
             {
-                String[] rowData = table.Rows;
-                foreach (String data in rowData)
+                double price = 0;
+                ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
+                APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
+                clientInfoHeader.AppID = "Query Example";
+                String queryString = "SELECT SUM(TicketAmount) FROM CO.Payables WHERE Services.Incident =" + IncidentID + "  AND Services.Services = " + PaxId + " GROUP BY Services.Services   ";
+                clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 1, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
+                foreach (CSVTable table in queryCSV.CSVTables)
                 {
-                    price = String.IsNullOrEmpty(data) ? 0 : Convert.ToDouble(data);
+                    String[] rowData = table.Rows;
+                    foreach (String data in rowData)
+                    {
+                        price = String.IsNullOrEmpty(data) ? 0 : Convert.ToDouble(data);
+                    }
                 }
+                return price;
             }
-            return price;
+            catch (Exception ex)
+            {
+                MessageBox.Show("getPaxPrice:" + ex.Message + " Det: " + ex.StackTrace);
+                return 0;
+            }
         }
         public double getMonthINPC(string fechaF)
         {

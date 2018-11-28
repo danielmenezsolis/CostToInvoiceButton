@@ -390,14 +390,10 @@ namespace CostToInvoiceButton
                     ((TextBox)doubleScreen.Controls["txtCateringDDate"]).Text = CateringDeliveryDate;
                     ((TextBox)doubleScreen.Controls["txtArrivalIncident"]).Text = ArrivalAirportIncident;
                     ((TextBox)doubleScreen.Controls["txtDepartureIncident"]).Text = DepartureAirportIncident;
-
                     ((TextBox)doubleScreen.Controls["txtSemeam"]).Text = SeneamCat;
-
                     ((TextBox)doubleScreen.Controls["txtCreationIncidentDate"]).Text = incidentCreation.ToString();
-
                     ((ComboBox)doubleScreen.Controls["cboCurrency"]).Text = SRType == "FUEL" ? "MXN" : GetCurrency();
-
-
+                    
                     UpdatePackageCost();
                     doubleScreen.ShowDialog();
                 }
@@ -934,8 +930,8 @@ namespace CostToInvoiceButton
                 ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
                 APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
                 clientInfoHeader.AppID = "Query Example";
-                String queryString = "SELECT CustomFields.c.period FROM Incident WHERE ID =" + IncidentID;
-                clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 1, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
+                String queryString = "SELECT CustomFields.c.periodmonth.Name, CustomFields.c.periodyear.Name FROM Incident WHERE ID =" + IncidentID;
+                clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 1, "-", false, false, out CSVTableSet queryCSV, out byte[] FileData);
                 if (queryCSV.CSVTables.Length > 0)
                 {
                     foreach (CSVTable table in queryCSV.CSVTables)
@@ -1031,7 +1027,7 @@ namespace CostToInvoiceButton
                     double inpc1 = 0;
                     double inpc2 = 0;
 
-                    string fecha1 = DateTime.Parse(Required).ToString("MMM-yy");
+                    string fecha1 = Required;
                     string fecha2 = DateTime.Parse(Presentation).ToString("MMM-yy");
 
                     if (fecha1.Contains(","))
@@ -1071,7 +1067,7 @@ namespace CostToInvoiceButton
                 clientInfoHeader = new ClientInfoHeader();
                 aPIAccessRequest = new APIAccessRequestHeader();
                 clientInfoHeader.AppID = "Query Example";
-                queryString = "SELECT Type,Cost,Time,Amount FROM CO.SENEAMOvers WHERE Incident = " + IncidentID;
+                queryString = "SELECT Type,SUM(Cost),Time,SUM(Amount) FROM CO.SENEAMOvers WHERE Incident = " + IncidentID;
                 clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 1, "|", false, false, out queryCSV, out FileData);
                 foreach (CSVTable table in queryCSV.CSVTables)
                 {
@@ -1105,7 +1101,7 @@ namespace CostToInvoiceButton
                             }
                             MessageBox.Show("actualización: " + pricef.ToString());
                             pricef = Convert.ToDouble(substrings[3]) + pricef;
-                            MessageBox.Show("no se que es: " + pricef.ToString());
+                            MessageBox.Show("monto mas actualización: " + pricef.ToString());
                             double recargos = pricef * (tRec / 100);
                             MessageBox.Show("recargos: " + recargos.ToString());
                             pricef = pricef + recargos;
@@ -1151,7 +1147,6 @@ namespace CostToInvoiceButton
                 {
                     tasa = 0;
                 }
-
                 return tasa;
             }
             catch (Exception ex)

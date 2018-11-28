@@ -80,6 +80,8 @@ namespace CostToInvoiceButton
                         cboCurrency.Text = "USD";
                         double tipoCambio = getExchangeRate(DateTime.Today);
 
+                        MessageBox.Show("Tipo de cambio: " + tipoCambio.ToString());
+
                         double cost = String.IsNullOrEmpty(dataGridServicios.Rows[e.RowIndex].Cells[5].Value.ToString()) ? 0 : Convert.ToDouble(dataGridServicios.Rows[e.RowIndex].Cells[5].FormattedValue);
                         if (cost >= tipoCambio)
                         {

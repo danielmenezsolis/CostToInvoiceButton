@@ -124,6 +124,7 @@
             this.txtParticipacionCobro = new System.Windows.Forms.TextBox();
             this.txtCustomerClass = new System.Windows.Forms.TextBox();
             this.txtCreationIncidentDate = new System.Windows.Forms.TextBox();
+            this.txtPaxGroup = new System.Windows.Forms.TextBox();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridSuppliers)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridServicios)).BeginInit();
@@ -970,11 +971,19 @@
             this.txtCreationIncidentDate.TabIndex = 92;
             this.txtCreationIncidentDate.TabStop = false;
             // 
+            // txtPaxGroup
+            // 
+            this.txtPaxGroup.Location = new System.Drawing.Point(139, 336);
+            this.txtPaxGroup.Name = "txtPaxGroup";
+            this.txtPaxGroup.Size = new System.Drawing.Size(39, 20);
+            this.txtPaxGroup.TabIndex = 93;
+            // 
             // DoubleScreen
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(825, 651);
+            this.Controls.Add(this.txtPaxGroup);
             this.Controls.Add(this.txtCreationIncidentDate);
             this.Controls.Add(this.txtCustomerClass);
             this.Controls.Add(this.txtParticipacionCobro);
@@ -1153,5 +1162,6 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn ParticipacionCobro;
         private System.Windows.Forms.DataGridViewButtonColumn EditColumn;
         private System.Windows.Forms.DataGridViewButtonColumn DeleteColumn;
+        private System.Windows.Forms.TextBox txtPaxGroup;
     }
 }

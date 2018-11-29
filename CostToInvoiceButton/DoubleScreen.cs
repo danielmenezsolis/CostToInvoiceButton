@@ -80,19 +80,22 @@ namespace CostToInvoiceButton
                         cboCurrency.Text = "USD";
                         double tipoCambio = getExchangeRate(DateTime.Today);
 
-                        MessageBox.Show("Tipo de cambio: " + tipoCambio.ToString());
+                        MessageBox.Show("Tipo de cambio: $" + tipoCambio.ToString());
 
+                        /*
                         double cost = String.IsNullOrEmpty(dataGridServicios.Rows[e.RowIndex].Cells[5].Value.ToString()) ? 0 : Convert.ToDouble(dataGridServicios.Rows[e.RowIndex].Cells[5].FormattedValue);
                         if (cost >= tipoCambio)
                         {
                             cost = Math.Round(cost / tipoCambio, 4);
                         }
                         txtCost.Text = cost.ToString();
+                        */
+                        txtCost.Text = "0";
 
                         double pri = String.IsNullOrEmpty(dataGridServicios.Rows[e.RowIndex].Cells[6].Value.ToString()) ? 0 : Convert.ToDouble(dataGridServicios.Rows[e.RowIndex].Cells[6].FormattedValue);
                         if (pri >= tipoCambio)
                         {
-                            pri = Math.Round(pri / tipoCambio, 4);
+                            pri = Math.Round(pri / tipoCambio, 0, MidpointRounding.AwayFromZero);
                         }
                         txtPrice.Text = pri.ToString();
 
@@ -111,7 +114,7 @@ namespace CostToInvoiceButton
                             {
                                 precio = precio / tipoCambio;
                             }
-                            precio = Math.Round(precio, 2);
+                            precio = Math.Round(precio, 0, MidpointRounding.AwayFromZero);
                             txtPrice.Text = precio.ToString();
                         }
                     }
@@ -349,7 +352,7 @@ namespace CostToInvoiceButton
                     {
                         cboCurrency.Text = "USD";
                     }
-                    if (txtCost.Text == "0")
+                    if (txtCost.Text == "0" && lblSrType.Text != "SENEAM")
                     {
                         cboCurrency.Text = "MXN";
                     }
@@ -544,7 +547,7 @@ namespace CostToInvoiceButton
             try
             {
                 double pricefinal = 0;
-                if (txtItemNumber.Text == "SOMFEAP325" || txtItemNumber.Text == "SOMFEAP260")
+                if (txtItemNumber.Text == "SOMFEAP325" || txtItemNumber.Text == "SOMFEAP260" || lblSrType.Text == "SENEAM")
                 {
                     pricefinal = Convert.ToDouble(txtPrice.Text);
                 }
@@ -552,12 +555,12 @@ namespace CostToInvoiceButton
                 if (lblSrType.Text == "CATERING")
                 {
                     cboCurrency.Text = "USD";
+                    double rate = getExchangeRate(DateTime.Parse(txtCateringDDate.Text));
 
                     if (txtUtilidad.Text == "A")
                     {
                         pricefinal = double.Parse(txtCost.Text);
 
-                        double rate = getExchangeRate(DateTime.Parse(txtCateringDDate.Text));
                         pricefinal = pricefinal / rate;
                         pricefinal = Math.Round(pricefinal, 4);
                     }
@@ -573,7 +576,6 @@ namespace CostToInvoiceButton
 
                             if (lblCurrencyPrice.Text == "USD")
                             {
-                                double rate = getExchangeRate(DateTime.Parse(txtCateringDDate.Text));
                                 precio = Convert.ToDouble(txtPrice.Text);
                                 precio = precio / rate;
                                 pricefinal = Math.Round(precio, 4);
@@ -1663,6 +1665,12 @@ namespace CostToInvoiceButton
                 }
                 if (lblSrType.Text == "FCC")
                 {
+                    int cargo = 0;
+                    if (isCargo())
+                    {
+                        cargo = 1;
+                    }
+
                     definicion = "?totalResults=true&q={bol_int_fbo:0,";
                     if (isFBOPrice())
                     {
@@ -1687,7 +1695,7 @@ namespace CostToInvoiceButton
                     }
                     else
                     {
-                        definicion += "str_item_number:'" + txtItemNumber.Text + "',str_icao_iata_code:'" + txtAirport.Text + "',bol_int_flight_cargo:1,str_schedule_type:'" + txtMainHour.Text + "',str_aircraft_type:'" + txtICAOD.Text + "',$or:[{str_client_category:{$exists:false}},{str_client_category:'" + txtCustomerClass.Text.Replace("&", "%") + "'}]}";
+                        definicion += "str_item_number:'" + txtItemNumber.Text + "',str_icao_iata_code:'" + txtAirport.Text + "',bol_int_flight_cargo:"+ cargo.ToString() +",str_schedule_type:'" + txtMainHour.Text + "',,str_aircraft_group:'" + txtPaxGroup.Text + "',str_aircraft_type:'" + txtICAOD.Text + "',$or:[{str_client_category:{$exists:false}},{str_client_category:'" + txtCustomerClass.Text.Replace("&", "%") + "'}]}";
                     }
                 }
                 global.LogMessage("GETPricesdef:" + definicion + "SRType:" + lblSrType.Text);
@@ -2609,6 +2617,35 @@ namespace CostToInvoiceButton
             catch (Exception ex)
             {
                 MessageBox.Show("isFBOPrice" + ex.Message + "Det:" + ex.StackTrace);
+                return false;
+            }
+        }
+        private bool isCargo()
+        {
+            try
+            {
+                bool cargo = false;
+                ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
+                APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
+                clientInfoHeader.AppID = "Query Example";
+                String queryString = "SELECT Customfields.c.flight_type.Name FROM Incident WHERE Id = " + lblIdIncident.Text;
+                clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 1, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
+                foreach (CSVTable table in queryCSV.CSVTables)
+                {
+                    String[] rowData = table.Rows;
+                    foreach (String data in rowData)
+                    {
+                        if (data.ToString() == "CARGO")
+                        {
+                            cargo = true;
+                        }
+                    }
+                }
+                return cargo;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("isCargo" + ex.Message + "Det:" + ex.StackTrace);
                 return false;
             }
         }

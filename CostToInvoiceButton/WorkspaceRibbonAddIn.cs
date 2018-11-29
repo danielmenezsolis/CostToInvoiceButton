@@ -83,6 +83,7 @@ namespace CostToInvoiceButton
                     string FuelType = "";
                     string CateringDeliveryDate = "";
                     string AircraftCategory = "";
+                    string AircraftPCategory = "";
                     string cClass = "";
                     Incident = (IIncident)recordContext.GetWorkspaceRecord(WorkspaceRecordType.Incident);
                     IList<ICfVal> IncCustomFieldList = Incident.CustomField;
@@ -131,6 +132,7 @@ namespace CostToInvoiceButton
                     cClass = getCustomerClass(IncidentID);
                     SRType = GetSRType();
                     AircraftCategory = GetCargoGroup(ICAO);
+                    AircraftPCategory = GetPaxGroup(ICAO);
                     ClientType = GetClientType();
                     FuelType = GetFuelType(IncidentID);
                     GetDeleteMCreated();
@@ -387,6 +389,7 @@ namespace CostToInvoiceButton
                     ((TextBox)doubleScreen.Controls["txtICAOD"]).Text = ICAO;
                     ((TextBox)doubleScreen.Controls["txtCustomerClass"]).Text = cClass;
                     ((TextBox)doubleScreen.Controls["txtCargoGroup"]).Text = AircraftCategory;
+                    ((TextBox)doubleScreen.Controls["txtPaxGroup"]).Text = AircraftPCategory;
                     ((TextBox)doubleScreen.Controls["txtCateringDDate"]).Text = CateringDeliveryDate;
                     ((TextBox)doubleScreen.Controls["txtArrivalIncident"]).Text = ArrivalAirportIncident;
                     ((TextBox)doubleScreen.Controls["txtDepartureIncident"]).Text = DepartureAirportIncident;
@@ -939,7 +942,11 @@ namespace CostToInvoiceButton
                         String[] rowData = table.Rows;
                         foreach (String data in rowData)
                         {
-                            required = data;
+                            Char delimiter = '-';
+                            string[] substrings = data.Split(delimiter);
+                            string month = substrings[0];
+                            string year = substrings[1].Remove(0,2);
+                            required = month + '-' + year;
                         }
                     }
                 }
@@ -970,7 +977,7 @@ namespace CostToInvoiceButton
                         String[] rowData = table.Rows;
                         foreach (String data in rowData)
                         {
-                            presentation = Convert.ToString(DateTime.Parse(data).ToLocalTime());
+                            presentation = Convert.ToString(DateTime.Parse(data));
                         }
                     }
                 }
@@ -1021,7 +1028,7 @@ namespace CostToInvoiceButton
                     MessageBox.Show("Required = " + Required.ToString());
 
                     string Presentation = GetSeneamPresDate();
-                    MessageBox.Show("Presentation = " + Presentation.ToString());
+                    //MessageBox.Show("Presentation = " + Presentation.ToString());
 
                     //INPC'S
                     double inpc1 = 0;
@@ -1030,11 +1037,11 @@ namespace CostToInvoiceButton
                     string fecha1 = Required;
                     string fecha2 = DateTime.Parse(Presentation).ToString("MMM-yy");
 
-                    if (fecha1.Contains(","))
+                    if (fecha1.Contains(",") || fecha1.Contains("."))
                     {
                         fecha1 = fecha1.Remove(3, 1);
                     }
-                    if (fecha2.Contains(","))
+                    if (fecha2.Contains(",") || fecha2.Contains("."))
                     {
                         fecha2 = fecha2.Remove(3, 1);
                     }
@@ -1042,15 +1049,16 @@ namespace CostToInvoiceButton
                     inpc1 = getMonthINPC(fecha1.ToUpper());
                     inpc2 = getMonthINPC(fecha2.ToUpper());
 
-                    MessageBox.Show("INPC1 = " + inpc1.ToString());
-                    MessageBox.Show("INPC2 = " + inpc2.ToString());
+                    MessageBox.Show("INPC 1 = " + inpc1.ToString());
+                    MessageBox.Show("INPC 2 = " + inpc2.ToString());
 
                     factorA = inpc2 / inpc1;
-                    MessageBox.Show("factorA = " + factorA.ToString());
+                    MessageBox.Show("Factor de actualización = " + factorA.ToString());
 
                     //TASA DE RECARGO
                     double sumaRec = 0;
                     IEnumerable<DateTime> meses = monthsBetween(DateTime.Parse(Required), DateTime.Parse(Presentation));
+                    //MessageBox.Show("Tipo: " + tipo);
                     if (tipo == "2")
                     {
                         meses = meses.Exclude(0, 1);
@@ -1062,7 +1070,7 @@ namespace CostToInvoiceButton
                         //MessageBox.Show("sumaRec actual: " + sumaRec.ToString());
                     }
                     tRec = sumaRec;
-                    MessageBox.Show("sumaRec total: " + sumaRec.ToString());
+                    //MessageBox.Show("sumaRec total: " + sumaRec.ToString());
                 }
                 clientInfoHeader = new ClientInfoHeader();
                 aPIAccessRequest = new APIAccessRequestHeader();
@@ -1094,19 +1102,19 @@ namespace CostToInvoiceButton
                         {
                             string priced = substrings[3];
                             double pricef = String.IsNullOrEmpty(priced) ? 0 : Convert.ToDouble(priced);
-                            pricef = (factorA * pricef) - pricef;
+                            pricef = Math.Round(((factorA * pricef) - pricef), 0, MidpointRounding.AwayFromZero);
                             if (pricef <= 0)
                             {
                                 pricef = 1;
                             }
-                            MessageBox.Show("actualización: " + pricef.ToString());
+                            MessageBox.Show("Actualización: $" + pricef.ToString());
                             pricef = Convert.ToDouble(substrings[3]) + pricef;
-                            MessageBox.Show("monto mas actualización: " + pricef.ToString());
-                            double recargos = pricef * (tRec / 100);
-                            MessageBox.Show("recargos: " + recargos.ToString());
+                            //MessageBox.Show("monto mas actualización: " + pricef.ToString());
+                            double recargos = Math.Round((pricef * (tRec / 100)),0,MidpointRounding.AwayFromZero);
+                            MessageBox.Show("Recargos: $" + recargos.ToString());
                             pricef = pricef + recargos;
-                            MessageBox.Show("pricef total: " + pricef.ToString());
-                            component.Precio = Math.Round(pricef, 4).ToString();
+                            //MessageBox.Show("pricef total: " + pricef.ToString());
+                            component.Precio = Math.Round(pricef, 0, MidpointRounding.AwayFromZero).ToString();
                         }
                         else
                         {
@@ -2398,6 +2406,32 @@ namespace CostToInvoiceButton
             catch (Exception ex)
             {
                 MessageBox.Show("GetCargoGroup:" + ex.Message + " Det: " + ex.StackTrace);
+                return "";
+            }
+        }
+        public string GetPaxGroup(string strIcao)
+        {
+            try
+            {
+                string pGroup = "";
+                ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
+                APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
+                clientInfoHeader.AppID = "Query Example";
+                String queryString = "SELECT MTOWGroup.Name FROM CO.AircraftType WHERE ICAODesignator = '" + strIcao + "'";
+                clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 1, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
+                foreach (CSVTable table in queryCSV.CSVTables)
+                {
+                    String[] rowData = table.Rows;
+                    foreach (String data in rowData)
+                    {
+                        pGroup = data;
+                    }
+                }
+                return pGroup;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("GetPaxGroup:" + ex.Message + " Det: " + ex.StackTrace);
                 return "";
             }
         }

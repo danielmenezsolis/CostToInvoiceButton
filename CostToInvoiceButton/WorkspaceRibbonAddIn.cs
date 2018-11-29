@@ -325,6 +325,7 @@ namespace CostToInvoiceButton
                                 component.ItemNumber = "OVEAIAS0131";
                                 if (!String.IsNullOrEmpty(component.ItemNumber))
                                 {
+                                    component.ItemDescription = "";
                                     component = GetComponentData(component);
                                     if (!String.IsNullOrEmpty(component.ItemDescription))
                                     {
@@ -345,6 +346,7 @@ namespace CostToInvoiceButton
                                 component.ItemNumber = "OHANIAS0129";
                                 if (!String.IsNullOrEmpty(component.ItemNumber))
                                 {
+                                    component.ItemDescription = "";
                                     component = GetComponentData(component);
                                     if (!String.IsNullOrEmpty(component.ItemDescription))
                                     {
@@ -396,7 +398,7 @@ namespace CostToInvoiceButton
                     ((TextBox)doubleScreen.Controls["txtSemeam"]).Text = SeneamCat;
                     ((TextBox)doubleScreen.Controls["txtCreationIncidentDate"]).Text = incidentCreation.ToString();
                     ((ComboBox)doubleScreen.Controls["cboCurrency"]).Text = SRType == "FUEL" ? "MXN" : GetCurrency();
-                    
+
                     UpdatePackageCost();
                     doubleScreen.ShowDialog();
                 }
@@ -945,7 +947,7 @@ namespace CostToInvoiceButton
                             Char delimiter = '-';
                             string[] substrings = data.Split(delimiter);
                             string month = substrings[0];
-                            string year = substrings[1].Remove(0,2);
+                            string year = substrings[1].Remove(0, 2);
                             required = month + '-' + year;
                         }
                     }
@@ -1110,7 +1112,7 @@ namespace CostToInvoiceButton
                             MessageBox.Show("Actualización: $" + pricef.ToString());
                             pricef = Convert.ToDouble(substrings[3]) + pricef;
                             //MessageBox.Show("monto mas actualización: " + pricef.ToString());
-                            double recargos = Math.Round((pricef * (tRec / 100)),0,MidpointRounding.AwayFromZero);
+                            double recargos = Math.Round((pricef * (tRec / 100)), 0, MidpointRounding.AwayFromZero);
                             MessageBox.Show("Recargos: $" + recargos.ToString());
                             pricef = pricef + recargos;
                             //MessageBox.Show("pricef total: " + pricef.ToString());

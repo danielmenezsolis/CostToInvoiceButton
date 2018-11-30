@@ -158,7 +158,20 @@ namespace CostToInvoiceButton
                     }
                     if (SRType == "GYCUSTODIA")
                     {
-                        CreateDeposit();
+                        int com = 0;
+                        servicios = GetListServices();
+                        foreach (Services item in servicios)
+                        {
+                            if ( item.ItemNumber == "IPSCNAP351")
+                            {
+                                com = 1;
+                            }
+                        }
+                        if (com == 0)
+                        {
+                            CreateDeposit();
+                            CreateDeposit();
+                        }                           
                     }
                     if (SRType == "SENEAM")
                     {
@@ -322,7 +335,7 @@ namespace CostToInvoiceButton
                             {
                                 component.Airport = item.Airport.Replace("-", "_");
                                 //component.ItemNumber = getFBOItemNumber(Convert.ToInt32(item.Itinerary));
-                                component.ItemNumber = "OVEAIAS0131";
+                                component.ItemNumber = "OVEAIA0131";
                                 if (!String.IsNullOrEmpty(component.ItemNumber))
                                 {
                                     component.ItemDescription = "";
@@ -871,7 +884,7 @@ namespace CostToInvoiceButton
                     String[] rowData = table.Rows;
                     foreach (String data in rowData)
                     {
-                        if (Convert.ToInt32(data) < 1)
+                        if (Convert.ToInt32(data) < 2)
                         {
                             Services service = new Services();
                             Char delimiter = '|';

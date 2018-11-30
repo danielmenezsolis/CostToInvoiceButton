@@ -60,19 +60,6 @@
             this.txtItemNumber = new System.Windows.Forms.TextBox();
             this.BtnAdd = new System.Windows.Forms.Button();
             this.dataGridInvoice = new System.Windows.Forms.DataGridView();
-            this.Item = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Vendor = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Quantity = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Cost = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Price = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Amount = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.IdService = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Currency = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Itinerary = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.RoyaltyItem = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.ParticipacionCobro = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.EditColumn = new System.Windows.Forms.DataGridViewButtonColumn();
-            this.DeleteColumn = new System.Windows.Forms.DataGridViewButtonColumn();
             this.label10 = new System.Windows.Forms.Label();
             this.label11 = new System.Windows.Forms.Label();
             this.label12 = new System.Windows.Forms.Label();
@@ -125,6 +112,19 @@
             this.txtCustomerClass = new System.Windows.Forms.TextBox();
             this.txtCreationIncidentDate = new System.Windows.Forms.TextBox();
             this.txtPaxGroup = new System.Windows.Forms.TextBox();
+            this.Item = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Vendor = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Quantity = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Cost = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Price = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Amount = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.IdService = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Currency = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Itinerary = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.RoyaltyItem = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.ParticipacionCobro = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.EditColumn = new System.Windows.Forms.DataGridViewButtonColumn();
+            this.DeleteColumn = new System.Windows.Forms.DataGridViewButtonColumn();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridSuppliers)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridServicios)).BeginInit();
@@ -137,7 +137,7 @@
             this.fileToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(825, 24);
+            this.menuStrip1.Size = new System.Drawing.Size(917, 24);
             this.menuStrip1.TabIndex = 3;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -242,7 +242,7 @@
             this.dataGridServicios.Name = "dataGridServicios";
             this.dataGridServicios.RowHeadersVisible = false;
             this.dataGridServicios.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.dataGridServicios.Size = new System.Drawing.Size(825, 248);
+            this.dataGridServicios.Size = new System.Drawing.Size(917, 248);
             this.dataGridServicios.TabIndex = 4;
             this.dataGridServicios.TabStop = false;
             this.dataGridServicios.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridServicios_CellContentClick);
@@ -259,20 +259,21 @@
             // label7
             // 
             this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(669, 421);
+            this.label7.Location = new System.Drawing.Point(744, 408);
             this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(31, 13);
+            this.label7.Size = new System.Drawing.Size(62, 13);
             this.label7.TabIndex = 33;
-            this.label7.Text = "Price";
+            this.label7.Text = "Price p/unit";
+            this.label7.Click += new System.EventHandler(this.label7_Click);
             // 
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(505, 421);
+            this.label6.Location = new System.Drawing.Point(295, 408);
             this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(28, 13);
+            this.label6.Size = new System.Drawing.Size(59, 13);
             this.label6.TabIndex = 32;
-            this.label6.Text = "Cost";
+            this.label6.Text = "Cost p/unit";
             // 
             // label5
             // 
@@ -285,7 +286,7 @@
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(3, 316);
+            this.label4.Location = new System.Drawing.Point(45, 313);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(45, 13);
             this.label4.TabIndex = 30;
@@ -294,25 +295,26 @@
             // lblQty
             // 
             this.lblQty.AutoSize = true;
-            this.lblQty.Location = new System.Drawing.Point(336, 421);
+            this.lblQty.Location = new System.Drawing.Point(522, 408);
             this.lblQty.Name = "lblQty";
-            this.lblQty.Size = new System.Drawing.Size(23, 13);
+            this.lblQty.Size = new System.Drawing.Size(46, 13);
             this.lblQty.TabIndex = 29;
-            this.lblQty.Text = "Qty";
+            this.lblQty.Text = "Quantity";
             // 
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(336, 369);
+            this.label2.Location = new System.Drawing.Point(390, 369);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(27, 13);
             this.label2.TabIndex = 28;
             this.label2.Text = "Item";
+            this.label2.Click += new System.EventHandler(this.label2_Click);
             // 
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(3, 369);
+            this.label1.Location = new System.Drawing.Point(46, 362);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(67, 13);
             this.label1.TabIndex = 27;
@@ -320,7 +322,7 @@
             // 
             // txtItem
             // 
-            this.txtItem.Location = new System.Drawing.Point(373, 362);
+            this.txtItem.Location = new System.Drawing.Point(423, 362);
             this.txtItem.Name = "txtItem";
             this.txtItem.ReadOnly = true;
             this.txtItem.Size = new System.Drawing.Size(431, 20);
@@ -329,10 +331,10 @@
             // 
             // txtClientName
             // 
-            this.txtClientName.Location = new System.Drawing.Point(575, 309);
+            this.txtClientName.Location = new System.Drawing.Point(574, 310);
             this.txtClientName.Name = "txtClientName";
             this.txtClientName.ReadOnly = true;
-            this.txtClientName.Size = new System.Drawing.Size(229, 20);
+            this.txtClientName.Size = new System.Drawing.Size(253, 20);
             this.txtClientName.TabIndex = 25;
             this.txtClientName.TabStop = false;
             // 
@@ -346,7 +348,7 @@
             // 
             // txtCost
             // 
-            this.txtCost.Location = new System.Drawing.Point(541, 414);
+            this.txtCost.Location = new System.Drawing.Point(360, 405);
             this.txtCost.Name = "txtCost";
             this.txtCost.Size = new System.Drawing.Size(100, 20);
             this.txtCost.TabIndex = 22;
@@ -354,7 +356,7 @@
             // 
             // txtQty
             // 
-            this.txtQty.Location = new System.Drawing.Point(373, 414);
+            this.txtQty.Location = new System.Drawing.Point(572, 405);
             this.txtQty.Name = "txtQty";
             this.txtQty.Size = new System.Drawing.Size(100, 20);
             this.txtQty.TabIndex = 21;
@@ -363,7 +365,7 @@
             // 
             // txtPrice
             // 
-            this.txtPrice.Location = new System.Drawing.Point(704, 414);
+            this.txtPrice.Location = new System.Drawing.Point(810, 405);
             this.txtPrice.Name = "txtPrice";
             this.txtPrice.Size = new System.Drawing.Size(100, 20);
             this.txtPrice.TabIndex = 23;
@@ -371,7 +373,7 @@
             // 
             // txtItemNumber
             // 
-            this.txtItemNumber.Location = new System.Drawing.Point(97, 362);
+            this.txtItemNumber.Location = new System.Drawing.Point(119, 359);
             this.txtItemNumber.Name = "txtItemNumber";
             this.txtItemNumber.ReadOnly = true;
             this.txtItemNumber.Size = new System.Drawing.Size(219, 20);
@@ -444,108 +446,10 @@
             this.dataGridInvoice.RowHeadersDefaultCellStyle = dataGridViewCellStyle7;
             this.dataGridInvoice.RowHeadersVisible = false;
             this.dataGridInvoice.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.dataGridInvoice.Size = new System.Drawing.Size(825, 133);
+            this.dataGridInvoice.Size = new System.Drawing.Size(917, 133);
             this.dataGridInvoice.TabIndex = 40;
             this.dataGridInvoice.TabStop = false;
             this.dataGridInvoice.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridInvoice_CellContentClick);
-            // 
-            // Item
-            // 
-            this.Item.Frozen = true;
-            this.Item.HeaderText = "Item";
-            this.Item.Name = "Item";
-            this.Item.Width = 52;
-            // 
-            // Vendor
-            // 
-            this.Vendor.Frozen = true;
-            this.Vendor.HeaderText = "Vendor";
-            this.Vendor.Name = "Vendor";
-            this.Vendor.Width = 66;
-            // 
-            // Quantity
-            // 
-            this.Quantity.Frozen = true;
-            this.Quantity.HeaderText = "Quantity";
-            this.Quantity.Name = "Quantity";
-            this.Quantity.Width = 71;
-            // 
-            // Cost
-            // 
-            this.Cost.Frozen = true;
-            this.Cost.HeaderText = "Cost";
-            this.Cost.Name = "Cost";
-            this.Cost.Width = 53;
-            // 
-            // Price
-            // 
-            this.Price.Frozen = true;
-            this.Price.HeaderText = "Price";
-            this.Price.Name = "Price";
-            this.Price.Width = 56;
-            // 
-            // Amount
-            // 
-            this.Amount.Frozen = true;
-            this.Amount.HeaderText = "Total Amount";
-            this.Amount.Name = "Amount";
-            this.Amount.Width = 95;
-            // 
-            // IdService
-            // 
-            this.IdService.Frozen = true;
-            this.IdService.HeaderText = "Service ID";
-            this.IdService.Name = "IdService";
-            this.IdService.Width = 82;
-            // 
-            // Currency
-            // 
-            this.Currency.Frozen = true;
-            this.Currency.HeaderText = "Currency";
-            this.Currency.Name = "Currency";
-            this.Currency.ReadOnly = true;
-            this.Currency.Width = 74;
-            // 
-            // Itinerary
-            // 
-            this.Itinerary.Frozen = true;
-            this.Itinerary.HeaderText = "Itinerary";
-            this.Itinerary.Name = "Itinerary";
-            this.Itinerary.ReadOnly = true;
-            this.Itinerary.Width = 69;
-            // 
-            // RoyaltyItem
-            // 
-            this.RoyaltyItem.Frozen = true;
-            this.RoyaltyItem.HeaderText = "CobroParticipacionNj";
-            this.RoyaltyItem.Name = "RoyaltyItem";
-            this.RoyaltyItem.ReadOnly = true;
-            this.RoyaltyItem.Width = 131;
-            // 
-            // ParticipacionCobro
-            // 
-            this.ParticipacionCobro.Frozen = true;
-            this.ParticipacionCobro.HeaderText = "ParticipacionCobro";
-            this.ParticipacionCobro.Name = "ParticipacionCobro";
-            this.ParticipacionCobro.Width = 121;
-            // 
-            // EditColumn
-            // 
-            this.EditColumn.Frozen = true;
-            this.EditColumn.HeaderText = "Edit";
-            this.EditColumn.Name = "EditColumn";
-            this.EditColumn.Text = "Edit";
-            this.EditColumn.UseColumnTextForButtonValue = true;
-            this.EditColumn.Visible = false;
-            this.EditColumn.Width = 31;
-            // 
-            // DeleteColumn
-            // 
-            this.DeleteColumn.HeaderText = "Delete";
-            this.DeleteColumn.Name = "DeleteColumn";
-            this.DeleteColumn.Text = "Delete";
-            this.DeleteColumn.UseColumnTextForButtonValue = true;
-            this.DeleteColumn.Width = 44;
             // 
             // label10
             // 
@@ -566,9 +470,9 @@
             // label12
             // 
             this.label12.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.label12.Location = new System.Drawing.Point(-4, 503);
+            this.label12.Location = new System.Drawing.Point(-4, 502);
             this.label12.Name = "label12";
-            this.label12.Size = new System.Drawing.Size(829, 2);
+            this.label12.Size = new System.Drawing.Size(914, 2);
             this.label12.TabIndex = 43;
             // 
             // label13
@@ -601,11 +505,11 @@
             // label16
             // 
             this.label16.AutoSize = true;
-            this.label16.Location = new System.Drawing.Point(3, 421);
+            this.label16.Location = new System.Drawing.Point(3, 408);
             this.label16.Name = "label16";
-            this.label16.Size = new System.Drawing.Size(49, 13);
+            this.label16.Size = new System.Drawing.Size(73, 13);
             this.label16.TabIndex = 48;
-            this.label16.Text = "Currency";
+            this.label16.Text = "Currency Cost";
             // 
             // txtCurrency
             // 
@@ -663,7 +567,7 @@
             // 
             this.cboSuppliers.Enabled = false;
             this.cboSuppliers.FormattingEnabled = true;
-            this.cboSuppliers.Location = new System.Drawing.Point(97, 308);
+            this.cboSuppliers.Location = new System.Drawing.Point(99, 309);
             this.cboSuppliers.Name = "cboSuppliers";
             this.cboSuppliers.Size = new System.Drawing.Size(361, 21);
             this.cboSuppliers.TabIndex = 55;
@@ -811,7 +715,7 @@
             this.cboCurrency.Items.AddRange(new object[] {
             "MXN",
             "USD"});
-            this.cboCurrency.Location = new System.Drawing.Point(97, 413);
+            this.cboCurrency.Location = new System.Drawing.Point(82, 405);
             this.cboCurrency.Name = "cboCurrency";
             this.cboCurrency.Size = new System.Drawing.Size(139, 21);
             this.cboCurrency.TabIndex = 73;
@@ -860,7 +764,7 @@
             // label9
             // 
             this.label9.AutoSize = true;
-            this.label9.Location = new System.Drawing.Point(477, 316);
+            this.label9.Location = new System.Drawing.Point(486, 313);
             this.label9.Name = "label9";
             this.label9.Size = new System.Drawing.Size(82, 13);
             this.label9.TabIndex = 79;
@@ -869,7 +773,7 @@
             // lblCurrencyPrice
             // 
             this.lblCurrencyPrice.AutoSize = true;
-            this.lblCurrencyPrice.Location = new System.Drawing.Point(734, 395);
+            this.lblCurrencyPrice.Location = new System.Drawing.Point(807, 389);
             this.lblCurrencyPrice.Name = "lblCurrencyPrice";
             this.lblCurrencyPrice.Size = new System.Drawing.Size(31, 13);
             this.lblCurrencyPrice.TabIndex = 80;
@@ -926,7 +830,7 @@
             // lblCurrencyCost
             // 
             this.lblCurrencyCost.AutoSize = true;
-            this.lblCurrencyCost.Location = new System.Drawing.Point(572, 395);
+            this.lblCurrencyCost.Location = new System.Drawing.Point(357, 389);
             this.lblCurrencyCost.Name = "lblCurrencyCost";
             this.lblCurrencyCost.Size = new System.Drawing.Size(31, 13);
             this.lblCurrencyCost.TabIndex = 87;
@@ -978,11 +882,109 @@
             this.txtPaxGroup.Size = new System.Drawing.Size(39, 20);
             this.txtPaxGroup.TabIndex = 93;
             // 
+            // Item
+            // 
+            this.Item.Frozen = true;
+            this.Item.HeaderText = "Item";
+            this.Item.Name = "Item";
+            this.Item.Width = 52;
+            // 
+            // Vendor
+            // 
+            this.Vendor.Frozen = true;
+            this.Vendor.HeaderText = "Vendor";
+            this.Vendor.Name = "Vendor";
+            this.Vendor.Width = 66;
+            // 
+            // Quantity
+            // 
+            this.Quantity.Frozen = true;
+            this.Quantity.HeaderText = "Quantity";
+            this.Quantity.Name = "Quantity";
+            this.Quantity.Width = 71;
+            // 
+            // Cost
+            // 
+            this.Cost.Frozen = true;
+            this.Cost.HeaderText = "Cost p/unit";
+            this.Cost.Name = "Cost";
+            this.Cost.Width = 84;
+            // 
+            // Price
+            // 
+            this.Price.Frozen = true;
+            this.Price.HeaderText = "Price p/unit";
+            this.Price.Name = "Price";
+            this.Price.Width = 87;
+            // 
+            // Amount
+            // 
+            this.Amount.Frozen = true;
+            this.Amount.HeaderText = "Total Price";
+            this.Amount.Name = "Amount";
+            this.Amount.Width = 83;
+            // 
+            // IdService
+            // 
+            this.IdService.Frozen = true;
+            this.IdService.HeaderText = "Service ID";
+            this.IdService.Name = "IdService";
+            this.IdService.Width = 82;
+            // 
+            // Currency
+            // 
+            this.Currency.Frozen = true;
+            this.Currency.HeaderText = "Currency";
+            this.Currency.Name = "Currency";
+            this.Currency.ReadOnly = true;
+            this.Currency.Width = 74;
+            // 
+            // Itinerary
+            // 
+            this.Itinerary.Frozen = true;
+            this.Itinerary.HeaderText = "Itinerary";
+            this.Itinerary.Name = "Itinerary";
+            this.Itinerary.ReadOnly = true;
+            this.Itinerary.Width = 69;
+            // 
+            // RoyaltyItem
+            // 
+            this.RoyaltyItem.Frozen = true;
+            this.RoyaltyItem.HeaderText = "CobroParticipacionNj";
+            this.RoyaltyItem.Name = "RoyaltyItem";
+            this.RoyaltyItem.ReadOnly = true;
+            this.RoyaltyItem.Width = 131;
+            // 
+            // ParticipacionCobro
+            // 
+            this.ParticipacionCobro.Frozen = true;
+            this.ParticipacionCobro.HeaderText = "ParticipacionCobro";
+            this.ParticipacionCobro.Name = "ParticipacionCobro";
+            this.ParticipacionCobro.Width = 121;
+            // 
+            // EditColumn
+            // 
+            this.EditColumn.Frozen = true;
+            this.EditColumn.HeaderText = "Edit";
+            this.EditColumn.Name = "EditColumn";
+            this.EditColumn.Text = "Edit";
+            this.EditColumn.UseColumnTextForButtonValue = true;
+            this.EditColumn.Visible = false;
+            this.EditColumn.Width = 31;
+            // 
+            // DeleteColumn
+            // 
+            this.DeleteColumn.HeaderText = "Delete";
+            this.DeleteColumn.Name = "DeleteColumn";
+            this.DeleteColumn.Text = "Delete";
+            this.DeleteColumn.UseColumnTextForButtonValue = true;
+            this.DeleteColumn.Width = 44;
+            // 
             // DoubleScreen
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(825, 651);
+            this.ClientSize = new System.Drawing.Size(917, 651);
             this.Controls.Add(this.txtPaxGroup);
             this.Controls.Add(this.txtCreationIncidentDate);
             this.Controls.Add(this.txtCustomerClass);
@@ -1063,6 +1065,7 @@
             this.Name = "DoubleScreen";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "DoubleScreen";
+            this.Load += new System.EventHandler(this.DoubleScreen_Load);
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridSuppliers)).EndInit();
@@ -1149,6 +1152,7 @@
         private System.Windows.Forms.TextBox txtParticipacionCobro;
         private System.Windows.Forms.TextBox txtCustomerClass;
         private System.Windows.Forms.TextBox txtCreationIncidentDate;
+        private System.Windows.Forms.TextBox txtPaxGroup;
         private System.Windows.Forms.DataGridViewTextBoxColumn Item;
         private System.Windows.Forms.DataGridViewTextBoxColumn Vendor;
         private System.Windows.Forms.DataGridViewTextBoxColumn Quantity;
@@ -1162,6 +1166,5 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn ParticipacionCobro;
         private System.Windows.Forms.DataGridViewButtonColumn EditColumn;
         private System.Windows.Forms.DataGridViewButtonColumn DeleteColumn;
-        private System.Windows.Forms.TextBox txtPaxGroup;
     }
 }

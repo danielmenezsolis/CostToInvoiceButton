@@ -51,7 +51,7 @@ namespace CostToInvoiceButton
                 txtUOM.Text = "";
                 if (e.RowIndex != -1)
                 {
-                    lblQty.Text = "Qty";
+                    lblQty.Text = "Quantity";
                     txtPrice.Enabled = true;
                     txtCost.Enabled = true;
                     cboCurrency.Enabled = true;
@@ -126,7 +126,6 @@ namespace CostToInvoiceButton
                         txtFBO.Text = GetFBOValue((string.IsNullOrEmpty(dataGridServicios.Rows[e.RowIndex].Cells[8].FormattedValue.ToString()) ? 0 : Convert.ToInt32(dataGridServicios.Rows[e.RowIndex].Cells[8].FormattedValue.ToString())));
                         GetItineraryHours(string.IsNullOrEmpty(dataGridServicios.Rows[e.RowIndex].Cells[8].FormattedValue.ToString()) ? 0 : Convert.ToInt32(dataGridServicios.Rows[e.RowIndex].Cells[8].FormattedValue.ToString()));
                         txtMainHour.Text = GetMainHourFBOFCC(txtATA.Text, txtATD.Text);
-
                     }
                     if (lblSrType.Text == "FUEL")
                     {
@@ -340,7 +339,7 @@ namespace CostToInvoiceButton
                         double b;
                         if (double.TryParse(txtCost.Text, out b))
                         {
-                            double m2 = Convert.ToDouble(getm2(txtICAOD.Text)) * 2;
+                            double m2 = Convert.ToDouble(getm2(txtICAOD.Text));
                             //MessageBox.Show("M2: " + m2.ToString());
                             double utilidad = gethSGroup(txtICAOD.Text);
                             utilidad = 1 + (utilidad / 100);
@@ -353,7 +352,7 @@ namespace CostToInvoiceButton
                     {
                         cboCurrency.Text = "USD";
                     }
-                    if (txtCost.Text == "0" && lblSrType.Text != "SENEAM")
+                    if (txtCost.Text == "0" && (lblSrType.Text != "SENEAM" || lblSrType.Text != "CATERING"))
                     {
                         cboCurrency.Text = "MXN";
                     }
@@ -556,7 +555,7 @@ namespace CostToInvoiceButton
 
                 if (lblSrType.Text == "CATERING")
                 {
-                    cboCurrency.Text = "USD";
+                    // cboCurrency.Text = "USD";
                     double rate = getExchangeRate(DateTime.Parse(txtCateringDDate.Text));
 
                     if (txtUtilidad.Text == "A")
@@ -568,7 +567,7 @@ namespace CostToInvoiceButton
                     }
                     else
                     {
-                        if (IsFloatValue(txtCost.Text))
+                        if (double.Parse(txtCost.Text) > 0)
                         {
                             double precio = Convert.ToDouble(txtCost.Text);
                             double utilidad = GetUtilidadPercentage(txtUtilidad.Text) / 100;
@@ -578,7 +577,7 @@ namespace CostToInvoiceButton
 
                             if (lblCurrencyPrice.Text == "USD")
                             {
-                                precio = Convert.ToDouble(txtPrice.Text);
+                                precio = Convert.ToDouble(pricefinal);
                                 precio = precio / rate;
                                 pricefinal = Math.Round(precio, 4);
                             }
@@ -608,7 +607,7 @@ namespace CostToInvoiceButton
                 {
                     if (IsNumber(txtCost.Text) && GetPrices() == 0)
                     {
-                        cboCurrency.Text = "USD";
+                        // cboCurrency.Text = "USD";
                         DateTime date = DateTime.Parse(txtATA.Text);
                         pricefinal = ((Convert.ToDouble(txtCost.Text) + (Convert.ToDouble(txtCost.Text) * GetUtilidadPercentage(txtUtilidad.Text) / 100)) / getExchangeRate(date));
                     }
@@ -1628,7 +1627,7 @@ namespace CostToInvoiceButton
                 //string Pass = Encoding.UTF8.GetString(Convert.FromBase64String("U2luZXJneTIwMTgu"));
                 client.Authenticator = new HttpBasicAuthenticator("servicios", "Sinergy*2018");
                 string definicion = "";
-                //string definicion = "?totalResults=false&q={str_item_number:'" + dataGridServicios.Rows[e.RowIndex].Cells[1].FormattedValue.ToString().Trim() + "',str_icao_iata_code:'" + airtport + "'}";
+                // string definicion = "?totalResults=false&q={str_item_number:'" + dataGridServicios.Rows[e.RowIndex].Cells[1].FormattedValue.ToString().Trim() + "',str_icao_iata_code:'" + airtport + "'}";
                 // string definicion = "?totalResults=true&q={str_item_number:'" + txtItemNumber.Text + "',str_icao_iata_code:'" + txtAirport.Text + "'}";
                 if (lblSrType.Text == "PERMISOS")
                 {
@@ -1697,7 +1696,7 @@ namespace CostToInvoiceButton
                     }
                     else
                     {
-                        definicion += "str_item_number:'" + txtItemNumber.Text + "',str_icao_iata_code:'" + txtAirport.Text + "',bol_int_flight_cargo:" + cargo.ToString() + ",str_schedule_type:'" + txtMainHour.Text + "',,str_aircraft_group:'" + txtPaxGroup.Text + "',str_aircraft_type:'" + txtICAOD.Text + "',$or:[{str_client_category:{$exists:false}},{str_client_category:'" + txtCustomerClass.Text.Replace("&", "%") + "'}]}";
+                        definicion += "str_item_number:'" + txtItemNumber.Text + "',str_icao_iata_code:'" + txtAirport.Text + "',bol_int_flight_cargo:" + cargo.ToString() + ",str_schedule_type:'" + txtMainHour.Text + "',str_aircraft_group:'" + txtPaxGroup.Text + "',str_aircraft_type:'" + txtICAOD.Text + "',$or:[{str_client_category:{$exists:false}},{str_client_category:'" + txtCustomerClass.Text.Replace("&", "%") + "'}]}";
                     }
                 }
                 global.LogMessage("GETPricesdef:" + definicion + "SRType:" + lblSrType.Text);
@@ -1761,10 +1760,6 @@ namespace CostToInvoiceButton
                         Curr = rootObjectPrices.items[0].str_currency_code;
                         OUM = rootObjectPrices.items[0].str_oum_code;
                     }
-                    if (lblSrType.Text == "CATERING")
-                    {
-                        price = Convert.ToDouble(txtPrice.Text);
-                    }
                 }
                 else
                 {
@@ -1777,6 +1772,10 @@ namespace CostToInvoiceButton
                 if (isComponent())
                 {
                     price = 0;
+                }
+                if (lblSrType.Text == "CATERING")
+                {
+                    price = Convert.ToDouble(txtPrice.Text);
                 }
                 return price;
             }
@@ -1950,14 +1949,29 @@ namespace CostToInvoiceButton
                 ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
                 APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
                 clientInfoHeader.AppID = "Query Example";
-                String queryString = "SELECT SUM(TicketAmount) FROM Co.Payables WHERE Services.ID =" + txtIdService.Text + " ";
-                clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 1, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
+                String queryString = "SELECT SUM(TicketAmount), Currency FROM Co.Payables WHERE Services.ID = " + txtIdService.Text + " GROUP BY Currency";
+                clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 10, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
                 foreach (CSVTable table in queryCSV.CSVTables)
                 {
                     String[] rowData = table.Rows;
                     foreach (String data in rowData)
                     {
-                        sum = String.IsNullOrEmpty(data) ? 0 : Convert.ToDouble(data);
+                        double cost = 0;
+                        String cur = "";
+                        Char delimiter = '|';
+                        String[] substrings = data.Split(delimiter);
+                        cost = Convert.ToDouble(substrings[0]);
+                        cur = substrings[1];
+
+                        if (cur == "2")
+                        {
+                            double tipoCambio = getExchangeRate(DateTime.Today);
+                            sum = sum + (cost*tipoCambio);
+                        }
+                        else
+                        {
+                            sum = sum + cost;
+                        }
                     }
                 }
                 return Math.Round(sum, 4);
@@ -2844,6 +2858,21 @@ namespace CostToInvoiceButton
         }
 
         private void txtUOM_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void label2_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void label7_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void DoubleScreen_Load(object sender, EventArgs e)
         {
 
         }

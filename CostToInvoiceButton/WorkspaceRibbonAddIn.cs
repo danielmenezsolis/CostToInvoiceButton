@@ -2156,6 +2156,7 @@ namespace CostToInvoiceButton
                             ItemNumber = ItemN,
                             Incident = IncidentID,
                             Airport = ArrivalAirportIncident.Replace('-', '_').Trim(),
+                            Informativo = "0",
                             Componente = "0",
                             MCreated = "1",
                             Itinerary = Itinerar,

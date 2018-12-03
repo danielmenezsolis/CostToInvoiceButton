@@ -1394,16 +1394,16 @@ namespace CostToInvoiceButton
                         cost = 0;
                     }
                 }
-                else if (lblSrType.Text == "GYCUSTODIA")
-                {
-                    cost = GetHSCost();
-                }
                 else if (GetTicketSumCatA() > 0)
                 {
                     if (GetTicketSumCatA() > 0)
                     {
                         cost = GetTicketSumCatA();
                     }
+                }
+                else if (lblSrType.Text == "GYCUSTODIA" && txtItemNumber.Text == "MHSPSAS0091")
+                {
+                    cost = GetHSCost();
                 }
                 else
                 {

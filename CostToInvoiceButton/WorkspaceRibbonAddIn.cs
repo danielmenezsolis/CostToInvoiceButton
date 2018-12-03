@@ -162,7 +162,7 @@ namespace CostToInvoiceButton
                         servicios = GetListServices();
                         foreach (Services item in servicios)
                         {
-                            if ( item.ItemNumber == "IPSCNAP351")
+                            if (item.ItemNumber == "IPSCNAP351")
                             {
                                 com = 1;
                             }
@@ -171,7 +171,7 @@ namespace CostToInvoiceButton
                         {
                             CreateDeposit();
                             CreateDeposit();
-                        }                           
+                        }
                     }
                     if (SRType == "SENEAM")
                     {
@@ -2191,6 +2191,7 @@ namespace CostToInvoiceButton
             clientInfoHeader.AppID = "Query Example";
             String queryString = "SELECT ArrivalAirport.ICAO_IATACODE,ToAirport.Country.LookupName ,ArrivalAirport.FuelType.Name FuelType,Id FROM CO.Fueling WHERE Incident = " + IncidentID + "";
             clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 1000, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
+
             foreach (CSVTable table in queryCSV.CSVTables)
             {
                 String[] rowData = table.Rows;
@@ -2198,7 +2199,7 @@ namespace CostToInvoiceButton
                 {
                     Char delimiter = '|';
                     string[] substrings = data.Split(delimiter);
-
+                    global.LogMessage("LookCountry[0]:" + LookCountry[0] + "ClientType: " + ClientType + "FuelType: " + substrings[2]);
                     if (ClientType == "Internacional" && LookCountry[0] != "MX" && substrings[2] == "International")
                     {
                         ItemN = "IAFMUAS0271";

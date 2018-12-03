@@ -18,6 +18,7 @@ using System.ServiceModel.Channels;
 using RightNow.AddIns.AddInViews;
 using CostToInvoiceButton.SOAPICCS;
 
+
 namespace CostToInvoiceButton
 {
     public partial class DoubleScreen : Form
@@ -1966,7 +1967,7 @@ namespace CostToInvoiceButton
                         if (cur == "2")
                         {
                             double tipoCambio = getExchangeRate(DateTime.Today);
-                            sum = sum + (cost*tipoCambio);
+                            sum = sum + (cost * tipoCambio);
                         }
                         else
                         {

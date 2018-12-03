@@ -324,6 +324,7 @@ namespace CostToInvoiceButton
                     }
                     if (txtItemNumber.Text == "MHSPSAS0091")
                     {
+                       
                         double b;
                         if (double.TryParse(txtCost.Text, out b))
                         {
@@ -334,6 +335,7 @@ namespace CostToInvoiceButton
                             utilidad = (Convert.ToDouble(txtCost.Text) * m2) * utilidad;
                             txtPrice.Text = Math.Round(utilidad, 4).ToString();
                         }
+                       
                     }
                     if (txtItemNumber.Text == "DEPEGAR0358")
                     {

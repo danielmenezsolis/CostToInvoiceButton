@@ -190,6 +190,7 @@ namespace CostToInvoiceButton
                             component.ItemNumber = "ASFIEAP357";
                             if (!String.IsNullOrEmpty(component.ItemNumber))
                             {
+                                component.ItemDescription = ""; 
                                 component = GetComponentData(component);
                                 if (!String.IsNullOrEmpty(component.ItemDescription))
                                 {
@@ -208,6 +209,7 @@ namespace CostToInvoiceButton
                                 component.ItemNumber = "AIPRTFE0101";
                                 if (!String.IsNullOrEmpty(component.ItemNumber))
                                 {
+                                    component.ItemDescription = "";
                                     component = GetComponentData(component);
                                     if (!String.IsNullOrEmpty(component.ItemDescription))
                                     {
@@ -227,6 +229,7 @@ namespace CostToInvoiceButton
                                 component.ItemNumber = "IISNNAP248";
                                 if (!String.IsNullOrEmpty(component.ItemNumber))
                                 {
+                                    component.ItemDescription = "";
                                     component = GetComponentData(component);
                                     if (!String.IsNullOrEmpty(component.ItemDescription))
                                     {
@@ -234,7 +237,7 @@ namespace CostToInvoiceButton
                                         component.Itinerary = Convert.ToInt32(item.Itinerary);
                                         component.Categories = GetCategories(component.ItemNumber, component.Airport);
                                         component.MCreated = "1";
-                                        component.MCreated = "0";
+                                        component.Componente = "0";
                                         component.ParentPaxId = IncidentID;
                                         InsertComponent(component);
                                     }
@@ -269,6 +272,7 @@ namespace CostToInvoiceButton
                                 component.ItemNumber = "AIPRTFE0101";
                                 if (!String.IsNullOrEmpty(component.ItemNumber))
                                 {
+                                    component.ItemDescription = "";
                                     component = GetComponentData(component);
                                     if (!String.IsNullOrEmpty(component.ItemDescription))
                                     {

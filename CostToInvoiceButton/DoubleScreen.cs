@@ -207,13 +207,13 @@ namespace CostToInvoiceButton
                         }
                         double pricesum = 0;
                         int arrival = GetArrivalAirport(Convert.ToInt32(txtItinerary.Text));
-                        MessageBox.Show("ID de aeropuerto: " + arrival.ToString());
+                        //MessageBox.Show("ID de aeropuerto: " + arrival.ToString());
                         double catcollectionfee = Convert.ToDouble(getAirportCateringCollectionFee(arrival)) / 100;
-                        MessageBox.Show("ID de CatCollFee: " + catcollectionfee.ToString());
+                        //MessageBox.Show("ID de CatCollFee: " + catcollectionfee.ToString());
                         double airportfee = Convert.ToDouble(getAirportCollectionFee(arrival)) / 100;
-                        MessageBox.Show("ID de AirCollFee: " + airportfee.ToString());
+                        //MessageBox.Show("ID de AirCollFee: " + airportfee.ToString());
                         double deductionfee = Convert.ToDouble(getAirportCollectionDeductionFee(arrival)) / 100;
-                        MessageBox.Show("ID de DedCollFee: " + deductionfee.ToString());
+                        //MessageBox.Show("ID de DedCollFee: " + deductionfee.ToString());
                         foreach (DataGridViewRow dgvRenglon in dataGridInvoice.Rows)
                         {
                             int itinerarycompare = Convert.ToInt32(dgvRenglon.Cells[8].Value);
@@ -226,21 +226,21 @@ namespace CostToInvoiceButton
                                 if (dgvRenglon.Cells[indice].Value.ToString() == "1" && dgvRenglon.Cells[0].Value.ToString().Contains("CATERING"))
                                 {
                                     fee = price * catcollectionfee;
-                                    MessageBox.Show("Item de Catering");
+                                    //MessageBox.Show("Item de Catering");
                                 }
                                 if (dgvRenglon.Cells[indice].Value.ToString() == "1" && !dgvRenglon.Cells[0].Value.ToString().Contains("CATERING"))
                                 {
                                     fee = price * airportfee;
-                                    MessageBox.Show("Item normal");
+                                    //MessageBox.Show("Item normal");
                                 }
-                                MessageBox.Show("ItemFee: " + fee.ToString());
+                                //MessageBox.Show("ItemFee: " + fee.ToString());
                                 dfee = fee * deductionfee;
-                                MessageBox.Show("ItemDedFee: " + dfee.ToString());
+                                //MessageBox.Show("ItemDedFee: " + dfee.ToString());
                                 pricesum = pricesum + (fee - dfee);
                             }
-                            MessageBox.Show("AFeeActual: " + pricesum.ToString());
+                            //MessageBox.Show("AFeeActual: " + pricesum.ToString());
                         }
-                        MessageBox.Show("AFeeTotal: " + pricesum.ToString());
+                        //MessageBox.Show("AFeeTotal: " + pricesum.ToString());
                         txtPrice.Text = Math.Round((pricesum), 4).ToString();
                         txtPrice.Enabled = false;
                         txtCost.Enabled = false;
@@ -1670,9 +1670,11 @@ namespace CostToInvoiceButton
                 if (lblSrType.Text == "FCC")
                 {
                     int cargo = 0;
+                    string grupo = txtPaxGroup.Text;
                     if (isCargo())
                     {
                         cargo = 1;
+                        grupo = txtCargoGroup.Text;
                     }
 
                     definicion = "?totalResults=true&q={bol_int_fbo:0,";
@@ -1699,7 +1701,7 @@ namespace CostToInvoiceButton
                     }
                     else
                     {
-                        definicion += "str_item_number:'" + txtItemNumber.Text + "',str_icao_iata_code:'" + txtAirport.Text + "',bol_int_flight_cargo:" + cargo.ToString() + ",str_schedule_type:'" + txtMainHour.Text + "',str_aircraft_group:'" + txtPaxGroup.Text + "',str_aircraft_type:'" + txtICAOD.Text + "',$or:[{str_client_category:{$exists:false}},{str_client_category:'" + txtCustomerClass.Text.Replace("&", "%") + "'}]}";
+                        definicion += "str_item_number:'" + txtItemNumber.Text + "',str_icao_iata_code:'" + txtAirport.Text + "',bol_int_flight_cargo:" + cargo.ToString() + ",str_schedule_type:'" + txtMainHour.Text + "',str_aircraft_group:'" + grupo.ToString() + "',str_aircraft_type:'" + txtICAOD.Text + "',$or:[{str_client_category:{$exists:false}},{str_client_category:'" + txtCustomerClass.Text.Replace("&", "%") + "'}]}";
                     }
                 }
                 global.LogMessage("GETPricesdef:" + definicion + "SRType:" + lblSrType.Text);

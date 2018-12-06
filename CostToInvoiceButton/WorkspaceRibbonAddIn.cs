@@ -1038,7 +1038,7 @@ namespace CostToInvoiceButton
                     MessageBox.Show("Required = " + Required.ToString());
 
                     string Presentation = GetSeneamPresDate();
-                    //MessageBox.Show("Presentation = " + Presentation.ToString());
+                    // MessageBox.Show("Presentation = " + Presentation.ToString());
 
                     //INPC'S
                     double inpc1 = 0;
@@ -1067,7 +1067,24 @@ namespace CostToInvoiceButton
 
                     //TASA DE RECARGO
                     double sumaRec = 0;
-                    IEnumerable<DateTime> meses = monthsBetween(DateTime.Parse(Required), DateTime.Parse(Presentation));
+                    fecha1 = "01-" + fecha1.ToUpper();
+
+                    fecha1 = fecha1.Replace("ENE","01");
+                    fecha1 = fecha1.Replace("FEB", "02");
+                    fecha1 = fecha1.Replace("MAR", "03");
+                    fecha1 = fecha1.Replace("ABR", "04");
+                    fecha1 = fecha1.Replace("MAY", "05");
+                    fecha1 = fecha1.Replace("JUN", "06");
+                    fecha1 = fecha1.Replace("JUL", "07");
+                    fecha1 = fecha1.Replace("AGO", "08");
+                    fecha1 = fecha1.Replace("SEP", "09");
+                    fecha1 = fecha1.Replace("OCT", "10");
+                    fecha1 = fecha1.Replace("NOV", "11");
+                    fecha1 = fecha1.Replace("DIC", "12");
+
+                    // MessageBox.Show("Fecha 1: " + fecha1.ToString());
+
+                    IEnumerable<DateTime> meses = monthsBetween(DateTime.Parse(fecha1), DateTime.Parse(Presentation));
                     //MessageBox.Show("Tipo: " + tipo);
                     if (tipo == "2")
                     {
@@ -1142,7 +1159,7 @@ namespace CostToInvoiceButton
             }
             catch (Exception ex)
             {
-                MessageBox.Show("GetSeneamPresDate:" + ex.Message + "Det: " + ex.StackTrace);
+                MessageBox.Show("CreateOvers:" + ex.Message + "Det: " + ex.StackTrace);
             }
         }
         private double GetTasaAnual(string ano)

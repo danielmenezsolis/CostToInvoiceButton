@@ -60,6 +60,19 @@
             this.txtItemNumber = new System.Windows.Forms.TextBox();
             this.BtnAdd = new System.Windows.Forms.Button();
             this.dataGridInvoice = new System.Windows.Forms.DataGridView();
+            this.Item = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Vendor = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Quantity = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Cost = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Price = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Amount = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.IdService = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Currency = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Itinerary = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.RoyaltyItem = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.ParticipacionCobro = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.EditColumn = new System.Windows.Forms.DataGridViewButtonColumn();
+            this.DeleteColumn = new System.Windows.Forms.DataGridViewButtonColumn();
             this.label10 = new System.Windows.Forms.Label();
             this.label11 = new System.Windows.Forms.Label();
             this.label12 = new System.Windows.Forms.Label();
@@ -112,19 +125,6 @@
             this.txtCustomerClass = new System.Windows.Forms.TextBox();
             this.txtCreationIncidentDate = new System.Windows.Forms.TextBox();
             this.txtPaxGroup = new System.Windows.Forms.TextBox();
-            this.Item = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Vendor = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Quantity = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Cost = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Price = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Amount = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.IdService = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Currency = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Itinerary = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.RoyaltyItem = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.ParticipacionCobro = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.EditColumn = new System.Windows.Forms.DataGridViewButtonColumn();
-            this.DeleteColumn = new System.Windows.Forms.DataGridViewButtonColumn();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridSuppliers)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridServicios)).BeginInit();
@@ -352,7 +352,8 @@
             this.txtCost.Name = "txtCost";
             this.txtCost.Size = new System.Drawing.Size(100, 20);
             this.txtCost.TabIndex = 22;
-            this.txtCost.TextChanged += new System.EventHandler(this.txtCost_TextChanged);
+            // this.txtCost.TextChanged += new System.EventHandler(this.txtCost_TextChanged);
+            this.txtCost.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txtCost_KeyDown);
             // 
             // txtQty
             // 
@@ -450,6 +451,104 @@
             this.dataGridInvoice.TabIndex = 40;
             this.dataGridInvoice.TabStop = false;
             this.dataGridInvoice.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridInvoice_CellContentClick);
+            // 
+            // Item
+            // 
+            this.Item.Frozen = true;
+            this.Item.HeaderText = "Item";
+            this.Item.Name = "Item";
+            this.Item.Width = 52;
+            // 
+            // Vendor
+            // 
+            this.Vendor.Frozen = true;
+            this.Vendor.HeaderText = "Vendor";
+            this.Vendor.Name = "Vendor";
+            this.Vendor.Width = 66;
+            // 
+            // Quantity
+            // 
+            this.Quantity.Frozen = true;
+            this.Quantity.HeaderText = "Quantity";
+            this.Quantity.Name = "Quantity";
+            this.Quantity.Width = 71;
+            // 
+            // Cost
+            // 
+            this.Cost.Frozen = true;
+            this.Cost.HeaderText = "Cost p/unit";
+            this.Cost.Name = "Cost";
+            this.Cost.Width = 84;
+            // 
+            // Price
+            // 
+            this.Price.Frozen = true;
+            this.Price.HeaderText = "Price p/unit";
+            this.Price.Name = "Price";
+            this.Price.Width = 87;
+            // 
+            // Amount
+            // 
+            this.Amount.Frozen = true;
+            this.Amount.HeaderText = "Total Price";
+            this.Amount.Name = "Amount";
+            this.Amount.Width = 83;
+            // 
+            // IdService
+            // 
+            this.IdService.Frozen = true;
+            this.IdService.HeaderText = "Service ID";
+            this.IdService.Name = "IdService";
+            this.IdService.Width = 82;
+            // 
+            // Currency
+            // 
+            this.Currency.Frozen = true;
+            this.Currency.HeaderText = "Currency";
+            this.Currency.Name = "Currency";
+            this.Currency.ReadOnly = true;
+            this.Currency.Width = 74;
+            // 
+            // Itinerary
+            // 
+            this.Itinerary.Frozen = true;
+            this.Itinerary.HeaderText = "Itinerary";
+            this.Itinerary.Name = "Itinerary";
+            this.Itinerary.ReadOnly = true;
+            this.Itinerary.Width = 69;
+            // 
+            // RoyaltyItem
+            // 
+            this.RoyaltyItem.Frozen = true;
+            this.RoyaltyItem.HeaderText = "CobroParticipacionNj";
+            this.RoyaltyItem.Name = "RoyaltyItem";
+            this.RoyaltyItem.ReadOnly = true;
+            this.RoyaltyItem.Width = 131;
+            // 
+            // ParticipacionCobro
+            // 
+            this.ParticipacionCobro.Frozen = true;
+            this.ParticipacionCobro.HeaderText = "ParticipacionCobro";
+            this.ParticipacionCobro.Name = "ParticipacionCobro";
+            this.ParticipacionCobro.Width = 121;
+            // 
+            // EditColumn
+            // 
+            this.EditColumn.Frozen = true;
+            this.EditColumn.HeaderText = "Edit";
+            this.EditColumn.Name = "EditColumn";
+            this.EditColumn.Text = "Edit";
+            this.EditColumn.UseColumnTextForButtonValue = true;
+            this.EditColumn.Visible = false;
+            this.EditColumn.Width = 31;
+            // 
+            // DeleteColumn
+            // 
+            this.DeleteColumn.HeaderText = "Delete";
+            this.DeleteColumn.Name = "DeleteColumn";
+            this.DeleteColumn.Text = "Delete";
+            this.DeleteColumn.UseColumnTextForButtonValue = true;
+            this.DeleteColumn.Width = 44;
             // 
             // label10
             // 
@@ -881,104 +980,6 @@
             this.txtPaxGroup.Name = "txtPaxGroup";
             this.txtPaxGroup.Size = new System.Drawing.Size(39, 20);
             this.txtPaxGroup.TabIndex = 93;
-            // 
-            // Item
-            // 
-            this.Item.Frozen = true;
-            this.Item.HeaderText = "Item";
-            this.Item.Name = "Item";
-            this.Item.Width = 52;
-            // 
-            // Vendor
-            // 
-            this.Vendor.Frozen = true;
-            this.Vendor.HeaderText = "Vendor";
-            this.Vendor.Name = "Vendor";
-            this.Vendor.Width = 66;
-            // 
-            // Quantity
-            // 
-            this.Quantity.Frozen = true;
-            this.Quantity.HeaderText = "Quantity";
-            this.Quantity.Name = "Quantity";
-            this.Quantity.Width = 71;
-            // 
-            // Cost
-            // 
-            this.Cost.Frozen = true;
-            this.Cost.HeaderText = "Cost p/unit";
-            this.Cost.Name = "Cost";
-            this.Cost.Width = 84;
-            // 
-            // Price
-            // 
-            this.Price.Frozen = true;
-            this.Price.HeaderText = "Price p/unit";
-            this.Price.Name = "Price";
-            this.Price.Width = 87;
-            // 
-            // Amount
-            // 
-            this.Amount.Frozen = true;
-            this.Amount.HeaderText = "Total Price";
-            this.Amount.Name = "Amount";
-            this.Amount.Width = 83;
-            // 
-            // IdService
-            // 
-            this.IdService.Frozen = true;
-            this.IdService.HeaderText = "Service ID";
-            this.IdService.Name = "IdService";
-            this.IdService.Width = 82;
-            // 
-            // Currency
-            // 
-            this.Currency.Frozen = true;
-            this.Currency.HeaderText = "Currency";
-            this.Currency.Name = "Currency";
-            this.Currency.ReadOnly = true;
-            this.Currency.Width = 74;
-            // 
-            // Itinerary
-            // 
-            this.Itinerary.Frozen = true;
-            this.Itinerary.HeaderText = "Itinerary";
-            this.Itinerary.Name = "Itinerary";
-            this.Itinerary.ReadOnly = true;
-            this.Itinerary.Width = 69;
-            // 
-            // RoyaltyItem
-            // 
-            this.RoyaltyItem.Frozen = true;
-            this.RoyaltyItem.HeaderText = "CobroParticipacionNj";
-            this.RoyaltyItem.Name = "RoyaltyItem";
-            this.RoyaltyItem.ReadOnly = true;
-            this.RoyaltyItem.Width = 131;
-            // 
-            // ParticipacionCobro
-            // 
-            this.ParticipacionCobro.Frozen = true;
-            this.ParticipacionCobro.HeaderText = "ParticipacionCobro";
-            this.ParticipacionCobro.Name = "ParticipacionCobro";
-            this.ParticipacionCobro.Width = 121;
-            // 
-            // EditColumn
-            // 
-            this.EditColumn.Frozen = true;
-            this.EditColumn.HeaderText = "Edit";
-            this.EditColumn.Name = "EditColumn";
-            this.EditColumn.Text = "Edit";
-            this.EditColumn.UseColumnTextForButtonValue = true;
-            this.EditColumn.Visible = false;
-            this.EditColumn.Width = 31;
-            // 
-            // DeleteColumn
-            // 
-            this.DeleteColumn.HeaderText = "Delete";
-            this.DeleteColumn.Name = "DeleteColumn";
-            this.DeleteColumn.Text = "Delete";
-            this.DeleteColumn.UseColumnTextForButtonValue = true;
-            this.DeleteColumn.Width = 44;
             // 
             // DoubleScreen
             // 

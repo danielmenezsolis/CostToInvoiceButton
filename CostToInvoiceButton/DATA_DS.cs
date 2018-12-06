@@ -30,9 +30,8 @@ namespace CostToInvoiceButton
         [XmlElement(ElementName = "P_EXCHANGE_DATE")]
         public string P_EXCHANGE_DATE { get; set; }
         [XmlElement(ElementName = "G_N_RATES")]
-        public G_N_RATES G_N_RATES { get; set; }
+        public List<G_N_RATES> G_N_RATES { get; set; }
     }
-
 
     //INPC
 
@@ -138,6 +137,12 @@ namespace CostToInvoiceButton
     {
         public string Name { get; set; }
         public string Id { get; set; }
+    }
+
+    public class Rate
+    {
+        public string RateName { get; set; }
+        public double RateDouble { get; set; }
     }
 
     public class WHours

@@ -186,7 +186,6 @@ namespace CostToInvoiceButton
                         {
                             ComponentChild component = new ComponentChild();
                             component.Airport = item.Airport.Replace("-", "_");
-
                             component.ItemNumber = "ASFIEAP357";
                             if (!String.IsNullOrEmpty(component.ItemNumber))
                             {
@@ -264,12 +263,11 @@ namespace CostToInvoiceButton
                         ComponentChild component = new ComponentChild();
                         foreach (Services item in FCCServices)
                         {
-
                             component.Airport = item.Airport.Replace("-", "_");
                             //component.ItemNumber = getFBOItemNumber(Convert.ToInt32(item.Itinerary));
                             if (ClientName.Contains("NETJETS"))
                             {
-                                component.ItemNumber = "AIPRTFE0101";
+                                component.ItemNumber = "AIPRTFE0179";
                                 if (!String.IsNullOrEmpty(component.ItemNumber))
                                 {
                                     component.ItemDescription = "";
@@ -314,6 +312,7 @@ namespace CostToInvoiceButton
                                     minover = extension < 0 ? 0 : extension;
                                 }
                             }
+                            /*
                             if (!GetItineraryCountries(Convert.ToInt32(item.Itinerary)))
                             {
                                 component.Airport = item.Airport.Replace("-", "_");
@@ -334,7 +333,9 @@ namespace CostToInvoiceButton
                                     }
                                 }
                             }
-
+                            */
+                            // OVERPARKING
+                            /*
                             if (GetMinutesLeg(Convert.ToInt32(item.Itinerary)) >= 2 && GetMinutesLeg(Convert.ToInt32(item.Itinerary)) < 8)
                             {
                                 component.Airport = item.Airport.Replace("-", "_");
@@ -356,6 +357,9 @@ namespace CostToInvoiceButton
                                     }
                                 }
                             }
+                            */
+                            // OVERNIGHT
+                            /*
                             if (GetMinutesLeg(Convert.ToInt32(item.Itinerary)) >= 8)
                             {
                                 component.Airport = item.Airport.Replace("-", "_");
@@ -377,6 +381,7 @@ namespace CostToInvoiceButton
                                     }
                                 }
                             }
+                            */
                         }
                         servicios.Clear();
                         servicios = GetListServices();
@@ -394,7 +399,6 @@ namespace CostToInvoiceButton
                     DgvServicios.Columns[8].Visible = false;
                     DgvServicios.Columns[13].Visible = false;
                     */
-
                     DgvServicios.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.DisplayedCells;
                     ((System.Windows.Forms.Label)doubleScreen.Controls["lblSrType"]).Text = SRType.ToUpper();
                     ((System.Windows.Forms.Label)doubleScreen.Controls["lblIdIncident"]).Text = IncidentID.ToString();
@@ -415,7 +419,6 @@ namespace CostToInvoiceButton
                     ((TextBox)doubleScreen.Controls["txtSemeam"]).Text = SeneamCat;
                     ((TextBox)doubleScreen.Controls["txtCreationIncidentDate"]).Text = incidentCreation.ToString();
                     ((ComboBox)doubleScreen.Controls["cboCurrency"]).Text = SRType == "FUEL" ? "MXN" : GetCurrency();
-
                     UpdatePackageCost();
                     doubleScreen.ShowDialog();
                 }
@@ -425,7 +428,6 @@ namespace CostToInvoiceButton
                 MessageBox.Show("Error en Click: " + ex.Message + "Det" + ex.StackTrace);
             }
         }
-
         public bool Init()
         {
             try
@@ -446,14 +448,12 @@ namespace CostToInvoiceButton
                 {
                     result = true;
                 }
-
                 return result;
             }
             catch (Exception ex)
             {
                 MessageBox.Show("Error en INIT: " + ex.Message);
                 return false;
-
             }
         }
         public double GetMinutesLeg(int Itinerarie)
@@ -482,7 +482,6 @@ namespace CostToInvoiceButton
                         //minutes = Convert.ToDouble(data);
                     }
                 }
-
                 TimeSpan t = TimeSpan.FromMinutes(minutes);
                 return Math.Ceiling(t.TotalHours);
             }
@@ -508,7 +507,6 @@ namespace CostToInvoiceButton
                     cur = data;
                 }
             }
-
             return cur;
         }
         public string GetFirstAirport()
@@ -527,7 +525,6 @@ namespace CostToInvoiceButton
                     air = data.Replace("-", "_");
                 }
             }
-
             return air;
         }
         public string getAirportById(int airportId)
@@ -565,11 +562,9 @@ namespace CostToInvoiceButton
                     sum = Convert.ToDouble(data);
                 }
             }
-
             return sum;
         }
         public string GetAirportUse(int Fueling)
-
         {
             try
             {
@@ -587,7 +582,6 @@ namespace CostToInvoiceButton
                         Use = data;
                     }
                 }
-
                 return Use;
             }
             catch (Exception ex)
@@ -648,9 +642,7 @@ namespace CostToInvoiceButton
             }
             catch (Exception ex)
             {
-
                 MessageBox.Show("getFBOItemNumber: " + ex.Message + "Detail: " + ex.StackTrace);
-
                 return null;
             }
         }
@@ -973,7 +965,6 @@ namespace CostToInvoiceButton
             }
             catch (Exception ex)
             {
-
                 MessageBox.Show("GetSeneamRequiredDate:" + ex.Message + "Det: " + ex.StackTrace);
                 return "";
             }
@@ -1116,7 +1107,6 @@ namespace CostToInvoiceButton
                         component.ParentPaxId = IncidentID;
                         component.MCreated = "1";
                         component.Componente = "0";
-                        component.Costo = substrings[1];
                         if (factorA > 0 || tRec > 0)
                         {
                             string priced = substrings[3];
@@ -1133,10 +1123,12 @@ namespace CostToInvoiceButton
                             MessageBox.Show("Recargos: $" + recargos.ToString());
                             pricef = pricef + recargos;
                             //MessageBox.Show("pricef total: " + pricef.ToString());
+                            component.Costo = Math.Round(pricef, 0, MidpointRounding.AwayFromZero).ToString();
                             component.Precio = Math.Round(pricef, 0, MidpointRounding.AwayFromZero).ToString();
                         }
                         else
                         {
+                            component.Costo = substrings[3];
                             component.Precio = substrings[3];
                         }
                         component = GetComponentData(component);
@@ -1509,7 +1501,6 @@ namespace CostToInvoiceButton
                                             componentchild.Airport = component.Airport;
                                             componentchild.Incident = IncidentID;
                                             componentchild.Componente = "1";
-
                                             componentchild.ItemNumber = nodeValue.InnerText;
                                             componentchild.Itinerary = component.Itinerary;
                                             componentchild.Categories = GetCategories(componentchild.ItemNumber, componentchild.Airport);

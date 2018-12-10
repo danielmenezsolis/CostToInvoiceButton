@@ -216,7 +216,7 @@ namespace CostToInvoiceButton
                                         component.Itinerary = Convert.ToInt32(item.Itinerary);
                                         component.Categories = GetCategories(component.ItemNumber, component.Airport);
                                         component.MCreated = "1";
-                                        component.MCreated = "0";
+                                        component.Componente = "0";
                                         component.ParentPaxId = IncidentID;
                                         InsertComponent(component);
                                     }
@@ -284,6 +284,9 @@ namespace CostToInvoiceButton
                                     }
                                 }
                             }
+                            double minover = 0;
+                            double antelacion = 0;
+                            double extension = 0;
                             if (!AirportOpen24(Convert.ToInt32(item.Itinerary)))
                             {
                                 int arrival = getArrivalAirport(Convert.ToInt32(item.Itinerary));
@@ -291,25 +294,56 @@ namespace CostToInvoiceButton
                                 {
                                     DateTime openDate;
                                     DateTime closeDate;
+
                                     string open = getOpenArrivalAirport(arrival);
                                     string close = getCloseArrivalAirport(arrival);
-                                    DateTime ATA = getATAItinerary(Convert.ToInt32(item.Itinerary));
-                                    DateTime ATD = getATDItinerary(Convert.ToInt32(item.Itinerary));
-                                    openDate = DateTime.Parse(ATA.Date.ToShortDateString() + " " + open);
-                                    closeDate = DateTime.Parse(ATD.Date.ToShortDateString() + " " + close);
-
-                                    double antelacion = (openDate - ATA).TotalMinutes;
-                                    double extension = ((closeDate - ATD).TotalMinutes) + 15;
-                                    double minover = 0;
+                                    DateTime ATA = getATAItinerary(Convert.ToInt32(item.Itinerary)).ToUniversalTime();
+                                    DateTime ATD = getATDItinerary(Convert.ToInt32(item.Itinerary)).ToUniversalTime();
+                                    openDate = DateTime.Parse(ATA.Date.ToShortDateString() + " " + open).ToUniversalTime();
+                                    closeDate = DateTime.Parse(ATA.Date.ToShortDateString() + " " + close).ToUniversalTime();
+                                    if (IsBetween(ATA, openDate, closeDate))
+                                    {
+                                        antelacion = (ATA - openDate).TotalMinutes;
+                                    }
+                                    // MessageBox.Show("llegada: " + antelacion.ToString());
+                                    extension = ((ATD - openDate).TotalMinutes) + 15;
                                     if (ATA.Date != ATD.Date)
                                     {
-                                        if (antelacion > 0 && extension > 0)
+                                        openDate = DateTime.Parse(ATD.Date.ToShortDateString() + " " + open);
+                                        closeDate = DateTime.Parse(ATD.Date.ToShortDateString() + " " + close);
+                                        if (IsBetween(ATD, openDate, closeDate))
                                         {
-                                            minover = (antelacion < 0 ? 0 : antelacion) + (extension < 0 ? 0 : extension);
+                                            extension = ((ATD - openDate).TotalMinutes) + 15;
+                                        }
+                                        else
+                                        {
+                                            extension = 0;
                                         }
                                     }
-
-                                    minover = extension < 0 ? 0 : extension;
+                                    //MessageBox.Show("salida: " + extension.ToString());
+                                    if (extension > 0)
+                                    {
+                                        minover = extension < 0 ? 0 : extension;
+                                    }
+                                    if (ATA.Date != ATD.Date)
+                                    {
+                                        minover = (antelacion < 0 ? 0 : antelacion) + (extension < 0 ? 0 : extension);
+                                    }
+                                    if (minover != 0)
+                                    {
+                                        if (antelacion > 0 && extension == 0)
+                                        {
+                                            MessageBox.Show("OVERTIME ARRIVAL detected: " + antelacion + " minutes.");
+                                        }
+                                        else if (extension > 0 && antelacion == 0)
+                                        {
+                                            MessageBox.Show("OVERTIME DEPARTURE detected: " + extension + " minutes.");
+                                        }
+                                        else
+                                        {
+                                            MessageBox.Show("OVERTIME ARRIVAL & DEPARTURE detected: " + minover + " minutes.");
+                                        }
+                                    }
                                 }
                             }
                             /*
@@ -427,6 +461,10 @@ namespace CostToInvoiceButton
             {
                 MessageBox.Show("Error en Click: " + ex.Message + "Det" + ex.StackTrace);
             }
+        }
+        public static bool IsBetween(DateTime input, DateTime date1, DateTime date2)
+        {
+            return (input > date1 && input < date2);
         }
         public bool Init()
         {
@@ -1518,6 +1556,7 @@ namespace CostToInvoiceButton
                                             componentchild.Airport = component.Airport;
                                             componentchild.Incident = IncidentID;
                                             componentchild.Componente = "1";
+                                            componentchild.MCreated = "1";
                                             componentchild.ItemNumber = nodeValue.InnerText;
                                             componentchild.Itinerary = component.Itinerary;
                                             componentchild.Categories = GetCategories(componentchild.ItemNumber, componentchild.Airport);

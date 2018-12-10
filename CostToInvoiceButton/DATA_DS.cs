@@ -149,6 +149,7 @@ namespace CostToInvoiceButton
     {
         public DateTime Opens { get; set; }
         public DateTime Closes { get; set; }
+        public int id { get; set; }
         public string Type { get; set; }
     }
 }

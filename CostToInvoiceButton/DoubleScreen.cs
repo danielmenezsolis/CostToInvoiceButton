@@ -26,6 +26,7 @@ namespace CostToInvoiceButton
         private IRecordContext recordContext { get; set; }
         private IGlobalContext global { get; set; }
         public List<WHours> WHoursList { get; set; }
+        public int HourId;
         private RightNowSyncPortClient clientORN { get; set; }
         public DoubleScreen(IGlobalContext globalContext, IRecordContext record)
         {
@@ -64,7 +65,6 @@ namespace CostToInvoiceButton
                     txtParticipacionCobro.Text = dataGridServicios.Rows[e.RowIndex].Cells[16].FormattedValue.ToString().Trim();
                     string airtport = dataGridServicios.Rows[e.RowIndex].Cells[3].FormattedValue.ToString().Trim();
                     txtAirport.Text = "IO_AEREO_" + airtport.Replace("-", "_").Trim();
-
                     /*
                     if (lblSrType.Text == "PERMISOS")
                     {
@@ -261,7 +261,11 @@ namespace CostToInvoiceButton
                         }
                         else
                         {
-                            txtPrice.Text = Math.Round(GetPrices(), 4).ToString();
+                            txtPrice.Text = dataGridServicios.Rows[e.RowIndex].Cells[6].FormattedValue.ToString();
+                            if (String.IsNullOrEmpty(dataGridServicios.Rows[e.RowIndex].Cells[6].FormattedValue.ToString()))
+                            {
+                                txtPrice.Text = Math.Round(GetPrices(), 4).ToString();
+                            }
                         }
                     }
                     if (txtUOM.Text == "TW")
@@ -322,7 +326,6 @@ namespace CostToInvoiceButton
                     }
                     if (txtItemNumber.Text == "MHSPSAS0091")
                     {
-                       
                         double b;
                         if (double.TryParse(txtCost.Text, out b))
                         {
@@ -333,7 +336,6 @@ namespace CostToInvoiceButton
                             utilidad = (Convert.ToDouble(txtCost.Text) * m2) * utilidad;
                             txtPrice.Text = Math.Round(utilidad, 4).ToString();
                         }
-                       
                     }
                     if (txtItemNumber.Text == "DEPEGAR0358")
                     {
@@ -363,7 +365,6 @@ namespace CostToInvoiceButton
                     {
                         cboCurrency.Text = "MXN";
                     }
-
                     getSuppliers();
                     Cursor.Current = Cursors.Default;
                 }
@@ -502,7 +503,8 @@ namespace CostToInvoiceButton
                             };
                             var body = "{";
                             // Información de precios costos
-                            body += "\"Precio\":\"" + dgvRenglon.Cells[4].Value.ToString() + "\"," +
+                            body += "\"ListoFactura\":true," + 
+                                "\"Precio\":\"" + dgvRenglon.Cells[4].Value.ToString() + "\"," +
                                 "\"Costo\":\"" + dgvRenglon.Cells[3].Value.ToString() + "\"";
                             if (!String.IsNullOrEmpty(dgvRenglon.Cells[1].Value.ToString()))
                             {
@@ -788,7 +790,7 @@ namespace CostToInvoiceButton
                 }
                 //MessageBox.Show("Fecha de carga: " + datecharge);
                 double rate = getExchangeRate(datecharge);
-                //MessageBox.Show("Tipo de cambio: " + rate);
+                MessageBox.Show("Tipo de cambio: $ " + rate);
                 double galonrate = galonprice / rate; // costo por galon
                 //MessageBox.Show("Costo por galon USD: " + galonrate);
                 double catcombus = GetCombCents(txtCombustible.Text);
@@ -1026,7 +1028,7 @@ namespace CostToInvoiceButton
                 ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
                 APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
                 clientInfoHeader.AppID = "Query Example";
-                String queryString = "SELECT OpensZULUTime,ClosesZULUTime,Type FROM CO.Airport_WorkingHours WHERE Airports =" + Arrival + "";
+                String queryString = "SELECT OpensZULUTime,ClosesZULUTime,Type, ID FROM CO.Airport_WorkingHours WHERE Airports =" + Arrival + "";
                 clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 1000, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
                 WHoursList = new List<WHours>();
                 foreach (CSVTable table in queryCSV.CSVTables)
@@ -1038,7 +1040,8 @@ namespace CostToInvoiceButton
                         Char delimiter = '|';
                         String[] substrings = data.Split(delimiter);
                         hours.Opens = DateTime.Parse(AtaDate + " " + substrings[0].Trim());
-                        hours.Closes = DateTime.Parse(ATDDate + " " + substrings[1].Trim());
+                        hours.Closes = DateTime.Parse(AtaDate + " " + substrings[1].Trim());
+                        hours.id = Convert.ToInt32(substrings[3].Trim());
                         switch (substrings[2].Trim())
                         {
                             case "1":
@@ -2334,31 +2337,41 @@ namespace CostToInvoiceButton
                 return null;
             }
         }
+        public static bool IsBetween(DateTime input, DateTime date1, DateTime date2)
+        {
+            return (input > date1 && input < date2);
+        }
         private string GetMainHourFBOFCC(string ata, string atd)
         {
             try
             {
-                DateTime ATA = DateTime.Parse(ata);
-                DateTime ATD = DateTime.Parse(atd);
-                string hour = "EXTRAORDINARIO";
+                DateTime ATA = DateTime.Parse(ata).ToUniversalTime();
+                DateTime ATD = DateTime.Parse(atd).ToUniversalTime();
+                string hour = "NORMAL";
                 if (WHoursList.Count > 0)
                 {
                     foreach (WHours w in WHoursList)
                     {
-                        if (ATA.CompareTo(w.Opens) >= 0 && ATA.CompareTo(w.Closes) <= 0 && w.Type == "CRITICO" &&
-                            ATD.CompareTo(w.Opens) >= 0 && ATD.CompareTo(w.Closes) <= 0)
+                        //MessageBox.Show("Horario ATA / Fuel Ticket: " + ATA.ToString());
+                        if (IsBetween(ATA, w.Opens, w.Closes) && w.Type == "NORMAL")
                         {
-
-                            hour = "CRITICO";
-                        }
-
-                        else if (ATA.CompareTo(w.Opens) >= 0 && ATA.CompareTo(w.Closes) <= 0 && w.Type == "NORMAL" &&
-                                                 ATD.CompareTo(w.Opens) >= 0 && ATD.CompareTo(w.Closes) <= 0)
-                        {
-
                             hour = "NORMAL";
+                            HourId = w.id;
+                            //MessageBox.Show("Horario ATA / Fuel Ticket: " + hour);
+                        }
+                        if (IsBetween(ATA, w.Opens, w.Closes) && w.Type == "CRITICO")
+                        {
+                            hour = "CRITICO";
+                            HourId = w.id;
+                            //MessageBox.Show("Horario ATA / Fuel Ticket: " + hour);
                         }
 
+                        if (IsBetween(ATA, w.Opens, w.Closes) && w.Type == "EXTRAORDINARIO")
+                        {
+                            hour = "EXTRAORDINARIO";
+                            HourId = w.id;
+                            //MessageBox.Show("Horario ATA / Fuel Ticket: " + hour);
+                        }
                     }
                     /*
                     foreach (WHours w in WHoursList)

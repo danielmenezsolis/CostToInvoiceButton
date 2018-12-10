@@ -1052,7 +1052,7 @@ namespace CostToInvoiceButton
                                 hours.Type = "NORMAL";
                                 break;
                         }
-                        MessageBox.Show("Type: " + hours.Type.ToString() + "   Opens: " + hours.Opens.ToString() + "   Closes: " + hours.Closes.ToString());
+                        //MessageBox.Show("Type: " + hours.Type.ToString() + "   Opens: " + hours.Opens.ToString() + "   Closes: " + hours.Closes.ToString());
                         WHoursList.Add(hours);
                     }
                 }
@@ -1848,7 +1848,7 @@ namespace CostToInvoiceButton
                     }
                     else if (txtItemNumber.Text == "ATPRIAP304")  
                     {
-                        definicion += "str_item_number:'" + txtItemNumber.Text + "'}";
+                        definicion = "?totalResults=true&q={bol_int_fbo:0,str_item_number:'" + txtItemNumber.Text + "'}";
                     }
                     else if (txtCategorias.Text.Contains("PERMISOS"))
                     {
@@ -1856,7 +1856,7 @@ namespace CostToInvoiceButton
                     }
                     else
                     {
-                        definicion += "str_item_number:'" + txtItemNumber.Text + "',$or:[{str_icao_iata_code:{$exists:false}},{str_icao_iata_code:'" + txtAirport.Text + "'}]'" + "',bol_int_flight_cargo:" + cargo.ToString() + ",str_schedule_type:'" + txtMainHour.Text + "',str_aircraft_group:'" + grupo.ToString() + "',$or:[{str_client_category:{$exists:false}},{str_client_category:'" + txtCustomerClass.Text.Replace("&", "%") + "'}]}";
+                        definicion += "str_item_number:'" + txtItemNumber.Text + "',$or:[{str_icao_iata_code:{$exists:false}},{str_icao_iata_code:'" + txtAirport.Text + "'}]" + ",bol_int_flight_cargo:" + cargo.ToString() + ",str_schedule_type:'" + txtMainHour.Text + "',str_aircraft_group:'" + grupo.ToString() + "',$or:[{str_client_category:{$exists:false}},{str_client_category:'" + txtCustomerClass.Text.Replace("&", "%") + "'}]}";
                     }
                 }
                 global.LogMessage("GETPricesdef:" + definicion + "SRType:" + lblSrType.Text);
@@ -2338,11 +2338,29 @@ namespace CostToInvoiceButton
         {
             try
             {
-                DateTime ArriveDate = DateTime.Parse(ata);
-                DateTime DeliverDate = DateTime.Parse(atd);
+                DateTime ATA = DateTime.Parse(ata);
+                DateTime ATD = DateTime.Parse(atd);
                 string hour = "EXTRAORDINARIO";
                 if (WHoursList.Count > 0)
                 {
+                    foreach (WHours w in WHoursList)
+                    {
+                        if (ATA.CompareTo(w.Opens) >= 0 && ATA.CompareTo(w.Closes) <= 0 && w.Type == "CRITICO" &&
+                            ATD.CompareTo(w.Opens) >= 0 && ATD.CompareTo(w.Closes) <= 0)
+                        {
+
+                            hour = "CRITICO";
+                        }
+
+                        else if (ATA.CompareTo(w.Opens) >= 0 && ATA.CompareTo(w.Closes) <= 0 && w.Type == "NORMAL" &&
+                                                 ATD.CompareTo(w.Opens) >= 0 && ATD.CompareTo(w.Closes) <= 0)
+                        {
+
+                            hour = "NORMAL";
+                        }
+
+                    }
+                    /*
                     foreach (WHours w in WHoursList)
                     {
                         double totalminutesOpen = (ArriveDate - w.Opens).TotalMinutes;
@@ -2357,7 +2375,7 @@ namespace CostToInvoiceButton
                         {
                             hour = "CRITICO";
                         }
-                    }
+                    }*/
                 }
                 return hour;
             }

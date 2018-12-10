@@ -2176,7 +2176,10 @@ namespace CostToInvoiceButton
                         };
                         component.Categories = GetCategories(component.ItemNumber, component.Airport);
                         component = GetComponentData(component);
-                        InsertComponent(component);
+                        if (!string.IsNullOrEmpty(component.ItemDescription))
+                        {
+                            InsertComponent(component);
+                        }
                     }
                 }
             }

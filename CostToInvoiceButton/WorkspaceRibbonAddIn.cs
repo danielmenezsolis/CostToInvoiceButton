@@ -720,7 +720,7 @@ namespace CostToInvoiceButton
             }
             catch (Exception ex)
             {
-                MessageBox.Show("getFBOItemNumber: " + ex.Message + "Detail: " + ex.StackTrace);
+                MessageBox.Show("getItemNumber: " + ex.Message + "Detail: " + ex.StackTrace);
                 return null;
             }
         }

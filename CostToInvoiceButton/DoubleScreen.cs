@@ -1039,6 +1039,8 @@ namespace CostToInvoiceButton
                         WHours hours = new WHours();
                         Char delimiter = '|';
                         String[] substrings = data.Split(delimiter);
+                        hours.Opens.ToUniversalTime();
+                        hours.Closes.ToUniversalTime();
                         hours.Opens = DateTime.Parse(AtaDate + " " + substrings[0].Trim());
                         hours.Closes = DateTime.Parse(AtaDate + " " + substrings[1].Trim());
                         hours.id = Convert.ToInt32(substrings[3].Trim());
@@ -1859,7 +1861,13 @@ namespace CostToInvoiceButton
                     }
                     else
                     {
-                        definicion += "str_item_number:'" + txtItemNumber.Text + "',$or:[{str_icao_iata_code:{$exists:false}},{str_icao_iata_code:'" + txtAirport.Text + "'}]" + ",bol_int_flight_cargo:" + cargo.ToString() + ",str_schedule_type:'" + txtMainHour.Text + "',str_aircraft_group:'" + grupo.ToString() + "',$or:[{str_client_category:{$exists:false}},{str_client_category:'" + txtCustomerClass.Text.Replace("&", "%") + "'}]}";
+                        definicion += "str_item_number:'" + txtItemNumber.Text +
+                            "',$or:[{str_icao_iata_code:{$exists:false}},{str_icao_iata_code:'" + txtAirport.Text + "'}]" +
+                            ",$or:[{str_aircraft_type:{$exists:false}},{str_aircraft_type:'" + txtICAOD.Text + "'}]" + 
+                            ",$or:[{str_aircraft_group:{$exists:false}},{str_aircraft_group:'" + grupo.ToString() + "'}]" + 
+                            ",bol_int_flight_cargo:" + cargo.ToString() + 
+                            ",str_schedule_type:'" + txtMainHour.Text +  
+                            "',$or:[{str_client_category:{$exists:false}},{str_client_category:'" + txtCustomerClass.Text.Replace("&", "%") + "'}]}";
                     }
                 }
                 global.LogMessage("GETPricesdef:" + definicion + "SRType:" + lblSrType.Text);

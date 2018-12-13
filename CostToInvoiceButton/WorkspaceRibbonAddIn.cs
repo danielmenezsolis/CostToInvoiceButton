@@ -284,6 +284,45 @@ namespace CostToInvoiceButton
                                     }
                                 }
                             }
+                            if (ClientName.Contains("GULF AND CARIB"))
+                            {
+                                string iNumber = "ASORTER237";
+                                Services service = new Services();
+                                component = new ComponentChild();
+                                component.Airport = item.Airport.Replace("-","_");
+                                component.Itinerary = Convert.ToInt32(item.Itinerary);
+                                component.ItemNumber = iNumber;
+                                component.Incident = IncidentID;
+                                component.ParentPaxId = IncidentID;
+                                component.MCreated = "1";
+                                component.Componente = "0";
+                                component.Costo = "";
+                                component.Precio = "";
+                                component = GetComponentData(component);
+                                component.Categories = GetCategories(component.ItemNumber, component.Airport);
+                                if (!string.IsNullOrEmpty(component.ItemDescription))
+                                {
+                                    InsertComponent(component);
+                                }
+                                string iNumber1 = "DSORTER236";
+                                Services service1 = new Services();
+                                ComponentChild component1 = new ComponentChild();
+                                component1.Airport = item.Airport.Replace("-", "_");
+                                component1.Itinerary = Convert.ToInt32(item.Itinerary);
+                                component1.ItemNumber = iNumber1;
+                                component1.Incident = IncidentID;
+                                component1.ParentPaxId = IncidentID;
+                                component1.MCreated = "1";
+                                component1.Componente = "0";
+                                component1.Costo = "";
+                                component1.Precio = "";
+                                component1 = GetComponentData(component1);
+                                component1.Categories = GetCategories(component1.ItemNumber, component1.Airport);
+                                if (!string.IsNullOrEmpty(component1.ItemDescription))
+                                {
+                                    InsertComponent(component1);
+                                }
+                            }
                             double minover = 0;
                             double antelacion = 0;
                             double extension = 0;
@@ -417,6 +456,7 @@ namespace CostToInvoiceButton
                             }
                             */
                         }
+                        
                         servicios.Clear();
                         servicios = GetListServices();
                     }

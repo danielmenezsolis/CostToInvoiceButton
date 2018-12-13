@@ -1077,7 +1077,8 @@
         }
 
         #endregion
-        private System.Windows.Forms.MenuStrip menuStrip1;
+
+        System.Windows.Forms.MenuStrip menuStrip1;
         private System.Windows.Forms.ToolStripMenuItem fileToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem saveToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;

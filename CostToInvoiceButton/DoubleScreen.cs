@@ -78,7 +78,7 @@ namespace CostToInvoiceButton
                     if (lblSrType.Text == "SENEAM")
                     {
                         cboCurrency.Text = "USD";
-                        double tipoCambio = getExchangeRate(DateTime.Today);
+                        double tipoCambio = getExchangeRateSemanal(DateTime.Today);
 
                         MessageBox.Show("Tipo de cambio: $" + tipoCambio.ToString());
 
@@ -348,7 +348,7 @@ namespace CostToInvoiceButton
                         {
                             foreach (DataGridViewRow dgvRenglon in dataGridInvoice.Rows)
                             {
-                                if (dgvRenglon.Cells[0].Value.ToString().Contains("DEPOSITO EN GARANTIA"))
+                                if (dgvRenglon.Cells[0].Value.ToString().Contains("USO DE INSTALA"))
                                 {
                                     price += Convert.ToDouble(dgvRenglon.Cells[5].Value.ToString());
                                 }
@@ -3120,7 +3120,6 @@ namespace CostToInvoiceButton
                             {
                                 pricefinal = GetFuelPrice();
                             }
-
                         }
                     }
                     if (lblSrType.Text == "FCC")

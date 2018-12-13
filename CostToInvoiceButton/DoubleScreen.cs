@@ -447,7 +447,7 @@ namespace CostToInvoiceButton
                         {
                             // cboCurrency.Text = "USD";
                             DateTime date = DateTime.Parse(txtATA.Text);
-                            txtPrice.Text = Math.Round((Convert.ToDouble(txtCost.Text) + (Convert.ToDouble(txtCost.Text) * GetUtilidadPercentage(txtUtilidad.Text) / 100)) / getExchangeRate(date),2,MidpointRounding.AwayFromZero).ToString();
+                            txtPrice.Text = Math.Round((Convert.ToDouble(txtCost.Text) + (Convert.ToDouble(txtCost.Text) * GetUtilidadPercentage(txtUtilidad.Text) / 100)) / getExchangeRate(date), 2, MidpointRounding.AwayFromZero).ToString();
                         }
                         if (txtItemNumber.Text == "ASECSAS0073")
                         {
@@ -503,7 +503,7 @@ namespace CostToInvoiceButton
                             };
                             var body = "{";
                             // Información de precios costos
-                            body += "\"ListoFactura\":true," + 
+                            body += "\"ListoFactura\":true," +
                                 "\"Precio\":\"" + dgvRenglon.Cells[4].Value.ToString() + "\"," +
                                 "\"Costo\":\"" + dgvRenglon.Cells[3].Value.ToString() + "\"";
                             if (!String.IsNullOrEmpty(dgvRenglon.Cells[1].Value.ToString()))
@@ -1039,8 +1039,7 @@ namespace CostToInvoiceButton
                         WHours hours = new WHours();
                         Char delimiter = '|';
                         String[] substrings = data.Split(delimiter);
-                        hours.Opens.ToUniversalTime();
-                        hours.Closes.ToUniversalTime();
+
                         hours.Opens = DateTime.Parse(AtaDate + " " + substrings[0].Trim());
                         hours.Closes = DateTime.Parse(AtaDate + " " + substrings[1].Trim());
                         hours.id = Convert.ToInt32(substrings[3].Trim());
@@ -1851,7 +1850,7 @@ namespace CostToInvoiceButton
                     {
                         definicion += "str_item_number:'" + txtItemNumber.Text + "',str_icao_iata_code:'" + txtAirport.Text + "'}";
                     }
-                    else if (txtItemNumber.Text == "ATPRIAP304")  
+                    else if (txtItemNumber.Text == "ATPRIAP304")
                     {
                         definicion = "?totalResults=true&q={bol_int_fbo:0,str_item_number:'" + txtItemNumber.Text + "'}";
                     }
@@ -1863,10 +1862,10 @@ namespace CostToInvoiceButton
                     {
                         definicion += "str_item_number:'" + txtItemNumber.Text +
                             "',$or:[{str_icao_iata_code:{$exists:false}},{str_icao_iata_code:'" + txtAirport.Text + "'}]" +
-                            ",$or:[{str_aircraft_type:{$exists:false}},{str_aircraft_type:'" + txtICAOD.Text + "'}]" + 
-                            ",$or:[{str_aircraft_group:{$exists:false}},{str_aircraft_group:'" + grupo.ToString() + "'}]" + 
-                            ",bol_int_flight_cargo:" + cargo.ToString() + 
-                            ",str_schedule_type:'" + txtMainHour.Text +  
+                            ",$or:[{str_aircraft_type:{$exists:false}},{str_aircraft_type:'" + txtICAOD.Text + "'}]" +
+                            ",$or:[{str_aircraft_group:{$exists:false}},{str_aircraft_group:'" + grupo.ToString() + "'}]" +
+                            ",bol_int_flight_cargo:" + cargo.ToString() +
+                            ",str_schedule_type:'" + txtMainHour.Text +
                             "',$or:[{str_client_category:{$exists:false}},{str_client_category:'" + txtCustomerClass.Text.Replace("&", "%") + "'}]}";
                     }
                 }
@@ -2353,13 +2352,28 @@ namespace CostToInvoiceButton
         {
             try
             {
-                DateTime ATA = DateTime.Parse(ata).ToUniversalTime();
-                DateTime ATD = DateTime.Parse(atd).ToUniversalTime();
-                string hour = "NORMAL";
+                DateTime ATA = DateTime.Parse(ata);
+                DateTime ATD = DateTime.Parse(atd);
+                string hour = "EXTRAORDINARIO";
                 if (WHoursList.Count > 0)
                 {
                     foreach (WHours w in WHoursList)
                     {
+                        if (ATA.CompareTo(w.Opens) >= 0 && ATA.CompareTo(w.Closes) <= 0 && w.Type == "CRITICO" &&
+                            ATD.CompareTo(w.Opens) >= 0 && ATD.CompareTo(w.Closes) <= 0)
+                        {
+
+                            hour = "CRITICO";
+                        }
+
+                        else if (ATA.CompareTo(w.Opens) >= 0 && ATA.CompareTo(w.Closes) <= 0 && w.Type == "NORMAL" &&
+                                                 ATD.CompareTo(w.Opens) >= 0 && ATD.CompareTo(w.Closes) <= 0)
+                        {
+
+                            hour = "NORMAL";
+                        }
+
+                        /*
                         //MessageBox.Show("Horario ATA / Fuel Ticket: " + ATA.ToString());
                         if (IsBetween(ATA, w.Opens, w.Closes) && w.Type == "NORMAL")
                         {
@@ -2379,7 +2393,7 @@ namespace CostToInvoiceButton
                             hour = "EXTRAORDINARIO";
                             HourId = w.id;
                             //MessageBox.Show("Horario ATA / Fuel Ticket: " + hour);
-                        }
+                        }*/
                     }
                     /*
                     foreach (WHours w in WHoursList)
@@ -3140,7 +3154,7 @@ namespace CostToInvoiceButton
                         {
                             // cboCurrency.Text = "USD";
                             DateTime date = DateTime.Parse(txtATA.Text);
-                            pricefinal = Math.Round(((Convert.ToDouble(txtCost.Text) + (Convert.ToDouble(txtCost.Text) * GetUtilidadPercentage(txtUtilidad.Text) / 100)) / getExchangeRateSemanal(date)),4,MidpointRounding.AwayFromZero);
+                            pricefinal = Math.Round(((Convert.ToDouble(txtCost.Text) + (Convert.ToDouble(txtCost.Text) * GetUtilidadPercentage(txtUtilidad.Text) / 100)) / getExchangeRateSemanal(date)), 4, MidpointRounding.AwayFromZero);
                         }
                         if (txtItemNumber.Text == "ASECSAS0073")
                         {

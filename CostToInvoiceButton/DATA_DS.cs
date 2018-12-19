@@ -144,12 +144,13 @@ namespace CostToInvoiceButton
         public string RateName { get; set; }
         public double RateDouble { get; set; }
     }
-
     public class WHours
     {
-        public DateTime Opens { get; set; }
-        public DateTime Closes { get; set; }
-        public int id { get; set; }
+        public DateTime ATAOpens { get; set; }
+        public DateTime ATACloses { get; set; }
+        public DateTime ATDOpens { get; set; }
+        public DateTime ATDCloses { get; set; }
         public string Type { get; set; }
+        public int id { get; set; }
     }
 }

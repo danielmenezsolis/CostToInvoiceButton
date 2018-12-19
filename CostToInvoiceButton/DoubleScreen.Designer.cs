@@ -43,6 +43,7 @@
             this.quitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.dataGridSuppliers = new System.Windows.Forms.DataGridView();
             this.dataGridServicios = new System.Windows.Forms.DataGridView();
+            this.chkInvoiceReady = new System.Windows.Forms.DataGridViewCheckBoxColumn();
             this.txtIdService = new System.Windows.Forms.TextBox();
             this.label7 = new System.Windows.Forms.Label();
             this.label6 = new System.Windows.Forms.Label();
@@ -102,7 +103,7 @@
             this.txtLimit = new System.Windows.Forms.TextBox();
             this.txtClientInfo = new System.Windows.Forms.TextBox();
             this.txtFuelDateCharge = new System.Windows.Forms.TextBox();
-            this.label8 = new System.Windows.Forms.Label();
+            this.lblGalons = new System.Windows.Forms.Label();
             this.txtGalones = new System.Windows.Forms.TextBox();
             this.cboCurrency = new System.Windows.Forms.ComboBox();
             this.txtAirportFee = new System.Windows.Forms.TextBox();
@@ -125,6 +126,11 @@
             this.txtCustomerClass = new System.Windows.Forms.TextBox();
             this.txtCreationIncidentDate = new System.Windows.Forms.TextBox();
             this.txtPaxGroup = new System.Windows.Forms.TextBox();
+            this.lblExchangeRate = new System.Windows.Forms.Label();
+            this.txtExchangeRate = new System.Windows.Forms.TextBox();
+            this.txtPackage = new System.Windows.Forms.TextBox();
+            this.txtTotalCostFuel = new System.Windows.Forms.TextBox();
+            this.lblTotalCostFuel = new System.Windows.Forms.Label();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridSuppliers)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridServicios)).BeginInit();
@@ -137,7 +143,7 @@
             this.fileToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(917, 24);
+            this.menuStrip1.Size = new System.Drawing.Size(961, 24);
             this.menuStrip1.TabIndex = 3;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -228,6 +234,8 @@
             dataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
             this.dataGridServicios.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle3;
             this.dataGridServicios.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dataGridServicios.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.chkInvoiceReady});
             dataGridViewCellStyle4.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
             dataGridViewCellStyle4.BackColor = System.Drawing.SystemColors.Window;
             dataGridViewCellStyle4.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -241,12 +249,18 @@
             this.dataGridServicios.MultiSelect = false;
             this.dataGridServicios.Name = "dataGridServicios";
             this.dataGridServicios.RowHeadersVisible = false;
+            this.dataGridServicios.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.AutoSizeToDisplayedHeaders;
             this.dataGridServicios.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.dataGridServicios.Size = new System.Drawing.Size(917, 248);
+            this.dataGridServicios.Size = new System.Drawing.Size(961, 248);
             this.dataGridServicios.TabIndex = 4;
             this.dataGridServicios.TabStop = false;
             this.dataGridServicios.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridServicios_CellContentClick);
             this.dataGridServicios.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridServicios_CellDoubleClick);
+            // 
+            // chkInvoiceReady
+            // 
+            this.chkInvoiceReady.HeaderText = "Invoice Ready";
+            this.chkInvoiceReady.Name = "chkInvoiceReady";
             // 
             // txtIdService
             // 
@@ -259,17 +273,16 @@
             // label7
             // 
             this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(744, 408);
+            this.label7.Location = new System.Drawing.Point(767, 408);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(62, 13);
             this.label7.TabIndex = 33;
             this.label7.Text = "Price p/unit";
-            this.label7.Click += new System.EventHandler(this.label7_Click);
             // 
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(295, 408);
+            this.label6.Location = new System.Drawing.Point(318, 408);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(59, 13);
             this.label6.TabIndex = 32;
@@ -286,7 +299,7 @@
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(45, 313);
+            this.label4.Location = new System.Drawing.Point(85, 313);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(45, 13);
             this.label4.TabIndex = 30;
@@ -295,7 +308,7 @@
             // lblQty
             // 
             this.lblQty.AutoSize = true;
-            this.lblQty.Location = new System.Drawing.Point(522, 408);
+            this.lblQty.Location = new System.Drawing.Point(526, 408);
             this.lblQty.Name = "lblQty";
             this.lblQty.Size = new System.Drawing.Size(46, 13);
             this.lblQty.TabIndex = 29;
@@ -304,12 +317,11 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(390, 369);
+            this.label2.Location = new System.Drawing.Point(274, 362);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(27, 13);
             this.label2.TabIndex = 28;
             this.label2.Text = "Item";
-            this.label2.Click += new System.EventHandler(this.label2_Click);
             // 
             // label1
             // 
@@ -322,16 +334,16 @@
             // 
             // txtItem
             // 
-            this.txtItem.Location = new System.Drawing.Point(423, 362);
+            this.txtItem.Location = new System.Drawing.Point(307, 359);
             this.txtItem.Name = "txtItem";
             this.txtItem.ReadOnly = true;
-            this.txtItem.Size = new System.Drawing.Size(431, 20);
+            this.txtItem.Size = new System.Drawing.Size(390, 20);
             this.txtItem.TabIndex = 26;
             this.txtItem.TabStop = false;
             // 
             // txtClientName
             // 
-            this.txtClientName.Location = new System.Drawing.Point(574, 310);
+            this.txtClientName.Location = new System.Drawing.Point(614, 310);
             this.txtClientName.Name = "txtClientName";
             this.txtClientName.ReadOnly = true;
             this.txtClientName.Size = new System.Drawing.Size(253, 20);
@@ -348,7 +360,7 @@
             // 
             // txtCost
             // 
-            this.txtCost.Location = new System.Drawing.Point(360, 405);
+            this.txtCost.Location = new System.Drawing.Point(383, 405);
             this.txtCost.Name = "txtCost";
             this.txtCost.Size = new System.Drawing.Size(100, 20);
             this.txtCost.TabIndex = 22;
@@ -356,7 +368,7 @@
             // 
             // txtQty
             // 
-            this.txtQty.Location = new System.Drawing.Point(572, 405);
+            this.txtQty.Location = new System.Drawing.Point(595, 405);
             this.txtQty.Name = "txtQty";
             this.txtQty.Size = new System.Drawing.Size(100, 20);
             this.txtQty.TabIndex = 21;
@@ -365,7 +377,7 @@
             // 
             // txtPrice
             // 
-            this.txtPrice.Location = new System.Drawing.Point(810, 405);
+            this.txtPrice.Location = new System.Drawing.Point(833, 405);
             this.txtPrice.Name = "txtPrice";
             this.txtPrice.Size = new System.Drawing.Size(100, 20);
             this.txtPrice.TabIndex = 23;
@@ -373,10 +385,10 @@
             // 
             // txtItemNumber
             // 
-            this.txtItemNumber.Location = new System.Drawing.Point(119, 359);
+            this.txtItemNumber.Location = new System.Drawing.Point(114, 359);
             this.txtItemNumber.Name = "txtItemNumber";
             this.txtItemNumber.ReadOnly = true;
-            this.txtItemNumber.Size = new System.Drawing.Size(219, 20);
+            this.txtItemNumber.Size = new System.Drawing.Size(133, 20);
             this.txtItemNumber.TabIndex = 20;
             this.txtItemNumber.TabStop = false;
             // 
@@ -446,7 +458,7 @@
             this.dataGridInvoice.RowHeadersDefaultCellStyle = dataGridViewCellStyle7;
             this.dataGridInvoice.RowHeadersVisible = false;
             this.dataGridInvoice.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.dataGridInvoice.Size = new System.Drawing.Size(917, 133);
+            this.dataGridInvoice.Size = new System.Drawing.Size(961, 133);
             this.dataGridInvoice.TabIndex = 40;
             this.dataGridInvoice.TabStop = false;
             this.dataGridInvoice.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridInvoice_CellContentClick);
@@ -603,7 +615,7 @@
             // label16
             // 
             this.label16.AutoSize = true;
-            this.label16.Location = new System.Drawing.Point(3, 408);
+            this.label16.Location = new System.Drawing.Point(26, 408);
             this.label16.Name = "label16";
             this.label16.Size = new System.Drawing.Size(73, 13);
             this.label16.TabIndex = 48;
@@ -665,7 +677,7 @@
             // 
             this.cboSuppliers.Enabled = false;
             this.cboSuppliers.FormattingEnabled = true;
-            this.cboSuppliers.Location = new System.Drawing.Point(99, 309);
+            this.cboSuppliers.Location = new System.Drawing.Point(139, 309);
             this.cboSuppliers.Name = "cboSuppliers";
             this.cboSuppliers.Size = new System.Drawing.Size(361, 21);
             this.cboSuppliers.TabIndex = 55;
@@ -791,21 +803,23 @@
             this.txtFuelDateCharge.TabIndex = 70;
             this.txtFuelDateCharge.TabStop = false;
             // 
-            // label8
+            // lblGalons
             // 
-            this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(662, 463);
-            this.label8.Name = "label8";
-            this.label8.Size = new System.Drawing.Size(40, 13);
-            this.label8.TabIndex = 71;
-            this.label8.Text = "Galons";
+            this.lblGalons.AutoSize = true;
+            this.lblGalons.Location = new System.Drawing.Point(825, 434);
+            this.lblGalons.Name = "lblGalons";
+            this.lblGalons.Size = new System.Drawing.Size(40, 13);
+            this.lblGalons.TabIndex = 71;
+            this.lblGalons.Text = "Galons";
+            this.lblGalons.Visible = false;
             // 
             // txtGalones
             // 
-            this.txtGalones.Location = new System.Drawing.Point(706, 456);
+            this.txtGalones.Location = new System.Drawing.Point(871, 431);
             this.txtGalones.Name = "txtGalones";
-            this.txtGalones.Size = new System.Drawing.Size(100, 20);
+            this.txtGalones.Size = new System.Drawing.Size(62, 20);
             this.txtGalones.TabIndex = 72;
+            this.txtGalones.Visible = false;
             // 
             // cboCurrency
             // 
@@ -813,7 +827,7 @@
             this.cboCurrency.Items.AddRange(new object[] {
             "MXN",
             "USD"});
-            this.cboCurrency.Location = new System.Drawing.Point(82, 405);
+            this.cboCurrency.Location = new System.Drawing.Point(105, 405);
             this.cboCurrency.Name = "cboCurrency";
             this.cboCurrency.Size = new System.Drawing.Size(139, 21);
             this.cboCurrency.TabIndex = 73;
@@ -862,7 +876,7 @@
             // label9
             // 
             this.label9.AutoSize = true;
-            this.label9.Location = new System.Drawing.Point(486, 313);
+            this.label9.Location = new System.Drawing.Point(526, 313);
             this.label9.Name = "label9";
             this.label9.Size = new System.Drawing.Size(82, 13);
             this.label9.TabIndex = 79;
@@ -871,7 +885,7 @@
             // lblCurrencyPrice
             // 
             this.lblCurrencyPrice.AutoSize = true;
-            this.lblCurrencyPrice.Location = new System.Drawing.Point(807, 389);
+            this.lblCurrencyPrice.Location = new System.Drawing.Point(830, 389);
             this.lblCurrencyPrice.Name = "lblCurrencyPrice";
             this.lblCurrencyPrice.Size = new System.Drawing.Size(31, 13);
             this.lblCurrencyPrice.TabIndex = 80;
@@ -928,7 +942,7 @@
             // lblCurrencyCost
             // 
             this.lblCurrencyCost.AutoSize = true;
-            this.lblCurrencyCost.Location = new System.Drawing.Point(357, 389);
+            this.lblCurrencyCost.Location = new System.Drawing.Point(380, 389);
             this.lblCurrencyCost.Name = "lblCurrencyCost";
             this.lblCurrencyCost.Size = new System.Drawing.Size(31, 13);
             this.lblCurrencyCost.TabIndex = 87;
@@ -980,11 +994,62 @@
             this.txtPaxGroup.Size = new System.Drawing.Size(39, 20);
             this.txtPaxGroup.TabIndex = 93;
             // 
+            // lblExchangeRate
+            // 
+            this.lblExchangeRate.AutoSize = true;
+            this.lblExchangeRate.Location = new System.Drawing.Point(739, 362);
+            this.lblExchangeRate.Name = "lblExchangeRate";
+            this.lblExchangeRate.Size = new System.Drawing.Size(81, 13);
+            this.lblExchangeRate.TabIndex = 95;
+            this.lblExchangeRate.Text = "Exchange Rate";
+            this.lblExchangeRate.Visible = false;
+            // 
+            // txtExchangeRate
+            // 
+            this.txtExchangeRate.Location = new System.Drawing.Point(826, 359);
+            this.txtExchangeRate.Name = "txtExchangeRate";
+            this.txtExchangeRate.ReadOnly = true;
+            this.txtExchangeRate.Size = new System.Drawing.Size(92, 20);
+            this.txtExchangeRate.TabIndex = 94;
+            this.txtExchangeRate.TabStop = false;
+            this.txtExchangeRate.Visible = false;
+            // 
+            // txtPackage
+            // 
+            this.txtPackage.Location = new System.Drawing.Point(810, 336);
+            this.txtPackage.Name = "txtPackage";
+            this.txtPackage.Size = new System.Drawing.Size(35, 20);
+            this.txtPackage.TabIndex = 96;
+            this.txtPackage.TabStop = false;
+            // 
+            // txtTotalCostFuel
+            // 
+            this.txtTotalCostFuel.Location = new System.Drawing.Point(383, 431);
+            this.txtTotalCostFuel.Name = "txtTotalCostFuel";
+            this.txtTotalCostFuel.Size = new System.Drawing.Size(100, 20);
+            this.txtTotalCostFuel.TabIndex = 98;
+            this.txtTotalCostFuel.Visible = false;
+            // 
+            // lblTotalCostFuel
+            // 
+            this.lblTotalCostFuel.AutoSize = true;
+            this.lblTotalCostFuel.Location = new System.Drawing.Point(322, 434);
+            this.lblTotalCostFuel.Name = "lblTotalCostFuel";
+            this.lblTotalCostFuel.Size = new System.Drawing.Size(55, 13);
+            this.lblTotalCostFuel.TabIndex = 97;
+            this.lblTotalCostFuel.Text = "Total Cost";
+            this.lblTotalCostFuel.Visible = false;
+            // 
             // DoubleScreen
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(917, 651);
+            this.ClientSize = new System.Drawing.Size(961, 651);
+            this.Controls.Add(this.txtTotalCostFuel);
+            this.Controls.Add(this.lblTotalCostFuel);
+            this.Controls.Add(this.txtPackage);
+            this.Controls.Add(this.lblExchangeRate);
+            this.Controls.Add(this.txtExchangeRate);
             this.Controls.Add(this.txtPaxGroup);
             this.Controls.Add(this.txtCreationIncidentDate);
             this.Controls.Add(this.txtCustomerClass);
@@ -1007,7 +1072,7 @@
             this.Controls.Add(this.txtAirportFee);
             this.Controls.Add(this.cboCurrency);
             this.Controls.Add(this.txtGalones);
-            this.Controls.Add(this.label8);
+            this.Controls.Add(this.lblGalons);
             this.Controls.Add(this.txtFuelDateCharge);
             this.Controls.Add(this.txtClientInfo);
             this.Controls.Add(this.txtLimit);
@@ -1131,7 +1196,7 @@
         private System.Windows.Forms.TextBox txtLimit;
         private System.Windows.Forms.TextBox txtClientInfo;
         private System.Windows.Forms.TextBox txtFuelDateCharge;
-        private System.Windows.Forms.Label label8;
+        private System.Windows.Forms.Label lblGalons;
         private System.Windows.Forms.TextBox txtGalones;
         private System.Windows.Forms.ComboBox cboCurrency;
         private System.Windows.Forms.TextBox txtAirportFee;
@@ -1167,5 +1232,11 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn ParticipacionCobro;
         private System.Windows.Forms.DataGridViewButtonColumn EditColumn;
         private System.Windows.Forms.DataGridViewButtonColumn DeleteColumn;
+        private System.Windows.Forms.Label lblExchangeRate;
+        private System.Windows.Forms.TextBox txtExchangeRate;
+        private System.Windows.Forms.TextBox txtPackage;
+        private System.Windows.Forms.DataGridViewCheckBoxColumn chkInvoiceReady;
+        private System.Windows.Forms.TextBox txtTotalCostFuel;
+        private System.Windows.Forms.Label lblTotalCostFuel;
     }
 }

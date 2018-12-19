@@ -40,6 +40,7 @@ namespace CostToInvoiceButton
         public string DepartureAirportIncident { get; set; }
         public string SRType { get; set; }
         public string SENCat { get; set; }
+        public string ClientName { get; set; }
 
 
         public WorkspaceRibbonAddIn(bool inDesignMode, IRecordContext RecordContext, IGlobalContext globalContext)
@@ -71,6 +72,7 @@ namespace CostToInvoiceButton
             {
                 if (Init())
                 {
+                    ClientName = "";
                     string Utilidad = "";
                     string Royalty = "";
                     string Combustible = "";
@@ -79,7 +81,6 @@ namespace CostToInvoiceButton
                     string SeneamCat = "";
                     string ICAO = "";
                     string ClientType = "";
-                    string ClientName = "";
                     string FuelType = "";
                     string CateringDeliveryDate = "";
                     string AircraftCategory = "";
@@ -1084,7 +1085,7 @@ namespace CostToInvoiceButton
             return Enumerable.Range(0, (d1.Year - d0.Year) * 12 + (d1.Month - d0.Month + 1))
                              .Select(m => new DateTime(d0.Year, d0.Month, 1).AddMonths(m));
         }
-
+        
         public void CreateOvers()
         {
             try
@@ -1347,6 +1348,10 @@ namespace CostToInvoiceButton
                 APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
                 clientInfoHeader.AppID = "Query Example";
                 String queryString = "SELECT ID,ItemNumber,ItemDescription,Airport,IDProveedor,Costo,Precio,InternalInvoice,Itinerary,Paquete,Componente,Informativo,ParentPaxID,Categories,fuel_id,CobroParticipacionNj,ParticipacionCobro,Site,IVA FROM CO.Services WHERE Incident =" + IncidentID + " AND Informativo = '0' AND (Componente IS NULL OR Componente  = '0') ORDER BY ID ASC, Itinerary ASC, ParentPaxId ASC";
+                if (ClientName.Contains("NETJETS"))
+                {
+                    queryString = "SELECT ID,ItemNumber,ItemDescription,Airport,IDProveedor,Costo,Precio,InternalInvoice,Itinerary,Paquete,Componente,Informativo,ParentPaxID,Categories,fuel_id,CobroParticipacionNj,ParticipacionCobro,Site,IVA FROM CO.Services WHERE Incident =" + IncidentID + " AND Informativo = '0' AND ((Componente IS NULL OR Componente  = '1') AND Paquete =  '0') ORDER BY ID ASC, Itinerary ASC, ParentPaxId ASC";
+                }
                 global.LogMessage(queryString);
                 clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 10000, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
                 foreach (CSVTable table in queryCSV.CSVTables)

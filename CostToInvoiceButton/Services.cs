@@ -25,8 +25,6 @@ namespace CostToInvoiceButton
         public string ParticipacionCobro { get; set; }
         public string Site { get; set; }
         public string Tax { get; set; }
-
-
     }
     public class ComponentChild
     {

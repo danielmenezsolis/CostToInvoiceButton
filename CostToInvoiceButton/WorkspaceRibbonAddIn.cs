@@ -72,6 +72,7 @@ namespace CostToInvoiceButton
             {
                 if (Init())
                 {
+                    recordContext.ExecuteEditorCommand(EditorCommand.Save);
                     ClientName = "";
                     string Utilidad = "";
                     string Royalty = "";
@@ -136,8 +137,8 @@ namespace CostToInvoiceButton
                     AircraftPCategory = GetPaxGroup(ICAO);
                     ClientType = GetClientType();
                     FuelType = GetFuelType(IncidentID);
-                    GetDeleteMCreated();
-                    //CreateChildComponents();
+                    // GetDeleteMCreated();
+                    // CreateChildComponents();
                     if (SRType != "FBO" || SRType != "FCC")
                     {
                         ArrivalAirportIncident = GetArrivalAirportIncident(IncidentID);
@@ -159,6 +160,7 @@ namespace CostToInvoiceButton
                     }
                     if (SRType == "GYCUSTODIA")
                     {
+                        GetDeleteMCreated();
                         int com = 0;
                         servicios = GetListServices();
                         foreach (Services item in servicios)
@@ -176,6 +178,7 @@ namespace CostToInvoiceButton
                     }
                     if (SRType == "SENEAM")
                     {
+                        GetDeleteMCreated();
                         CreateOvers();
                         CreateSENEAMFee();
                     }
@@ -243,6 +246,7 @@ namespace CostToInvoiceButton
                                     }
                                 }
                             }
+                            /*
                             GetDeleteFuelItems();
                             GetFuelData(ClientType, FuelType, int.Parse(item.Itinerary), item.Airport);
                             CreateFuelMinimun(ClientType, FuelType, int.Parse(item.Itinerary), item.Airport);
@@ -254,6 +258,7 @@ namespace CostToInvoiceButton
                                     CreateAirNavICCS();
                                 }
                             }
+                            */
                         }
                         servicios.Clear();
                         servicios = GetListServices();

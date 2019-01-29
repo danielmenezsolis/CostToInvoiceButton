@@ -118,6 +118,7 @@
             this.txtTotalCostFuel = new System.Windows.Forms.TextBox();
             this.lblTotalCostFuel = new System.Windows.Forms.Label();
             this.txtInvoiceReady = new System.Windows.Forms.TextBox();
+            this.BAdd = new System.Windows.Forms.Button();
             this.InvoiceReady = new System.Windows.Forms.DataGridViewCheckBoxColumn();
             this.Item = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Vendor = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -390,6 +391,7 @@
             this.BtnAdd.TabIndex = 24;
             this.BtnAdd.Text = "Add";
             this.BtnAdd.UseVisualStyleBackColor = true;
+            this.BtnAdd.Visible = false;
             this.BtnAdd.Click += new System.EventHandler(this.BtnAdd_Click);
             // 
             // dataGridInvoice
@@ -432,7 +434,7 @@
             dataGridViewCellStyle6.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
             this.dataGridInvoice.DefaultCellStyle = dataGridViewCellStyle6;
             this.dataGridInvoice.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.dataGridInvoice.EditMode = System.Windows.Forms.DataGridViewEditMode.EditProgrammatically;
+            this.dataGridInvoice.EditMode = System.Windows.Forms.DataGridViewEditMode.EditOnF2;
             this.dataGridInvoice.Location = new System.Drawing.Point(0, 518);
             this.dataGridInvoice.MultiSelect = false;
             this.dataGridInvoice.Name = "dataGridInvoice";
@@ -937,12 +939,24 @@
             this.txtInvoiceReady.TabIndex = 99;
             this.txtInvoiceReady.TabStop = false;
             // 
+            // BAdd
+            // 
+            this.BAdd.Location = new System.Drawing.Point(6, 469);
+            this.BAdd.Name = "BAdd";
+            this.BAdd.Size = new System.Drawing.Size(75, 23);
+            this.BAdd.TabIndex = 100;
+            this.BAdd.Text = "Add";
+            this.BAdd.UseVisualStyleBackColor = true;
+            this.BAdd.Click += new System.EventHandler(this.BAdd_Click);
+            // 
             // InvoiceReady
             // 
             this.InvoiceReady.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
-            this.InvoiceReady.HeaderText = "Invoice Ready?";
+            this.InvoiceReady.FalseValue = "";
+            this.InvoiceReady.HeaderText = "InvoiceReady";
             this.InvoiceReady.Name = "InvoiceReady";
             this.InvoiceReady.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this.InvoiceReady.TrueValue = "";
             this.InvoiceReady.Width = 79;
             // 
             // Item
@@ -1014,6 +1028,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(961, 651);
+            this.Controls.Add(this.BAdd);
             this.Controls.Add(this.txtInvoiceReady);
             this.Controls.Add(this.txtTotalCostFuel);
             this.Controls.Add(this.lblTotalCostFuel);
@@ -1194,6 +1209,7 @@
         private System.Windows.Forms.TextBox txtTotalCostFuel;
         private System.Windows.Forms.Label lblTotalCostFuel;
         private System.Windows.Forms.TextBox txtInvoiceReady;
+        private System.Windows.Forms.Button BAdd;
         private System.Windows.Forms.DataGridViewCheckBoxColumn InvoiceReady;
         private System.Windows.Forms.DataGridViewTextBoxColumn Item;
         private System.Windows.Forms.DataGridViewTextBoxColumn Vendor;

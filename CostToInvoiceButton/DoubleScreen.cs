@@ -253,7 +253,7 @@ namespace CostToInvoiceButton
                             txtPrice.Text = Math.Round(GetPrices(), 2).ToString();
                         }
                     }
-                    
+
                     // MANEJO DE FUEL EN FBO/FCC
                     /* 
                      * Se definio manejar los servicios de FUEL en SR por separado.
@@ -270,7 +270,7 @@ namespace CostToInvoiceButton
                         }
                     }
                     */
-                    
+
 
                     if (lblSrType.Text == "FCC")
                     {
@@ -358,7 +358,7 @@ namespace CostToInvoiceButton
                             txtCost.Text = (Convert.ToDouble(txtCost.Text) * hr).ToString();
                         }
                     }
-                    
+
                     // MANEJO DE ITEMS
                     if (txtItemNumber.Text == "ASECSAS0073")
                     {
@@ -511,42 +511,7 @@ namespace CostToInvoiceButton
         }
         private void BtnAdd_Click(object sender, EventArgs e)
         {
-            try
-            {
-                global.LogMessage("BtnAdd_Click: Inicio");
-                if (ValidateData())
-                {
-                    global.LogMessage("BtnAdd_Click: Valdación de datos");
-                    if (dataGridInvoice.RowCount <= dataGridServicios.RowCount - 1)
-                    {
-                        global.LogMessage("BtnAdd_Click: Mínimo un servicio");
-                        if (ValidateRows())
-                        {
-                            global.LogMessage("BtnAdd_Click: Validación de columna");
-                            double amount = Math.Round((Convert.ToDouble(txtPrice.Text) * Convert.ToDouble(txtQty.Text)), 2);
-                            dataGridInvoice.Rows.Add(Convert.ToBoolean(txtInvoiceReady.Text == "1" ? true : false), txtItem.Text, cboSuppliers.Text, txtQty.Text, txtCost.Text, txtPrice.Text, amount, txtIdService.Text, cboCurrency.Text);
-                            ClearTxtBoxes();
-                            global.LogMessage("BtnAdd_Click: Se ingreso columna");
-                        }
-                        else
-                        {
-                            MessageBox.Show("Item has been already added");
-                        }
-                    }
-                    else
-                    {
-                        MessageBox.Show("Cannot add more suppliers than services");
-                    }
-                }
-                else
-                {
-                    MessageBox.Show("All data must be filled correctly");
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("ButtonAddClic: " + ex.Message + "Det:" + ex.StackTrace);
-            }
+          
         }
         private void txtQty_TextChanged(object sender, EventArgs e)
         {
@@ -1555,15 +1520,22 @@ namespace CostToInvoiceButton
         }
         private void ClearTxtBoxes()
         {
-            txtAmount.Text = "0";
-            txtCost.Text = "";
-            txtIdService.Text = "";
+            try
+            {
+                txtAmount.Text = "0";
+                txtCost.Text = "";
+                txtIdService.Text = "";
 
-            txtItem.Text = "";
-            txtItemNumber.Text = "";
-            txtPrice.Text = "";
-            txtQty.Text = "1";
+                txtItem.Text = "";
+                txtItemNumber.Text = "";
+                txtPrice.Text = "";
+                txtQty.Text = "1";
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("ClearTxtBoxes" + ex.Message + "DEtalle: " + ex.StackTrace);
 
+            }
         }
         public bool IsFloatValue(string text)
         {
@@ -1797,7 +1769,7 @@ namespace CostToInvoiceButton
                                 DateTime inicio = DateTime.Parse(item.str_start_date + " " + "00:00");
                                 DateTime fin = DateTime.Parse(item.str_end_date + " " + "23:59");
                                 DateTime fecha = DateTime.Parse(txtATA.Text);
-                                
+
                                 // MessageBox.Show("Inicio: " + inicio.ToString() + "\n" + "Fin: " + fin.ToString() + "\n" + "ATA: " + fecha.ToString());
                                 if (fecha.CompareTo(inicio) >= 0 && fecha.CompareTo(fin) <= 0)
                                 {
@@ -1969,7 +1941,7 @@ namespace CostToInvoiceButton
                     }
                     if (txtCategorias.Text.Contains("AERO"))
                     {
-                        definicion += "str_item_number:'" + txtItemNumber.Text + "',str_icao_iata_code:'" + txtAirport.Text + "',bol_int_flight_cargo:" + cargo.ToString() + ",str_schedule_type:'" + txtMainHour.Text + "',str_aircraft_type:'" + txtICAOD.Text + "',str_ft_arrival: '" + arr_type.ToString() +  "', str_ft_depart: '" + dep_type.ToString() + "',$or:[{str_client_category:{$exists:false}},{str_client_category:'" + txtCustomerClass.Text.Replace("&", "%") + "'}]}";
+                        definicion += "str_item_number:'" + txtItemNumber.Text + "',str_icao_iata_code:'" + txtAirport.Text + "',bol_int_flight_cargo:" + cargo.ToString() + ",str_schedule_type:'" + txtMainHour.Text + "',str_aircraft_type:'" + txtICAOD.Text + "',str_ft_arrival: '" + arr_type.ToString() + "', str_ft_depart: '" + dep_type.ToString() + "',$or:[{str_client_category:{$exists:false}},{str_client_category:'" + txtCustomerClass.Text.Replace("&", "%") + "'}]}";
                     }
                     else if (txtCustomerClass.Text == "NTJET")
                     {
@@ -2018,7 +1990,7 @@ namespace CostToInvoiceButton
                                 ",str_schedule_type:'" + txtMainHour.Text + "'" +
                                 ",bol_int_flight_cargo:'" + cargo.ToString() + "'" +
                                 ",$and:[{$or:[{str_icao_iata_code:'" + txtAirport.Text + "'},{str_icao_iata_code:{$exists:false}}]}," +
-                                "{$or:[{str_aircraft_group:'" + grupo.ToString() + "'},{str_aircraft_group:{$exists:false}}]},"+
+                                "{$or:[{str_aircraft_group:'" + grupo.ToString() + "'},{str_aircraft_group:{$exists:false}}]}," +
                                 "{$or:[{str_client_category:{$like:'" + txtCustomerClass.Text.Replace("&", "%") + "'}},{str_client_category:{$exists:false}}]}," +
                                 "{$or:[{str_aircraft_type:'" + txtICAOD.Text + "'},{str_aircraft_type:{$exists:false}}]}]}";
                     }
@@ -3311,6 +3283,48 @@ namespace CostToInvoiceButton
                 {
                     global.LogMessage("Error en txtCost.Text:" + ex.Message + "Det:" + ex.StackTrace);
                 }
+            }
+        }
+
+        private void BAdd_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                
+                if (ValidateData())
+                {
+                
+                    if (dataGridInvoice.RowCount <= dataGridServicios.RowCount - 1)
+                    {
+                        
+                        if (ValidateRows())
+                        {
+                           
+                            double amount = Math.Round((Convert.ToDouble(txtPrice.Text) * Convert.ToDouble(txtQty.Text)), 2);
+                            bool invoi = txtInvoiceReady.Text == "1" ? true : false;
+                           
+                            dataGridInvoice.Rows.Add(invoi, txtItem.Text, cboSuppliers.Text, txtQty.Text, txtCost.Text, txtPrice.Text, amount, txtIdService.Text, cboCurrency.Text);
+                            ClearTxtBoxes();
+                           
+                        }
+                        else
+                        {
+                            MessageBox.Show("Item has been already added");
+                        }
+                    }
+                    else
+                    {
+                        MessageBox.Show("Cannot add more suppliers than services");
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("All data must be filled correctly");
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("ButtonAddClic: " + ex.Message + "Det:" + ex.StackTrace);
             }
         }
     }

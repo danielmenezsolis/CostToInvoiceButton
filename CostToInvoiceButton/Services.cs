@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 
 
@@ -6,13 +7,16 @@ namespace CostToInvoiceButton
 {
     public class Services
     {
+        [JsonProperty(PropertyName = "Invoice Ready")]
+        public string InvoiceReady { get; set; }
         public string ID { get; set; }
+        [JsonProperty(PropertyName = "Item Number")]
         public string ItemNumber { get; set; }
         public string Description { get; set; }
         public string Airport { get; set; }
         public string Supplier { get; set; }
-        public string Cost { get; set; }
-        public string Price { get; set; }
+        public string UnitCost { get; set; }
+        public string UnitPrice { get; set; }
         public string InvoiceInternal { get; set; }
         public string Itinerary { get; set; }
         public string Pax { get; set; }

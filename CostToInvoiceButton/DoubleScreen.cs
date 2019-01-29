@@ -47,9 +47,10 @@ namespace CostToInvoiceButton
             try
             {
                 Cursor.Current = Cursors.WaitCursor;
-                txtUOM.Text = "";
+                // txtUOM.Text = "";
                 if (e.RowIndex != -1)
                 {
+                    // Etiquetas/Cajas
                     lblQty.Text = "Quantity";
                     txtExchangeRate.Hide();
                     lblExchangeRate.Hide();
@@ -62,6 +63,7 @@ namespace CostToInvoiceButton
                     cboCurrency.Enabled = true;
                     ClearTxtBoxes();
                     dataGridSuppliers.DataSource = null;
+                    txtInvoiceReady.Text = dataGridServicios.Rows[e.RowIndex].Cells["InvoiceReady"].Value.ToString() == "Yes" ? "1" : "0";
                     txtIdService.Text = dataGridServicios.Rows[e.RowIndex].Cells["ID"].Value.ToString();
                     txtItinerary.Text = dataGridServicios.Rows[e.RowIndex].Cells["Itinerary"].Value.ToString();
                     txtPackage.Text = dataGridServicios.Rows[e.RowIndex].Cells["Pax"].Value.ToString();
@@ -153,7 +155,8 @@ namespace CostToInvoiceButton
 
                     }
                     txtCategorias.Text = dataGridServicios.Rows[e.RowIndex].Cells["Categorias"].FormattedValue.ToString().Trim();
-                    if (String.IsNullOrEmpty(dataGridServicios.Rows[e.RowIndex].Cells["Cost"].FormattedValue.ToString()))
+                    // COSTOS EN LISTA DE SERVICIOS
+                    if (String.IsNullOrEmpty(dataGridServicios.Rows[e.RowIndex].Cells["UnitCost"].FormattedValue.ToString()))
                     {
                         txtCost.Text = GetCosts(out string Currency).ToString();
                         if (!String.IsNullOrEmpty(Currency))
@@ -167,14 +170,67 @@ namespace CostToInvoiceButton
                     }
                     else
                     {
-                        txtCost.Text = dataGridServicios.Rows[e.RowIndex].Cells["Cost"].FormattedValue.ToString();
+                        txtCost.Text = dataGridServicios.Rows[e.RowIndex].Cells["UnitCost"].FormattedValue.ToString();
                     }
-                    if (String.IsNullOrEmpty(dataGridServicios.Rows[e.RowIndex].Cells["Price"].FormattedValue.ToString()))
+                    // PRECIOS EN LISTA DE SERVICIOS
+                    if (String.IsNullOrEmpty(dataGridServicios.Rows[e.RowIndex].Cells["UnitPrice"].FormattedValue.ToString()))
                     {
-                        if (lblSrType.Text != "FUEL" || lblSrType.Text != "FCC")
+                        if (lblSrType.Text != "FUEL" || (lblSrType.Text != "FCC" && Convert.ToDouble(txtPrice.Text) == 0))
                         {
                             txtPrice.Text = GetPrices().ToString();
                         }
+                    }
+                    else
+                    {
+                        txtPrice.Text = dataGridServicios.Rows[e.RowIndex].Cells["UnitPrice"].FormattedValue.ToString();
+                    }
+
+                    if ((lblSrType.Text == "FBO" && (txtItemNumber.Text == "ASFIEAP357" || txtItemNumber.Text == "AFREISP0179")) || (lblSrType.Text == "FCC" && txtItemNumber.Text == "AFREISP0179"))
+                    {
+                        int indice = 10;
+                        if (txtItemNumber.Text == "AFREISP0179")
+                        {
+                            indice = 9;
+                        }
+                        double pricesum = 0;
+                        int arrival = GetArrivalAirport(Convert.ToInt32(txtItinerary.Text));
+                        //MessageBox.Show("ID de aeropuerto: " + arrival.ToString());
+                        double catcollectionfee = Convert.ToDouble(getAirportCateringCollectionFee(arrival)) / 100;
+                        //MessageBox.Show("ID de CatCollFee: " + catcollectionfee.ToString());
+                        double airportfee = Convert.ToDouble(getAirportCollectionFee(arrival)) / 100;
+                        //MessageBox.Show("ID de AirCollFee: " + airportfee.ToString());
+                        double deductionfee = Convert.ToDouble(getAirportCollectionDeductionFee(arrival)) / 100;
+                        //MessageBox.Show("ID de DedCollFee: " + deductionfee.ToString());
+                        foreach (DataGridViewRow dgvRenglon in dataGridInvoice.Rows)
+                        {
+                            int itinerarycompare = Convert.ToInt32(dgvRenglon.Cells["Itinerary"].Value);
+                            double price = Convert.ToDouble(dgvRenglon.Cells["Total Price"].Value);
+                            double fee = 0;
+                            double dfee = 0;
+
+                            if (Convert.ToInt32(txtItinerary.Text) == itinerarycompare)
+                            {
+                                if (dgvRenglon.Cells[indice].Value.ToString() == "1" && dgvRenglon.Cells["Item"].Value.ToString().Contains("CATERING"))
+                                {
+                                    fee = price * catcollectionfee;
+                                    //MessageBox.Show("Item de Catering");
+                                }
+                                if (dgvRenglon.Cells[indice].Value.ToString() == "1" && !dgvRenglon.Cells["Item"].Value.ToString().Contains("CATERING"))
+                                {
+                                    fee = price * airportfee;
+                                    //MessageBox.Show("Item normal");
+                                }
+                                //MessageBox.Show("ItemFee: " + fee.ToString());
+                                dfee = fee * deductionfee;
+                                //MessageBox.Show("ItemDedFee: " + dfee.ToString());
+                                pricesum = pricesum + (fee - dfee);
+                            }
+                            //MessageBox.Show("AFeeActual: " + pricesum.ToString());
+                        }
+                        MessageBox.Show("Total Fee: " + pricesum.ToString());
+                        txtPrice.Text = Math.Round((pricesum), 4).ToString();
+                        txtPrice.Enabled = false;
+                        txtCost.Enabled = false;
                     }
                     /*
                     else
@@ -194,9 +250,14 @@ namespace CostToInvoiceButton
                         }
                         else
                         {
-                            txtPrice.Text = Math.Round(GetPrices(), 4).ToString();
+                            txtPrice.Text = Math.Round(GetPrices(), 2).ToString();
                         }
                     }
+                    
+                    // MANEJO DE FUEL EN FBO/FCC
+                    /* 
+                     * Se definio manejar los servicios de FUEL en SR por separado.
+                     *
                     if (lblSrType.Text == "FBO" || lblSrType.Text == "FCC")
                     {
                         if (txtItemNumber.Text == "AGASIAS0270" || txtItemNumber.Text == "JFUEIAS0269" || txtItemNumber.Text == "AGASIAS0011" || txtItemNumber.Text == "JFUEIAS0010")
@@ -208,56 +269,13 @@ namespace CostToInvoiceButton
                             }
                         }
                     }
-                    if ((lblSrType.Text == "FBO" && (txtItemNumber.Text == "ASFIEAP357" || txtItemNumber.Text == "AIPRTFE0101")) || (lblSrType.Text == "FCC" && txtItemNumber.Text == "AIPRTFE0101"))
-                    {
-                        int indice = 10;
-                        if (txtItemNumber.Text == "AIPRTFE0101")
-                        {
-                            indice = 9;
-                        }
-                        double pricesum = 0;
-                        int arrival = GetArrivalAirport(Convert.ToInt32(txtItinerary.Text));
-                        //MessageBox.Show("ID de aeropuerto: " + arrival.ToString());
-                        double catcollectionfee = Convert.ToDouble(getAirportCateringCollectionFee(arrival)) / 100;
-                        //MessageBox.Show("ID de CatCollFee: " + catcollectionfee.ToString());
-                        double airportfee = Convert.ToDouble(getAirportCollectionFee(arrival)) / 100;
-                        //MessageBox.Show("ID de AirCollFee: " + airportfee.ToString());
-                        double deductionfee = Convert.ToDouble(getAirportCollectionDeductionFee(arrival)) / 100;
-                        //MessageBox.Show("ID de DedCollFee: " + deductionfee.ToString());
-                        foreach (DataGridViewRow dgvRenglon in dataGridInvoice.Rows)
-                        {
-                            int itinerarycompare = Convert.ToInt32(dgvRenglon.Cells[8].Value);
-                            double price = Convert.ToDouble(dgvRenglon.Cells[5].Value);
-                            double fee = 0;
-                            double dfee = 0;
+                    */
+                    
 
-                            if (Convert.ToInt32(txtItinerary.Text) == itinerarycompare)
-                            {
-                                if (dgvRenglon.Cells[indice].Value.ToString() == "1" && dgvRenglon.Cells[0].Value.ToString().Contains("CATERING"))
-                                {
-                                    fee = price * catcollectionfee;
-                                    //MessageBox.Show("Item de Catering");
-                                }
-                                if (dgvRenglon.Cells[indice].Value.ToString() == "1" && !dgvRenglon.Cells[0].Value.ToString().Contains("CATERING"))
-                                {
-                                    fee = price * airportfee;
-                                    //MessageBox.Show("Item normal");
-                                }
-                                //MessageBox.Show("ItemFee: " + fee.ToString());
-                                dfee = fee * deductionfee;
-                                //MessageBox.Show("ItemDedFee: " + dfee.ToString());
-                                pricesum = pricesum + (fee - dfee);
-                            }
-                            //MessageBox.Show("AFeeActual: " + pricesum.ToString());
-                        }
-                        //MessageBox.Show("AFeeTotal: " + pricesum.ToString());
-                        txtPrice.Text = Math.Round((pricesum), 4).ToString();
-                        txtPrice.Enabled = false;
-                        txtCost.Enabled = false;
-
-                    }
                     if (lblSrType.Text == "FCC")
                     {
+                        /* MANEJO DE AIRCRAFT SECURITY / SEGURIDAD DE LA AERONAVE */
+                        /*
                         if (txtItemNumber.Text == "ASECSAS0073")
                         {
                             lblQty.Text = "Periods";
@@ -266,11 +284,13 @@ namespace CostToInvoiceButton
                             txtQty.Text = minutehour.ToString();
                             txtPrice.Text = Math.Round((GetPrices() * minutehour), 4).ToString();
                         }
+                        */
                         if ((txtAirport.Text.Contains("MHLM") || txtAirport.Text.Contains("MGGT")) && GetCountItinerary() > 1 && txtClientName.Text.Contains("GULF AND CAR") && isBHInside())
                         {
                             double p = GetPrices();
                             txtPrice.Text = Math.Round(p - (p * 0.025), 4).ToString();
                         }
+                        /*
                         else
                         {
                             txtPrice.Text = dataGridServicios.Rows[e.RowIndex].Cells["Price"].FormattedValue.ToString();
@@ -278,9 +298,13 @@ namespace CostToInvoiceButton
                             {
                                 txtPrice.Text = Math.Round(GetPrices(), 4).ToString();
                             }
-                        }
+                        }*/
                     }
-                    if (txtUOM.Text == "TW")
+
+                    // MANEJO DE UOM
+                    // MessageBox.Show("La UOM es: " + txtUOM.Text);
+
+                    if (txtUOM.Text == "TW" && String.IsNullOrEmpty(txtPrice.Text))
                     {
                         double b;
                         if (double.TryParse(txtCost.Text, out b))
@@ -288,7 +312,8 @@ namespace CostToInvoiceButton
                             txtPrice.Text = GetMTOWPrice();
                         }
                     }
-                    if (txtUOM.Text == "HHR")
+
+                    if (txtUOM.Text == "HHR" && String.IsNullOrEmpty(txtPrice.Text))
                     {
                         double b;
                         if (double.TryParse(txtCost.Text, out b))
@@ -307,7 +332,23 @@ namespace CostToInvoiceButton
                             txtPrice.Text = "0";
                         }
                     }
-                    if (txtUOM.Text == "HR")
+
+                    if (txtUOM.Text == "HHR" && !String.IsNullOrEmpty(txtPrice.Text))
+                    {
+                        double b;
+                        MessageBox.Show("La UOM es HHR.");
+                        if (double.TryParse(txtPrice.Text, out b))
+                        {
+                            double hhr = GetMinutesLeg() * 2;
+                            MessageBox.Show("Total de HHR: " + hhr.ToString());
+                            txtQty.Text = hhr.ToString();
+                            // MessageBox.Show("Costo por periodo: " + txtCost.Text);
+                            // MessageBox.Show("Periodos: " + hhr.ToString());
+                            // txtCost.Text = (Convert.ToDouble(txtCost.Text) * hhr).ToString();
+                            // MessageBox.Show("Costo total: " + txtCost.Text);
+                        }
+                    }
+                    if (txtUOM.Text == "HR" && String.IsNullOrEmpty(txtPrice.Text))
                     {
                         double b;
                         if (double.TryParse(txtCost.Text, out b))
@@ -317,6 +358,8 @@ namespace CostToInvoiceButton
                             txtCost.Text = (Convert.ToDouble(txtCost.Text) * hr).ToString();
                         }
                     }
+                    
+                    // MANEJO DE ITEMS
                     if (txtItemNumber.Text == "ASECSAS0073")
                     {
                         double b;
@@ -336,6 +379,7 @@ namespace CostToInvoiceButton
                             txtPrice.Text = (Convert.ToDouble(txtCost.Text) * per).ToString();
                         }
                     }
+
                     if (txtItemNumber.Text == "MHSPSAS0091")
                     {
                         double b;
@@ -349,6 +393,7 @@ namespace CostToInvoiceButton
                             txtPrice.Text = Math.Round(utilidad, 4).ToString();
                         }
                     }
+
                     if (txtItemNumber.Text == "DEPEGAR0358")
                     {
                         double price = 0;
@@ -360,9 +405,9 @@ namespace CostToInvoiceButton
                         {
                             foreach (DataGridViewRow dgvRenglon in dataGridInvoice.Rows)
                             {
-                                if (dgvRenglon.Cells[0].Value.ToString().Contains("USO DE INSTALA"))
+                                if (dgvRenglon.Cells["Item"].Value.ToString().Contains("USO DE INSTALA"))
                                 {
-                                    price += Convert.ToDouble(dgvRenglon.Cells[5].Value.ToString());
+                                    price += Convert.ToDouble(dgvRenglon.Cells["Total Price"].Value.ToString());
                                 }
                             }
                         }
@@ -373,14 +418,17 @@ namespace CostToInvoiceButton
                     {
                         cboCurrency.Text = "USD";
                     }
+
                     if (txtCost.Text == "0" && (lblSrType.Text != "SENEAM" || lblSrType.Text != "CATERING"))
                     {
                         cboCurrency.Text = "MXN";
                     }
+
                     if (lblSrType.Text == "FUEL")
                     {
                         txtTotalCostFuel.Text = Math.Round((Convert.ToDouble(txtCost.Text) * Convert.ToDouble(txtQty.Text)), 2, MidpointRounding.AwayFromZero).ToString();
                     }
+
                     getSuppliers();
                     Cursor.Current = Cursors.Default;
                 }
@@ -392,7 +440,59 @@ namespace CostToInvoiceButton
         }
         private void quitToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            this.Close();
+            try
+            {
+                if (dataGridInvoice.Rows.Count != 0 && validateFBOFee())
+                {
+                    int i = 0;
+                    DialogResult dialogResult = MessageBox.Show("Save before closing?", "Double Screen", MessageBoxButtons.YesNo);
+                    if (dialogResult == DialogResult.Yes)
+                    {
+                        foreach (DataGridViewRow dgvRenglon in dataGridInvoice.Rows)
+                        {
+                            var client = new RestClient("https://iccsmx.custhelp.com/");
+                            var request = new RestRequest("/services/rest/connect/v1.4/CO.Services/" + dgvRenglon.Cells["Service ID"].Value.ToString() + "", Method.POST)
+                            {
+                                RequestFormat = DataFormat.Json
+                            };
+                            var body = "{";
+                            // Información de precios costos
+                            body += "\"ListoFactura\":" + dgvRenglon.Cells["InvoiceReady"].Value.ToString() + "\"," +
+                                "\"Precio\":\"" + dgvRenglon.Cells["Price p/unit"].Value.ToString() + "\"," +
+                                "\"Costo\":\"" + dgvRenglon.Cells["Cost p/unit"].Value.ToString() + "\"";
+                            if (!String.IsNullOrEmpty(dgvRenglon.Cells["Vendor"].Value.ToString()))
+                            {
+                                body += ",\"IDProveedor\":\"" + dgvRenglon.Cells["Vendor"].Value.ToString() + "\"";
+                            }
+                            body += "}";
+                            global.LogMessage(body);
+                            request.AddParameter("application/json", body, ParameterType.RequestBody);
+                            request.AddHeader("Authorization", "Basic ZW9saXZhczpTaW5lcmd5KjIwMTg=");
+                            request.AddHeader("X-HTTP-Method-Override", "PATCH");
+                            request.AddHeader("OSvC-CREST-Application-Context", "Update Service {id}");
+                            IRestResponse response = client.Execute(request);
+                            var content = response.Content;
+                            if (content == "")
+                            {
+                                i = i + 1;
+                            }
+                            else
+                            {
+                                MessageBox.Show(response.Content);
+                            }
+                        }
+                        if (i > 0)
+                        {
+                            MessageBox.Show("Data saved");
+                        }
+                    }
+                }
+                this.Close();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("saveToolStripMenuItem_Click" + ex.Message + "Det: " + ex.StackTrace);
+            }
         }
         private void dataGridSuppliers_CellContentDoubleClick(object sender, DataGridViewCellEventArgs e)
         {
@@ -419,12 +519,8 @@ namespace CostToInvoiceButton
                     {
                         if (ValidateRows())
                         {
-                            double amount = Math.Round((Convert.ToDouble(txtPrice.Text) * Convert.ToDouble(txtQty.Text)), 4);
-                            if (txtItemNumber.Text == "LANDSAF0008")
-                            {
-                                amount = Math.Round(Convert.ToDouble(txtPrice.Text));
-                            }
-                            dataGridInvoice.Rows.Add(txtItem.Text, cboSuppliers.Text, txtQty.Text, txtCost.Text, txtPrice.Text, amount, txtIdService.Text, cboCurrency.Text, txtItinerary.Text, txtCobroParticipacionNj.Text, txtParticipacionCobro.Text);
+                            double amount = Math.Round((Convert.ToDouble(txtPrice.Text) * Convert.ToDouble(txtQty.Text)), 2);
+                            dataGridInvoice.Rows.Add(Convert.ToBoolean(txtInvoiceReady.Text == "1" ? true : false), txtItem.Text, cboSuppliers.Text, txtQty.Text, txtCost.Text, txtPrice.Text, amount, txtIdService.Text, cboCurrency.Text);
                             ClearTxtBoxes();
                         }
                         else
@@ -465,6 +561,7 @@ namespace CostToInvoiceButton
                             DateTime date = DateTime.Parse(txtATA.Text);
                             txtPrice.Text = Math.Round((Convert.ToDouble(txtCost.Text) + (Convert.ToDouble(txtCost.Text) * GetUtilidadPercentage(txtUtilidad.Text) / 100)) / getExchangeRate(date), 2, MidpointRounding.AwayFromZero).ToString();
                         }
+                        /*
                         if (txtItemNumber.Text == "ASECSAS0073")
                         {
                             if (IsNumber(txtCost.Text))
@@ -473,9 +570,7 @@ namespace CostToInvoiceButton
                                 txtPrice.Text = Math.Round((Convert.ToDouble(txtCost.Text) * minutehour), 2, MidpointRounding.AwayFromZero).ToString();
                             }
                         }
-                    }
-                    else if (lblSrType.Text == "FUEL")
-                    {
+                        */
                     }
                     else
                     {
@@ -486,17 +581,6 @@ namespace CostToInvoiceButton
             catch (Exception ex)
             {
                 MessageBox.Show(ex.StackTrace);
-            }
-        }
-        private void txtPrice_TextChanged(object sender, EventArgs e)
-        {
-            try
-            {
-
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message + "Det:" + ex.StackTrace);
             }
         }
         private void saveToolStripMenuItem_Click(object sender, EventArgs e)
@@ -515,18 +599,18 @@ namespace CostToInvoiceButton
                         foreach (DataGridViewRow dgvRenglon in dataGridInvoice.Rows)
                         {
                             var client = new RestClient("https://iccsmx.custhelp.com/");
-                            var request = new RestRequest("/services/rest/connect/v1.4/CO.Services/" + dgvRenglon.Cells[6].Value.ToString() + "", Method.POST)
+                            var request = new RestRequest("/services/rest/connect/v1.4/CO.Services/" + dgvRenglon.Cells["Service ID"].Value.ToString() + "", Method.POST)
                             {
                                 RequestFormat = DataFormat.Json
                             };
                             var body = "{";
                             // Información de precios costos
-                            body += "\"ListoFactura\":true," +
-                                "\"Precio\":\"" + dgvRenglon.Cells[4].Value.ToString() + "\"," +
-                                "\"Costo\":\"" + dgvRenglon.Cells[3].Value.ToString() + "\"";
-                            if (!String.IsNullOrEmpty(dgvRenglon.Cells[1].Value.ToString()))
+                            body += "\"ListoFactura\":" + dgvRenglon.Cells["InvoiceReady"].Value.ToString() + "\"," +
+                                "\"Precio\":\"" + dgvRenglon.Cells["Price p/unit"].Value.ToString() + "\"," +
+                                "\"Costo\":\"" + dgvRenglon.Cells["Cost p/unit"].Value.ToString() + "\"";
+                            if (!String.IsNullOrEmpty(dgvRenglon.Cells["Vendor"].Value.ToString()))
                             {
-                                body += ",\"IDProveedor\":\"" + dgvRenglon.Cells[1].Value.ToString() + "\"";
+                                body += ",\"IDProveedor\":\"" + dgvRenglon.Cells["Vendor"].Value.ToString() + "\"";
                             }
                             body += "}";
                             global.LogMessage(body);
@@ -587,10 +671,7 @@ namespace CostToInvoiceButton
                 }
             }
         }
-        private void dataGridServicios_CellContentClick(object sender, DataGridViewCellEventArgs e)
-        {
 
-        }
         /*
          * private void txtCost_TextChanged(object sender, EventArgs e)
         {
@@ -691,6 +772,7 @@ namespace CostToInvoiceButton
                 global.LogMessage("Error en txtCost.Text:" + ex.Message + "Det:" + ex.StackTrace);
             }
         } */
+
         // Functions
         // IS COMPONENT - EO
         private bool isComponent()
@@ -783,7 +865,7 @@ namespace CostToInvoiceButton
                     minutes = minutes - 120;
                 }
                 TimeSpan t = TimeSpan.FromMinutes(minutes);
-                return Math.Ceiling(t.TotalHours);
+                return Math.Ceiling(t.TotalMinutes);
             }
             catch (Exception ex)
             {
@@ -957,10 +1039,10 @@ namespace CostToInvoiceButton
                 {
                     foreach (DataGridViewRow dgvRenglon in dataGridInvoice.Rows)
                     {
-                        int itinerarycompare = String.IsNullOrEmpty(dgvRenglon.Cells[8].Value.ToString()) ? 0 : Convert.ToInt32(dgvRenglon.Cells[8].Value);
-                        if (lblSrType.Text == "FBO" && dgvRenglon.Cells[0].Value.ToString().Contains("LOGISTIC / LOGISTICA") && item.Itinerarie == itinerarycompare)
+                        int itinerarycompare = String.IsNullOrEmpty(dgvRenglon.Cells["Itinerary"].Value.ToString()) ? 0 : Convert.ToInt32(dgvRenglon.Cells["Itinerary"].Value);
+                        if (lblSrType.Text == "FBO" && dgvRenglon.Cells["Item"].Value.ToString().Contains("LOGISTIC / LOGISTICA") && item.Itinerarie == itinerarycompare)
                         {
-                            pricecompare = pricecompare + Convert.ToDouble(dgvRenglon.Cells[4].Value);
+                            pricecompare = pricecompare + Convert.ToDouble(dgvRenglon.Cells["Price p/unit"].Value);
                         }
                     }
                     if (item.Limit < pricecompare)
@@ -996,7 +1078,7 @@ namespace CostToInvoiceButton
                         txtATA.Text = DateTime.Parse(substrings[0] + " " + substrings[1]).ToString();
                         txtATD.Text = DateTime.Parse(substrings[2] + " " + substrings[3]).ToString();
                         int Arri = String.IsNullOrEmpty(substrings[4]) ? 0 : Convert.ToInt32(substrings[4]);
-                        getArrivalHours(Arri, DateTime.Parse(txtATA.Text).ToLocalTime().ToString("yyyy-MM-dd"), DateTime.Parse(txtATD.Text).ToLocalTime().ToString("yyyy-MM-dd"));
+                        getArrivalHours(Arri, DateTime.Parse(txtATA.Text).ToString("yyyy-MM-dd"), DateTime.Parse(txtATD.Text).ToString("yyyy-MM-dd"));
                         txtArrivalAiport.Text = substrings[4];
                         txtLimit.Text = getGrupoLogLimit(Arri);
                         txtAirportFee.Text = getAirportCollectionFee(Arri);
@@ -1045,7 +1127,7 @@ namespace CostToInvoiceButton
                 ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
                 APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
                 clientInfoHeader.AppID = "Query Example";
-                String queryString = "SELECT OpensZULUTime,ClosesZULUTime,Type, ID FROM CO.Airport_WorkingHours WHERE Airports =" + Arrival + "";
+                String queryString = "SELECT OpensZULUTime,ClosesZULUTime,Type, ID FROM CO.Airport_WorkingHours WHERE Airports =" + Arrival;
                 clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 1000, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
                 WHoursList = new List<WHours>();
                 foreach (CSVTable table in queryCSV.CSVTables)
@@ -1056,7 +1138,6 @@ namespace CostToInvoiceButton
                         WHours hours = new WHours();
                         Char delimiter = '|';
                         String[] substrings = data.Split(delimiter);
-
                         hours.ATAOpens = DateTime.Parse(AtaDate + " " + substrings[0]);
                         hours.ATACloses = DateTime.Parse(AtaDate + " " + substrings[1]);
                         hours.ATDOpens = DateTime.Parse(ATDDate + " " + substrings[0]);
@@ -1068,7 +1149,6 @@ namespace CostToInvoiceButton
                             hours.ATACloses = hours.ATACloses.AddDays(1);
                             hours.ATDCloses = hours.ATDCloses.AddDays(1);
                             //MessageBox.Show(hours.Closes.ToString());
-
                         }
                         hours.id = Convert.ToInt32(substrings[3].Trim());
                         switch (substrings[2].Trim())
@@ -1078,13 +1158,13 @@ namespace CostToInvoiceButton
                                 break;
                             case "2":
                                 hours.Type = "CRITICO";
-                                break
-                                    ;
+                                break;
                             case "25":
                                 hours.Type = "NORMAL";
                                 break;
                         }
-                        //MessageBox.Show("Type: " + hours.Type.ToString() + "   Opens: " + hours.Opens.ToString() + "   Closes: " + hours.Closes.ToString());
+                        global.LogMessage("Type: " + hours.Type.ToString() + "   ATA Opens: " + hours.ATAOpens.ToString() + "   ATA Closes: " + hours.ATACloses.ToString() +
+                            "\nATD Opens: " + hours.ATDOpens.ToString() + "   ATD Closes: " + hours.ATDCloses.ToString());
                         WHoursList.Add(hours);
                     }
                 }
@@ -1243,7 +1323,6 @@ namespace CostToInvoiceButton
                  (HttpWebRequest)WebRequest.Create("https://egqy-test.fa.us6.oraclecloud.com:443/xmlpserver/services/ExternalReportWSSService");
                 // Configure the request content type to be xml, HTTP method to be POST, and set the content length
                 request.Method = "POST";
-
                 request.ContentType = "application/soap+xml; charset=UTF-8;action=\"\"";
                 request.ContentLength = byteArray.Length;
                 // Configure the request to use basic authentication, with base64 encoded user name and password, to invoke the service.
@@ -1344,7 +1423,6 @@ namespace CostToInvoiceButton
                  (HttpWebRequest)WebRequest.Create("https://egqy-test.fa.us6.oraclecloud.com:443/xmlpserver/services/ExternalReportWSSService");
                 // Configure the request content type to be xml, HTTP method to be POST, and set the content length
                 request.Method = "POST";
-
                 request.ContentType = "application/soap+xml; charset=UTF-8;action=\"\"";
                 request.ContentLength = byteArray.Length;
                 // Configure the request to use basic authentication, with base64 encoded user name and password, to invoke the service.
@@ -1436,7 +1514,7 @@ namespace CostToInvoiceButton
                 bool res = true;
                 foreach (DataGridViewRow dgvRenglon in dataGridInvoice.Rows)
                 {
-                    if (txtIdService.Text == dgvRenglon.Cells[7].Value.ToString())
+                    if (txtIdService.Text == dgvRenglon.Cells["Currency"].Value.ToString())
                     {
                         res = false;
                     }
@@ -1457,7 +1535,7 @@ namespace CostToInvoiceButton
                 foreach (DataGridViewRow dgvRenglon in dataGridInvoice.Rows)
                 {
                     ItiPrices itiPrices = new ItiPrices();
-                    itiPrices.Itinerarie = String.IsNullOrEmpty(dgvRenglon.Cells[8].Value.ToString()) ? 0 : Convert.ToInt32(dgvRenglon.Cells[8].Value);
+                    itiPrices.Itinerarie = String.IsNullOrEmpty(dgvRenglon.Cells["Itinerary"].Value.ToString()) ? 0 : Convert.ToInt32(dgvRenglon.Cells["Itinerary"].Value);
                     itiPrices.Limit = getGrupoLogLimitItinerary(itiPrices.Itinerarie);
                     itineraries.Add(itiPrices);
                 }
@@ -1644,11 +1722,12 @@ namespace CostToInvoiceButton
                         */
                         else
                         {
-                            definicion += "str_item_number:'" + txtItemNumber.Text +
-                                "',$or:[{str_icao_iata_code:{$exists:false}},{str_icao_iata_code:'" + txtAirport.Text + "'}]" +
-                                ",$or:[{str_aircraft_type:{$exists:false}},{str_aircraft_type:'" + txtICAOD.Text + "'}]" +
-                                ",str_ft_arrival:'" + arr_type.ToString() + "', str_ft_depart: '" + dep_type.ToString() +
-                                "',str_schedule_type:'" + txtMainHour.Text + "'}";
+                            definicion += "str_item_number:'" + txtItemNumber.Text + "'" +
+                                ",str_ft_arrival:'" + arr_type.ToString() + "'" +
+                                ",str_ft_depart:'" + dep_type.ToString() + "'" +
+                                ",str_schedule_type:'" + txtMainHour.Text + "'" +
+                                ",$and:[{$or:[{str_icao_iata_code:'" + txtAirport.Text + "'},{str_icao_iata_code:{$exists:false}}]}," +
+                                "{$or:[{str_aircraft_type:'" + txtICAOD.Text + "'},{str_aircraft_type:{$exists:false}}]}]}";
                         }
                         definicion += "&orderby=flo_cost,flo_cost:asc";
                     }
@@ -1889,14 +1968,18 @@ namespace CostToInvoiceButton
                     }
                     else if (txtCustomerClass.Text == "NTJET")
                     {
-                        definicion += "str_item_number:'" + txtItemNumber.Text +
-                            "',$or:[{str_icao_iata_code:{$exists:false}},{str_icao_iata_code:'" + txtAirport.Text + "'}]" +
-                            ",$or:[{str_aircraft_type:{$exists:false}},{str_aircraft_type:'" + txtICAOD.Text + "'}]" +
-                            ",bol_int_flight_cargo:'0'" +
-                            ",str_ft_arrival:'" + arr_type.ToString() + "', str_ft_depart: '" + dep_type.ToString() +
-                            "',str_schedule_type:'" + txtMainHour.Text +
-                            "',str_client_category:'NTJET'}";
+
+                        definicion += "str_item_number:'" + txtItemNumber.Text + "'" +
+                                ",str_ft_arrival:'" + arr_type.ToString() + "'" +
+                                ",str_ft_depart:'" + dep_type.ToString() + "'" +
+                                ",str_schedule_type:'" + txtMainHour.Text + "'" +
+                                ",bol_int_flight_cargo:'0'" +
+                                ",str_client_category:'NTJET'" +
+                                ",$and:[{$or:[{str_icao_iata_code:'" + txtAirport.Text + "'},{str_icao_iata_code:{$exists:false}}]}," +
+                                "{$or:[{str_aircraft_type:'" + txtICAOD.Text + "'},{str_aircraft_type:{$exists:false}}]}]}";
                     }
+                    // MANEJO DE ITEMS ADICIONALES ANTERIORES
+                    /*
                     else if (txtItemNumber.Text == "ASECSAS0073")
                     {
                         definicion += "str_item_number:'" + txtItemNumber.Text + "',str_icao_iata_code:'" + txtAirport.Text + "',str_client_category:'ASI_SECURITY'} ";
@@ -1910,6 +1993,7 @@ namespace CostToInvoiceButton
                     {
                         definicion += "str_item_number:'" + txtItemNumber.Text + "',str_icao_iata_code:'" + txtAirport.Text + "'}";
                     }
+                    */
                     /*
                     else if (txtItemNumber.Text == "ATPRIAP304")
                     {
@@ -1922,16 +2006,18 @@ namespace CostToInvoiceButton
                     */
                     else
                     {
-                        definicion += "str_item_number:'" + txtItemNumber.Text +
-                            "',$or:[{str_icao_iata_code:{$exists:false}},{str_icao_iata_code:'" + txtAirport.Text + "'}]" +
-                            ",$or:[{str_aircraft_type:{$exists:false}},{str_aircraft_type:'" + txtICAOD.Text + "'}]" +
-                            ",$or:[{str_aircraft_group:{$exists:false}},{str_aircraft_group:'" + grupo.ToString() + "'}]" +
-                            ",bol_int_flight_cargo:" + cargo.ToString() +
-                            ",str_ft_arrival:'" + arr_type.ToString() + "', str_ft_depart: '" + dep_type.ToString() +
-                            "',str_schedule_type:'" + txtMainHour.Text +
-                            "',$or:[{str_client_category:{$exists:false}},{str_client_category:{$like:'" + txtCustomerClass.Text.Replace("&", "%") + "'}}]}";
+
+                        definicion += "str_item_number:'" + txtItemNumber.Text + "'" +
+                                ",str_ft_arrival:'" + arr_type.ToString() + "'" +
+                                ",str_ft_depart:'" + dep_type.ToString() + "'" +
+                                ",str_schedule_type:'" + txtMainHour.Text + "'" +
+                                ",bol_int_flight_cargo:'" + cargo.ToString() + "'" +
+                                ",$and:[{$or:[{str_icao_iata_code:'" + txtAirport.Text + "'},{str_icao_iata_code:{$exists:false}}]}," +
+                                "{$or:[{str_aircraft_group:'" + grupo.ToString() + "'},{str_aircraft_group:{$exists:false}}]},"+
+                                "{$or:[{str_client_category:{$like:'" + txtCustomerClass.Text.Replace("&", "%") + "'}},{str_client_category:{$exists:false}}]}," +
+                                "{$or:[{str_aircraft_type:'" + txtICAOD.Text + "'},{str_aircraft_type:{$exists:false}}]}]}";
                     }
-                    definicion += "&orderby=flo_amount,flo_amount:asc";
+                    // definicion += "&orderby=flo_amount,flo_amount:asc";
                 }
                 global.LogMessage("GETPricesdef:" + definicion + "SRType:" + lblSrType.Text);
                 var request = new RestRequest("rest/v6/customPrecios/" + definicion, Method.GET);
@@ -1962,12 +2048,18 @@ namespace CostToInvoiceButton
                             DateTime inicio = DateTime.Parse(item.str_start_date + " " + "00:00");
                             DateTime fin = DateTime.Parse(item.str_end_date + " " + "23:59");
                             DateTime fecha = DateTime.Parse(txtATA.Text);
-
                             if (fecha.CompareTo(inicio) >= 0 && fecha.CompareTo(fin) <= 0)
                             {
+                                //MessageBox.Show("Precio: " + item.flo_amount);
                                 price = item.flo_amount;
                                 Curr = item.str_currency_code;
                                 OUM = item.str_oum_code;
+                                String cClass = "";
+                                cClass = String.IsNullOrEmpty(item.str_client_category) ? " " : item.str_client_category;
+                                if (txtCustomerClass.Text == cClass)
+                                {
+                                    break;
+                                }
                             }
                         }
                     }
@@ -1978,7 +2070,6 @@ namespace CostToInvoiceButton
                             DateTime inicio = DateTime.Parse(item.str_start_date + " " + "00:00");
                             DateTime fin = DateTime.Parse(item.str_end_date + " " + "23:59");
                             DateTime fecha = DateTime.Parse(GetSRCreationDate(Convert.ToInt32(lblIdIncident.Text)));
-
                             if (fecha.CompareTo(inicio) >= 0 && fecha.CompareTo(fin) <= 0)
                             {
                                 price = item.flo_amount;
@@ -2009,10 +2100,12 @@ namespace CostToInvoiceButton
                     DateTime date = DateTime.Parse(txtATA.Text);
                     price = ((Convert.ToDouble(txtCost.Text) + (Convert.ToDouble(txtCost.Text) * GetUtilidadPercentage(txtUtilidad.Text) / 100)) / getExchangeRateSemanal(date));
                 }
+                /*
                 if (isComponent())
                 {
                     price = 0;
                 }
+                */
                 if (lblSrType.Text == "CATERING")
                 {
                     price = Convert.ToDouble(txtPrice.Text);
@@ -2022,7 +2115,6 @@ namespace CostToInvoiceButton
             catch (Exception ex)
             {
                 global.LogMessage("GetPrices: " + ex.Message + "Detalle: " + ex.StackTrace);
-
                 return 0;
             }
         }
@@ -2099,7 +2191,6 @@ namespace CostToInvoiceButton
                 string User = Encoding.UTF8.GetString(Convert.FromBase64String("aW1wbGVtZW50YWRvcg=="));
                 string Pass = Encoding.UTF8.GetString(Convert.FromBase64String("U2luZXJneSoyMDE4"));
                 client.Authenticator = new HttpBasicAuthenticator("servicios", "Sinergy*2018");
-
                 //string definicion = "?totalResults=false&q={str_item_number:'" + dataGridServicios.Rows[e.RowIndex].Cells[1].FormattedValue.ToString().Trim() + "',str_icao_iata_code:'" + airtport + "'}";
                 string definicion = "?q={str_tipo:'FUEL',str_categoria:'" + Combustible + "'} ";
                 var request = new RestRequest("rest/v6/customCategorias/" + definicion, Method.GET);
@@ -2420,7 +2511,7 @@ namespace CostToInvoiceButton
             {
                 DateTime ATA = DateTime.Parse(ata);
                 DateTime ATD = DateTime.Parse(atd);
-
+                global.LogMessage("GetMainHourFBOFCC:     ATA" + ATA.ToString() + "     ATD" + ATD.ToString());
                 string hour = "EXTRAORDINARIO";
                 string hourata = "EXTRAORDINARIO";
                 string houratd = "EXTRAORDINARIO";
@@ -3119,14 +3210,6 @@ namespace CostToInvoiceButton
                 return 0;
             }
         }
-        private void txtUOM_TextChanged(object sender, EventArgs e)
-        {
-
-        }
-        private void DoubleScreen_Load(object sender, EventArgs e)
-        {
-
-        }
         private void txtCost_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Enter)
@@ -3197,7 +3280,7 @@ namespace CostToInvoiceButton
                         {
                             // cboCurrency.Text = "USD";
                             DateTime date = DateTime.Parse(txtATA.Text);
-                            pricefinal = Math.Round(((Convert.ToDouble(txtCost.Text) + (Convert.ToDouble(txtCost.Text) * GetUtilidadPercentage(txtUtilidad.Text) / 100)) / getExchangeRateSemanal(date)), 4, MidpointRounding.AwayFromZero);
+                            pricefinal = Math.Round(((Convert.ToDouble(txtCost.Text) + (Convert.ToDouble(txtCost.Text) * GetUtilidadPercentage(txtUtilidad.Text) / 100)) / getExchangeRateSemanal(date)), 2, MidpointRounding.AwayFromZero);
                         }
                         if (txtItemNumber.Text == "ASECSAS0073")
                         {

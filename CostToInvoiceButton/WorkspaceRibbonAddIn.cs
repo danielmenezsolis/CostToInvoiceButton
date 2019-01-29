@@ -41,8 +41,6 @@ namespace CostToInvoiceButton
         public string SRType { get; set; }
         public string SENCat { get; set; }
         public string ClientName { get; set; }
-
-
         public WorkspaceRibbonAddIn(bool inDesignMode, IRecordContext RecordContext, IGlobalContext globalContext)
         {
             if (inDesignMode == false)
@@ -53,7 +51,6 @@ namespace CostToInvoiceButton
                 RecordContext.Saving += new CancelEventHandler(RecordContext_Saving);
             }
         }
-
         private void RecordContext_Saving(object sender, CancelEventArgs e)
         {
             try
@@ -72,7 +69,7 @@ namespace CostToInvoiceButton
             {
                 if (Init())
                 {
-                    recordContext.ExecuteEditorCommand(EditorCommand.Save);
+                    // recordContext.ExecuteEditorCommand(EditorCommand.Save);
                     ClientName = "";
                     string Utilidad = "";
                     string Royalty = "";
@@ -132,6 +129,11 @@ namespace CostToInvoiceButton
                     IncidentID = Incident.ID;
                     ICAO = getICAODesi(IncidentID);
                     cClass = getCustomerClass(IncidentID);
+                    if (cClass == "")
+                    {
+                        MessageBox.Show("Client Class is null." + "\n" + "'GENERALES' class will be used.");
+                        cClass = "GENERALES";
+                    }
                     SRType = GetSRType();
                     AircraftCategory = GetCargoGroup(ICAO);
                     AircraftPCategory = GetPaxGroup(ICAO);
@@ -265,6 +267,7 @@ namespace CostToInvoiceButton
                     }
                     if (SRType == "FCC")
                     {
+                        // GetDeleteMCreated();
                         var FCCServices = servicios.DistinctBy(b => b.Itinerary).ToList();
                         ComponentChild component = new ComponentChild();
                         foreach (Services item in FCCServices)
@@ -273,7 +276,8 @@ namespace CostToInvoiceButton
                             //component.ItemNumber = getFBOItemNumber(Convert.ToInt32(item.Itinerary));
                             if (ClientName.Contains("NETJETS"))
                             {
-                                component.ItemNumber = "AIPRTFE0179";
+                                GetDeleteGF_PF();
+                                component.ItemNumber = "AFREISP0179";
                                 if (!String.IsNullOrEmpty(component.ItemNumber))
                                 {
                                     component.ItemDescription = "";
@@ -292,6 +296,7 @@ namespace CostToInvoiceButton
                             }
                             if (ClientName.Contains("GULF AND CARIB"))
                             {
+                                GetDeleteGF_PF();
                                 string iNumber = "ASORTER237";
                                 Services service = new Services();
                                 component = new ComponentChild();
@@ -310,6 +315,7 @@ namespace CostToInvoiceButton
                                 {
                                     InsertComponent(component);
                                 }
+
                                 string iNumber1 = "DSORTER236";
                                 Services service1 = new Services();
                                 ComponentChild component1 = new ComponentChild();
@@ -332,30 +338,34 @@ namespace CostToInvoiceButton
                             double minover = 0;
                             double antelacion = 0;
                             double extension = 0;
-                            if (!AirportOpen24(Convert.ToInt32(item.Itinerary)))
+                            if (AirportOpen24(Convert.ToInt32(item.Itinerary)) != false)
                             {
                                 int arrival = getArrivalAirport(Convert.ToInt32(item.Itinerary));
                                 if (arrival != 0)
                                 {
                                     DateTime openDate;
                                     DateTime closeDate;
-
                                     string open = getOpenArrivalAirport(arrival);
                                     string close = getCloseArrivalAirport(arrival);
-                                    DateTime ATA = getATAItinerary(Convert.ToInt32(item.Itinerary)).ToUniversalTime();
-                                    DateTime ATD = getATDItinerary(Convert.ToInt32(item.Itinerary)).ToUniversalTime();
-                                    openDate = DateTime.Parse(ATA.Date.ToShortDateString() + " " + open).ToUniversalTime();
-                                    closeDate = DateTime.Parse(ATA.Date.ToShortDateString() + " " + close).ToUniversalTime();
+                                    DateTime ATA = getATAItinerary(Convert.ToInt32(item.Itinerary));//.ToUniversalTime();
+                                    DateTime ATD = getATDItinerary(Convert.ToInt32(item.Itinerary));//.ToUniversalTime();
+                                    global.LogMessage("ATA: " + ATA.ToString() + "\nATD: " + ATD.ToString());
+                                    openDate = DateTime.Parse(ATA.Date.ToShortDateString() + " " + open);//.ToUniversalTime();
+                                    closeDate = DateTime.Parse(ATA.Date.ToShortDateString() + " " + close);//.ToUniversalTime();
+                                    global.LogMessage("openDate: " + openDate.ToString() + "\ncloseDate: " + closeDate.ToString());
                                     if (IsBetween(ATA, openDate, closeDate))
                                     {
                                         antelacion = (ATA - openDate).TotalMinutes;
                                     }
-                                    // MessageBox.Show("llegada: " + antelacion.ToString());
+                                    global.LogMessage("Antelacion: " + antelacion.ToString());
                                     extension = ((ATD - openDate).TotalMinutes) + 15;
-                                    if (ATA.Date != ATD.Date)
+                                    global.LogMessage("Extension: " + extension.ToString());
+                                    if (ATA.DayOfYear.ToString() != ATD.DayOfYear.ToString())
                                     {
+                                        global.LogMessage("ATA.Date != ATD.Date");
                                         openDate = DateTime.Parse(ATD.Date.ToShortDateString() + " " + open);
                                         closeDate = DateTime.Parse(ATD.Date.ToShortDateString() + " " + close);
+                                        global.LogMessage("openDate: " + openDate.ToString() + "\ncloseDate: " + closeDate.ToString());
                                         if (IsBetween(ATD, openDate, closeDate))
                                         {
                                             extension = ((ATD - openDate).TotalMinutes) + 15;
@@ -365,15 +375,17 @@ namespace CostToInvoiceButton
                                             extension = 0;
                                         }
                                     }
-                                    //MessageBox.Show("salida: " + extension.ToString());
+                                    global.LogMessage("Después de validar día.\nExtensión: " + extension.ToString());
                                     if (extension > 0)
                                     {
                                         minover = extension < 0 ? 0 : extension;
                                     }
-                                    if (ATA.Date != ATD.Date)
+                                    global.LogMessage("Extensión mayor a 0.\nExtensión: " + extension.ToString() + "\nMinutos de overtime: " + minover.ToString());
+                                    if (ATA.DayOfYear.ToString() != ATD.DayOfYear.ToString())
                                     {
                                         minover = (antelacion < 0 ? 0 : antelacion) + (extension < 0 ? 0 : extension);
                                     }
+                                    global.LogMessage("Días distintos.\nExtensión: " + extension.ToString() + "\nMinutos de overtime: " + minover.ToString());
                                     if (minover != 0)
                                     {
                                         if (antelacion > 0 && extension == 0)
@@ -462,7 +474,7 @@ namespace CostToInvoiceButton
                             }
                             */
                         }
-                        
+
                         servicios.Clear();
                         servicios = GetListServices();
                     }
@@ -470,15 +482,22 @@ namespace CostToInvoiceButton
                     doubleScreen = new DoubleScreen(global, recordContext);
                     DgvServicios = ((DataGridView)doubleScreen.Controls["dataGridServicios"]);
                     DgvServicios.DataSource = servicios;
-                    /*
-                    DgvServicios.Columns[3].Visible = false;
-                    DgvServicios.Columns[4].Visible = false;
-                    DgvServicios.Columns[5].Visible = false;
-                    DgvServicios.Columns[6].Visible = false;
-                    DgvServicios.Columns[7].Visible = false;
-                    DgvServicios.Columns[8].Visible = false;
-                    DgvServicios.Columns[13].Visible = false;
-                    */
+                    
+                    // OCULTAR COLUMNAS
+                    DgvServicios.Columns["Supplier"].Visible = false;
+                    DgvServicios.Columns["InvoiceInternal"].Visible = false;
+                    DgvServicios.Columns["Itinerary"].Visible = false;
+                    DgvServicios.Columns["Pax"].Visible = false;
+                    DgvServicios.Columns["Task"].Visible = false;
+                    DgvServicios.Columns["Informative"].Visible = false;
+                    DgvServicios.Columns["ParentPax"].Visible = false;
+                    DgvServicios.Columns["Categorias"].Visible = false;
+                    DgvServicios.Columns["FuelId"].Visible = false;
+                    DgvServicios.Columns["CobroParticipacionNJ"].Visible = false;
+                    DgvServicios.Columns["ParticipacionCobro"].Visible = false;
+                    DgvServicios.Columns["Site"].Visible = false;
+                    DgvServicios.Columns["Tax"].Visible = false;
+                    
                     DgvServicios.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.DisplayedCells;
                     ((System.Windows.Forms.Label)doubleScreen.Controls["lblSrType"]).Text = SRType.ToUpper();
                     ((System.Windows.Forms.Label)doubleScreen.Controls["lblIdIncident"]).Text = IncidentID.ToString();
@@ -672,7 +691,6 @@ namespace CostToInvoiceButton
             {
                 MessageBox.Show("GetAirportUse: " + ex.Message + "Detail: " + ex.StackTrace);
                 return null;
-
             }
         }
         public string getFBOItemNumber(int Itinerary)
@@ -735,11 +753,11 @@ namespace CostToInvoiceButton
             try
             {
                 bool open = true;
-
                 ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
                 APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
                 clientInfoHeader.AppID = "Query Example";
                 String queryString = "SELECT ArrivalAirport.HoursOpen24 FROM Co.Itinerary  WHERE ID =" + Itinerarie;
+                global.LogMessage("AirportOpen24: " + queryString);
                 clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 1, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
                 foreach (CSVTable table in queryCSV.CSVTables)
                 {
@@ -763,11 +781,11 @@ namespace CostToInvoiceButton
         public int getArrivalAirport(int Itinerarie)
         {
             int arriv = 0;
-
             ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
             APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
             clientInfoHeader.AppID = "Query Example";
             String queryString = "SELECT ArrivalAirport FROM Co.Itinerary  WHERE ID =" + Itinerarie;
+            global.LogMessage("getArrivalAirport query: " + queryString);
             clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 1, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
             foreach (CSVTable table in queryCSV.CSVTables)
             {
@@ -786,6 +804,7 @@ namespace CostToInvoiceButton
             APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
             clientInfoHeader.AppID = "Query Example";
             String queryString = "SELECT OpensZuluTime FROM Co.Airport_WorkingHours  WHERE Airports =" + Arrival;
+            global.LogMessage("getOpenArrivalAirport query:" + queryString);
             clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 1, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
             foreach (CSVTable table in queryCSV.CSVTables)
             {
@@ -804,6 +823,7 @@ namespace CostToInvoiceButton
             APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
             clientInfoHeader.AppID = "Query Example";
             String queryString = "SELECT ClosesZuluTime  FROM Co.Airport_WorkingHours  WHERE Airports =" + Arrival;
+            global.LogMessage("getCloseArrivalAirport query:" + queryString);
             clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 1, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
             foreach (CSVTable table in queryCSV.CSVTables)
             {
@@ -824,6 +844,7 @@ namespace CostToInvoiceButton
                 APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
                 clientInfoHeader.AppID = "Query Example";
                 String queryString = "SELECT ATA,ATATime FROM Co.Itinerary WHERE ID = " + Itinerarie;
+                global.LogMessage("getATAItinerary query:" + queryString);
                 clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 1, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
                 foreach (CSVTable table in queryCSV.CSVTables)
                 {
@@ -852,6 +873,7 @@ namespace CostToInvoiceButton
                 APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
                 clientInfoHeader.AppID = "Query Example";
                 String queryString = "SELECT ATD,ATDTime FROM Co.Itinerary WHERE ID = " + Itinerarie;
+                global.LogMessage("getATDItinerary query:" + queryString);
                 clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 1, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
                 foreach (CSVTable table in queryCSV.CSVTables)
                 {
@@ -1352,29 +1374,28 @@ namespace CostToInvoiceButton
                 ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
                 APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
                 clientInfoHeader.AppID = "Query Example";
-                String queryString = "SELECT ID,ItemNumber,ItemDescription,Airport,IDProveedor,Costo,Precio,InternalInvoice,Itinerary,Paquete,Componente,Informativo,ParentPaxID,Categories,fuel_id,CobroParticipacionNj,ParticipacionCobro,Site,IVA FROM CO.Services WHERE Incident =" + IncidentID + " AND Informativo = '0' AND (Componente IS NULL OR Componente  = '0') ORDER BY ID ASC, Itinerary ASC, ParentPaxId ASC";
-                if (ClientName.Contains("NETJETS"))
-                {
-                    queryString = "SELECT ID,ItemNumber,ItemDescription,Airport,IDProveedor,Costo,Precio,InternalInvoice,Itinerary,Paquete,Componente,Informativo,ParentPaxID,Categories,fuel_id,CobroParticipacionNj,ParticipacionCobro,Site,IVA FROM CO.Services WHERE Incident =" + IncidentID + " AND Informativo = '0' AND ((Componente IS NULL OR Componente  = '1') AND Paquete =  '0') ORDER BY ID ASC, Itinerary ASC, ParentPaxId ASC";
-                }
-                global.LogMessage(queryString);
+                String queryString = "SELECT ID,ItemNumber,ItemDescription,Airport,IDProveedor,Costo,Precio,InternalInvoice,Itinerary,Paquete,Componente,Informativo,ParentPaxID,Categories,fuel_id,CobroParticipacionNj,ParticipacionCobro,Site,IVA,ListoFactura FROM CO.Services WHERE Incident =" + IncidentID + " AND Informativo = '0' AND (Componente IS NULL OR Componente  = '0') ORDER BY ID ASC, Itinerary ASC, ParentPaxId ASC";
+                /*if (ClientName.Contains("NETJET")) {
+                    queryString = "SELECT ID,ItemNumber,ItemDescription,Airport,IDProveedor,Costo,Precio,InternalInvoice,Itinerary,Paquete,Componente,Informativo,ParentPaxID,Categories,fuel_id,CobroParticipacionNj,ParticipacionCobro,Site,IVA FROM CO.Services WHERE Incident =" + IncidentID + " AND Informativo = '0' ORDER BY ID ASC, Itinerary ASC, ParentPaxId ASC";
+                }*/
+                global.LogMessage("GetListServices: " + queryString);
                 clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 10000, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
                 foreach (CSVTable table in queryCSV.CSVTables)
                 {
                     String[] rowData = table.Rows;
-
                     foreach (String data in rowData)
                     {
                         Services service = new Services();
                         Char delimiter = '|';
                         string[] substrings = data.Split(delimiter);
+                        service.InvoiceReady = substrings[19] == "1" ? "Yes" : "No";
                         service.ID = substrings[0];
                         service.ItemNumber = substrings[1];
                         service.Description = substrings[2].Replace('"', ' ').Trim();
                         service.Airport = substrings[3].Replace('_', '-').Trim();
                         service.Supplier = substrings[4].Replace('"', ' ').Trim();
-                        service.Cost = substrings[5];
-                        service.Price = substrings[6];
+                        service.UnitCost = substrings[5];
+                        service.UnitPrice = substrings[6];
                         service.InvoiceInternal = substrings[7];
                         service.Itinerary = substrings[8];
                         service.Pax = substrings[9] == "1" ? "Yes" : "No";
@@ -1434,6 +1455,33 @@ namespace CostToInvoiceButton
                 APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
                 clientInfoHeader.AppID = "Query Example";
                 String queryString = "SELECT ID FROM CO.Services WHERE ManualCreated = '1' AND Incident = " + IncidentID;
+                clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 10000, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
+                if (queryCSV.CSVTables.Length > 0)
+                {
+                    foreach (CSVTable table in queryCSV.CSVTables)
+                    {
+                        String[] rowData = table.Rows;
+                        foreach (String data in rowData)
+                        {
+                            DeleteServices(Convert.ToInt32(data));
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+        public void GetDeleteGF_PF()
+        {
+            try
+            {
+
+                ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
+                APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
+                clientInfoHeader.AppID = "Query Example";
+                String queryString = "SELECT ID FROM CO.Services WHERE (ItemNumber = 'ASORTER237' OR ItemNumber = 'DSORTER236' OR ItemNumber = 'AFREISP0179') AND Incident = " + IncidentID;
                 clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 10000, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
                 if (queryCSV.CSVTables.Length > 0)
                 {
@@ -1516,7 +1564,6 @@ namespace CostToInvoiceButton
         {
             try
             {
-
                 string envelope = "<soapenv:Envelope" +
                  "   xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\"" +
                  "   xmlns:typ=\"http://xmlns.oracle.com/apps/scm/productModel/items/structures/structureServiceV2/types/\"" +
@@ -2093,7 +2140,7 @@ namespace CostToInvoiceButton
         {
             try
             {
-                string clase = "GENERALES";
+                string clase = "";
                 ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
                 APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
                 clientInfoHeader.AppID = "Query Example";
@@ -2112,7 +2159,7 @@ namespace CostToInvoiceButton
             catch (Exception ex)
             {
                 MessageBox.Show("getCustomerClass" + ex.Message + "Det" + ex.StackTrace);
-                return " ";
+                return "";
             }
         }
         public string getICAODesi(int Incident)
@@ -2879,11 +2926,11 @@ namespace CostToInvoiceButton
         }
         public string Text
         {
-            get { return "Invoice to Cost"; }
+            get { return "Income and Outcome"; }
         }
         public string Tooltip
         {
-            get { return "Create Invoice"; }
+            get { return "Income and Outcome screen."; }
         }
         public bool Initialize(IGlobalContext GlobalContext)
         {

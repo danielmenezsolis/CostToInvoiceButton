@@ -43,7 +43,6 @@
             this.quitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.dataGridSuppliers = new System.Windows.Forms.DataGridView();
             this.dataGridServicios = new System.Windows.Forms.DataGridView();
-            this.chkInvoiceReady = new System.Windows.Forms.DataGridViewCheckBoxColumn();
             this.txtIdService = new System.Windows.Forms.TextBox();
             this.label7 = new System.Windows.Forms.Label();
             this.label6 = new System.Windows.Forms.Label();
@@ -61,19 +60,6 @@
             this.txtItemNumber = new System.Windows.Forms.TextBox();
             this.BtnAdd = new System.Windows.Forms.Button();
             this.dataGridInvoice = new System.Windows.Forms.DataGridView();
-            this.Item = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Vendor = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Quantity = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Cost = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Price = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Amount = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.IdService = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Currency = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Itinerary = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.RoyaltyItem = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.ParticipacionCobro = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.EditColumn = new System.Windows.Forms.DataGridViewButtonColumn();
-            this.DeleteColumn = new System.Windows.Forms.DataGridViewButtonColumn();
             this.label10 = new System.Windows.Forms.Label();
             this.label11 = new System.Windows.Forms.Label();
             this.label12 = new System.Windows.Forms.Label();
@@ -131,6 +117,18 @@
             this.txtPackage = new System.Windows.Forms.TextBox();
             this.txtTotalCostFuel = new System.Windows.Forms.TextBox();
             this.lblTotalCostFuel = new System.Windows.Forms.Label();
+            this.txtInvoiceReady = new System.Windows.Forms.TextBox();
+            this.InvoiceReady = new System.Windows.Forms.DataGridViewCheckBoxColumn();
+            this.Item = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Vendor = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Quantity = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Cost = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Price = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Amount = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.IdService = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Currency = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.EditColumn = new System.Windows.Forms.DataGridViewButtonColumn();
+            this.DeleteColumn = new System.Windows.Forms.DataGridViewButtonColumn();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridSuppliers)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridServicios)).BeginInit();
@@ -234,8 +232,6 @@
             dataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
             this.dataGridServicios.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle3;
             this.dataGridServicios.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridServicios.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
-            this.chkInvoiceReady});
             dataGridViewCellStyle4.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
             dataGridViewCellStyle4.BackColor = System.Drawing.SystemColors.Window;
             dataGridViewCellStyle4.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -254,13 +250,7 @@
             this.dataGridServicios.Size = new System.Drawing.Size(961, 248);
             this.dataGridServicios.TabIndex = 4;
             this.dataGridServicios.TabStop = false;
-            this.dataGridServicios.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridServicios_CellContentClick);
             this.dataGridServicios.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridServicios_CellDoubleClick);
-            // 
-            // chkInvoiceReady
-            // 
-            this.chkInvoiceReady.HeaderText = "Invoice Ready";
-            this.chkInvoiceReady.Name = "chkInvoiceReady";
             // 
             // txtIdService
             // 
@@ -381,7 +371,6 @@
             this.txtPrice.Name = "txtPrice";
             this.txtPrice.Size = new System.Drawing.Size(100, 20);
             this.txtPrice.TabIndex = 23;
-            this.txtPrice.TextChanged += new System.EventHandler(this.txtPrice_TextChanged);
             // 
             // txtItemNumber
             // 
@@ -394,6 +383,7 @@
             // 
             // BtnAdd
             // 
+            this.BtnAdd.DialogResult = System.Windows.Forms.DialogResult.Cancel;
             this.BtnAdd.Location = new System.Drawing.Point(6, 469);
             this.BtnAdd.Name = "BtnAdd";
             this.BtnAdd.Size = new System.Drawing.Size(75, 23);
@@ -422,6 +412,7 @@
             this.dataGridInvoice.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle5;
             this.dataGridInvoice.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dataGridInvoice.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.InvoiceReady,
             this.Item,
             this.Vendor,
             this.Quantity,
@@ -430,9 +421,6 @@
             this.Amount,
             this.IdService,
             this.Currency,
-            this.Itinerary,
-            this.RoyaltyItem,
-            this.ParticipacionCobro,
             this.EditColumn,
             this.DeleteColumn});
             dataGridViewCellStyle6.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
@@ -462,104 +450,6 @@
             this.dataGridInvoice.TabIndex = 40;
             this.dataGridInvoice.TabStop = false;
             this.dataGridInvoice.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridInvoice_CellContentClick);
-            // 
-            // Item
-            // 
-            this.Item.Frozen = true;
-            this.Item.HeaderText = "Item";
-            this.Item.Name = "Item";
-            this.Item.Width = 52;
-            // 
-            // Vendor
-            // 
-            this.Vendor.Frozen = true;
-            this.Vendor.HeaderText = "Vendor";
-            this.Vendor.Name = "Vendor";
-            this.Vendor.Width = 66;
-            // 
-            // Quantity
-            // 
-            this.Quantity.Frozen = true;
-            this.Quantity.HeaderText = "Quantity";
-            this.Quantity.Name = "Quantity";
-            this.Quantity.Width = 71;
-            // 
-            // Cost
-            // 
-            this.Cost.Frozen = true;
-            this.Cost.HeaderText = "Cost p/unit";
-            this.Cost.Name = "Cost";
-            this.Cost.Width = 84;
-            // 
-            // Price
-            // 
-            this.Price.Frozen = true;
-            this.Price.HeaderText = "Price p/unit";
-            this.Price.Name = "Price";
-            this.Price.Width = 87;
-            // 
-            // Amount
-            // 
-            this.Amount.Frozen = true;
-            this.Amount.HeaderText = "Total Price";
-            this.Amount.Name = "Amount";
-            this.Amount.Width = 83;
-            // 
-            // IdService
-            // 
-            this.IdService.Frozen = true;
-            this.IdService.HeaderText = "Service ID";
-            this.IdService.Name = "IdService";
-            this.IdService.Width = 82;
-            // 
-            // Currency
-            // 
-            this.Currency.Frozen = true;
-            this.Currency.HeaderText = "Currency";
-            this.Currency.Name = "Currency";
-            this.Currency.ReadOnly = true;
-            this.Currency.Width = 74;
-            // 
-            // Itinerary
-            // 
-            this.Itinerary.Frozen = true;
-            this.Itinerary.HeaderText = "Itinerary";
-            this.Itinerary.Name = "Itinerary";
-            this.Itinerary.ReadOnly = true;
-            this.Itinerary.Width = 69;
-            // 
-            // RoyaltyItem
-            // 
-            this.RoyaltyItem.Frozen = true;
-            this.RoyaltyItem.HeaderText = "CobroParticipacionNj";
-            this.RoyaltyItem.Name = "RoyaltyItem";
-            this.RoyaltyItem.ReadOnly = true;
-            this.RoyaltyItem.Width = 131;
-            // 
-            // ParticipacionCobro
-            // 
-            this.ParticipacionCobro.Frozen = true;
-            this.ParticipacionCobro.HeaderText = "ParticipacionCobro";
-            this.ParticipacionCobro.Name = "ParticipacionCobro";
-            this.ParticipacionCobro.Width = 121;
-            // 
-            // EditColumn
-            // 
-            this.EditColumn.Frozen = true;
-            this.EditColumn.HeaderText = "Edit";
-            this.EditColumn.Name = "EditColumn";
-            this.EditColumn.Text = "Edit";
-            this.EditColumn.UseColumnTextForButtonValue = true;
-            this.EditColumn.Visible = false;
-            this.EditColumn.Width = 31;
-            // 
-            // DeleteColumn
-            // 
-            this.DeleteColumn.HeaderText = "Delete";
-            this.DeleteColumn.Name = "DeleteColumn";
-            this.DeleteColumn.Text = "Delete";
-            this.DeleteColumn.UseColumnTextForButtonValue = true;
-            this.DeleteColumn.Width = 44;
             // 
             // label10
             // 
@@ -937,7 +827,6 @@
             this.txtUOM.Name = "txtUOM";
             this.txtUOM.Size = new System.Drawing.Size(39, 20);
             this.txtUOM.TabIndex = 86;
-            this.txtUOM.TextChanged += new System.EventHandler(this.txtUOM_TextChanged);
             // 
             // lblCurrencyCost
             // 
@@ -1040,11 +929,94 @@
             this.lblTotalCostFuel.Text = "Total Cost";
             this.lblTotalCostFuel.Visible = false;
             // 
+            // txtInvoiceReady
+            // 
+            this.txtInvoiceReady.Location = new System.Drawing.Point(654, 456);
+            this.txtInvoiceReady.Name = "txtInvoiceReady";
+            this.txtInvoiceReady.Size = new System.Drawing.Size(35, 20);
+            this.txtInvoiceReady.TabIndex = 99;
+            this.txtInvoiceReady.TabStop = false;
+            // 
+            // InvoiceReady
+            // 
+            this.InvoiceReady.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
+            this.InvoiceReady.HeaderText = "Invoice Ready?";
+            this.InvoiceReady.Name = "InvoiceReady";
+            this.InvoiceReady.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this.InvoiceReady.Width = 79;
+            // 
+            // Item
+            // 
+            this.Item.HeaderText = "Item";
+            this.Item.Name = "Item";
+            this.Item.Width = 52;
+            // 
+            // Vendor
+            // 
+            this.Vendor.HeaderText = "Supplier";
+            this.Vendor.Name = "Vendor";
+            this.Vendor.Width = 70;
+            // 
+            // Quantity
+            // 
+            this.Quantity.HeaderText = "Quantity";
+            this.Quantity.Name = "Quantity";
+            this.Quantity.Width = 71;
+            // 
+            // Cost
+            // 
+            this.Cost.HeaderText = "Cost p/unit";
+            this.Cost.Name = "Cost";
+            this.Cost.Width = 78;
+            // 
+            // Price
+            // 
+            this.Price.HeaderText = "Price p/unit";
+            this.Price.Name = "Price";
+            this.Price.Width = 80;
+            // 
+            // Amount
+            // 
+            this.Amount.HeaderText = "Total Price";
+            this.Amount.Name = "Amount";
+            this.Amount.Width = 77;
+            // 
+            // IdService
+            // 
+            this.IdService.HeaderText = "Service ID";
+            this.IdService.Name = "IdService";
+            this.IdService.Width = 76;
+            // 
+            // Currency
+            // 
+            this.Currency.HeaderText = "Currency";
+            this.Currency.Name = "Currency";
+            this.Currency.ReadOnly = true;
+            this.Currency.Width = 74;
+            // 
+            // EditColumn
+            // 
+            this.EditColumn.HeaderText = "Edit";
+            this.EditColumn.Name = "EditColumn";
+            this.EditColumn.Text = "Edit";
+            this.EditColumn.UseColumnTextForButtonValue = true;
+            this.EditColumn.Visible = false;
+            this.EditColumn.Width = 31;
+            // 
+            // DeleteColumn
+            // 
+            this.DeleteColumn.HeaderText = "Delete";
+            this.DeleteColumn.Name = "DeleteColumn";
+            this.DeleteColumn.Text = "Delete";
+            this.DeleteColumn.UseColumnTextForButtonValue = true;
+            this.DeleteColumn.Width = 44;
+            // 
             // DoubleScreen
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(961, 651);
+            this.Controls.Add(this.txtInvoiceReady);
             this.Controls.Add(this.txtTotalCostFuel);
             this.Controls.Add(this.lblTotalCostFuel);
             this.Controls.Add(this.txtPackage);
@@ -1130,7 +1102,6 @@
             this.Name = "DoubleScreen";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "DoubleScreen";
-            this.Load += new System.EventHandler(this.DoubleScreen_Load);
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridSuppliers)).EndInit();
@@ -1219,6 +1190,13 @@
         private System.Windows.Forms.TextBox txtCustomerClass;
         private System.Windows.Forms.TextBox txtCreationIncidentDate;
         private System.Windows.Forms.TextBox txtPaxGroup;
+        private System.Windows.Forms.Label lblExchangeRate;
+        private System.Windows.Forms.TextBox txtExchangeRate;
+        private System.Windows.Forms.TextBox txtPackage;
+        private System.Windows.Forms.TextBox txtTotalCostFuel;
+        private System.Windows.Forms.Label lblTotalCostFuel;
+        private System.Windows.Forms.TextBox txtInvoiceReady;
+        private System.Windows.Forms.DataGridViewCheckBoxColumn InvoiceReady;
         private System.Windows.Forms.DataGridViewTextBoxColumn Item;
         private System.Windows.Forms.DataGridViewTextBoxColumn Vendor;
         private System.Windows.Forms.DataGridViewTextBoxColumn Quantity;
@@ -1227,16 +1205,7 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn Amount;
         private System.Windows.Forms.DataGridViewTextBoxColumn IdService;
         private System.Windows.Forms.DataGridViewTextBoxColumn Currency;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Itinerary;
-        private System.Windows.Forms.DataGridViewTextBoxColumn RoyaltyItem;
-        private System.Windows.Forms.DataGridViewTextBoxColumn ParticipacionCobro;
         private System.Windows.Forms.DataGridViewButtonColumn EditColumn;
         private System.Windows.Forms.DataGridViewButtonColumn DeleteColumn;
-        private System.Windows.Forms.Label lblExchangeRate;
-        private System.Windows.Forms.TextBox txtExchangeRate;
-        private System.Windows.Forms.TextBox txtPackage;
-        private System.Windows.Forms.DataGridViewCheckBoxColumn chkInvoiceReady;
-        private System.Windows.Forms.TextBox txtTotalCostFuel;
-        private System.Windows.Forms.Label lblTotalCostFuel;
     }
 }

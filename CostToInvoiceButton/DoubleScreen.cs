@@ -455,9 +455,10 @@ namespace CostToInvoiceButton
                             {
                                 RequestFormat = DataFormat.Json
                             };
+                            DataGridViewCheckBoxCell chk = (DataGridViewCheckBoxCell)dgvRenglon.Cells["InvoiceReady"];
                             var body = "{";
                             // Información de precios costos
-                            body += "\"ListoFactura\":" + dgvRenglon.Cells["InvoiceReady"].Value.ToString() + "\"," +
+                            body += "\"ListoFactura\":" + chk.EditedFormattedValue.ToString().ToLower() + "\"," +
                                 "\"Precio\":\"" + dgvRenglon.Cells["Price p/unit"].Value.ToString() + "\"," +
                                 "\"Costo\":\"" + dgvRenglon.Cells["Cost p/unit"].Value.ToString() + "\"";
                             if (!String.IsNullOrEmpty(dgvRenglon.Cells["Vendor"].Value.ToString()))
@@ -511,7 +512,7 @@ namespace CostToInvoiceButton
         }
         private void BtnAdd_Click(object sender, EventArgs e)
         {
-          
+
         }
         private void txtQty_TextChanged(object sender, EventArgs e)
         {
@@ -569,15 +570,18 @@ namespace CostToInvoiceButton
                         foreach (DataGridViewRow dgvRenglon in dataGridInvoice.Rows)
                         {
                             var client = new RestClient("https://iccsmx.custhelp.com/");
-                            var request = new RestRequest("/services/rest/connect/v1.4/CO.Services/" + dgvRenglon.Cells["Service ID"].Value.ToString() + "", Method.POST)
+                            var request = new RestRequest("/services/rest/connect/v1.4/CO.Services/" + dgvRenglon.Cells["IdService"].Value.ToString() + "", Method.POST)
                             {
                                 RequestFormat = DataFormat.Json
                             };
                             var body = "{";
                             // Información de precios costos
-                            body += "\"ListoFactura\":" + dgvRenglon.Cells["InvoiceReady"].Value.ToString() + "\"," +
-                                "\"Precio\":\"" + dgvRenglon.Cells["Price p/unit"].Value.ToString() + "\"," +
-                                "\"Costo\":\"" + dgvRenglon.Cells["Cost p/unit"].Value.ToString() + "\"";
+
+                            bool ready = Convert.ToBoolean(dgvRenglon.Cells["InvoiceReady"].Value);
+
+                            body += "\"ListoFactura\":" + ready.ToString().ToLower() + "," +
+                                "\"Precio\":\"" + dgvRenglon.Cells["Price"].Value.ToString() + "\"," +
+                                "\"Costo\":\"" + dgvRenglon.Cells["Cost"].Value.ToString() + "\"";
                             if (!String.IsNullOrEmpty(dgvRenglon.Cells["Vendor"].Value.ToString()))
                             {
                                 body += ",\"IDProveedor\":\"" + dgvRenglon.Cells["Vendor"].Value.ToString() + "\"";
@@ -625,6 +629,7 @@ namespace CostToInvoiceButton
         {
             if (e.RowIndex != -1)
             {
+
                 string action = dataGridInvoice.Rows[e.RowIndex].Cells[e.ColumnIndex].Value.ToString();
                 if (action == "Edit")
                 {
@@ -632,7 +637,7 @@ namespace CostToInvoiceButton
                 }
                 if (action == "Delete")
                 {
-                    DialogResult dialogResult = MessageBox.Show("¿Want to erase row?", "Double Screen", MessageBoxButtons.YesNo);
+                    DialogResult dialogResult = MessageBox.Show("Want to erase row?", "Double Screen", MessageBoxButtons.YesNo);
                     if (dialogResult == DialogResult.Yes)
                     {
                         dataGridInvoice.Rows.RemoveAt(e.RowIndex);
@@ -3290,22 +3295,22 @@ namespace CostToInvoiceButton
         {
             try
             {
-                
+
                 if (ValidateData())
                 {
-                
+
                     if (dataGridInvoice.RowCount <= dataGridServicios.RowCount - 1)
                     {
-                        
+
                         if (ValidateRows())
                         {
-                           
+
                             double amount = Math.Round((Convert.ToDouble(txtPrice.Text) * Convert.ToDouble(txtQty.Text)), 2);
                             bool invoi = txtInvoiceReady.Text == "1" ? true : false;
-                           
-                            dataGridInvoice.Rows.Add(invoi, txtItem.Text, cboSuppliers.Text, txtQty.Text, txtCost.Text, txtPrice.Text, amount, txtIdService.Text, cboCurrency.Text);
+
+                            dataGridInvoice.Rows.Add(invoi, txtItem.Text, cboSuppliers.Text, txtQty.Text, txtCost.Text, txtPrice.Text, amount, txtIdService.Text, cboCurrency.Text, txtItinerary.Text);
                             ClearTxtBoxes();
-                           
+
                         }
                         else
                         {

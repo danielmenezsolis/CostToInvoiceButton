@@ -484,7 +484,7 @@ namespace CostToInvoiceButton
                     DgvServicios.DataSource = servicios;
                     
                     // OCULTAR COLUMNAS
-                    
+                    /*
                     DgvServicios.Columns["Supplier"].Visible = false;
                     DgvServicios.Columns["InvoiceInternal"].Visible = false;
                     DgvServicios.Columns["Itinerary"].Visible = false;
@@ -498,7 +498,7 @@ namespace CostToInvoiceButton
                     DgvServicios.Columns["ParticipacionCobro"].Visible = false;
                     DgvServicios.Columns["Site"].Visible = false;
                     DgvServicios.Columns["Tax"].Visible = false;
-                    
+                    */
                     DgvServicios.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.DisplayedCells;
                     ((System.Windows.Forms.Label)doubleScreen.Controls["lblSrType"]).Text = SRType.ToUpper();
                     ((System.Windows.Forms.Label)doubleScreen.Controls["lblIdIncident"]).Text = IncidentID.ToString();

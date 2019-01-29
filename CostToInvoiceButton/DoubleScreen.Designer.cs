@@ -221,6 +221,7 @@
             this.dataGridServicios.AllowUserToOrderColumns = true;
             this.dataGridServicios.AllowUserToResizeColumns = false;
             this.dataGridServicios.AllowUserToResizeRows = false;
+            this.dataGridServicios.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
             this.dataGridServicios.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
             this.dataGridServicios.CellBorderStyle = System.Windows.Forms.DataGridViewCellBorderStyle.Raised;
             dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
@@ -231,7 +232,6 @@
             dataGridViewCellStyle3.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
             dataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
             this.dataGridServicios.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle3;
-            this.dataGridServicios.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             dataGridViewCellStyle4.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
             dataGridViewCellStyle4.BackColor = System.Drawing.SystemColors.Window;
             dataGridViewCellStyle4.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -398,7 +398,7 @@
             this.dataGridInvoice.AllowUserToDeleteRows = false;
             this.dataGridInvoice.AllowUserToResizeColumns = false;
             this.dataGridInvoice.AllowUserToResizeRows = false;
-            this.dataGridInvoice.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.ColumnHeader;
+            this.dataGridInvoice.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
             this.dataGridInvoice.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
             this.dataGridInvoice.CellBorderStyle = System.Windows.Forms.DataGridViewCellBorderStyle.None;
             this.dataGridInvoice.ColumnHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.Single;
@@ -949,50 +949,50 @@
             // 
             this.Item.HeaderText = "Item";
             this.Item.Name = "Item";
-            this.Item.Width = 52;
+            this.Item.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
             // 
             // Vendor
             // 
             this.Vendor.HeaderText = "Supplier";
             this.Vendor.Name = "Vendor";
-            this.Vendor.Width = 70;
+            this.Vendor.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
             // 
             // Quantity
             // 
             this.Quantity.HeaderText = "Quantity";
             this.Quantity.Name = "Quantity";
-            this.Quantity.Width = 71;
+            this.Quantity.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
             // 
             // Cost
             // 
             this.Cost.HeaderText = "Cost p/unit";
             this.Cost.Name = "Cost";
-            this.Cost.Width = 78;
+            this.Cost.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
             // 
             // Price
             // 
             this.Price.HeaderText = "Price p/unit";
             this.Price.Name = "Price";
-            this.Price.Width = 80;
+            this.Price.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
             // 
             // Amount
             // 
             this.Amount.HeaderText = "Total Price";
             this.Amount.Name = "Amount";
-            this.Amount.Width = 77;
+            this.Amount.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
             // 
             // IdService
             // 
             this.IdService.HeaderText = "Service ID";
             this.IdService.Name = "IdService";
-            this.IdService.Width = 76;
+            this.IdService.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
             // 
             // Currency
             // 
             this.Currency.HeaderText = "Currency";
             this.Currency.Name = "Currency";
             this.Currency.ReadOnly = true;
-            this.Currency.Width = 74;
+            this.Currency.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
             // 
             // EditColumn
             // 
@@ -1001,7 +1001,6 @@
             this.EditColumn.Text = "Edit";
             this.EditColumn.UseColumnTextForButtonValue = true;
             this.EditColumn.Visible = false;
-            this.EditColumn.Width = 31;
             // 
             // DeleteColumn
             // 
@@ -1009,7 +1008,6 @@
             this.DeleteColumn.Name = "DeleteColumn";
             this.DeleteColumn.Text = "Delete";
             this.DeleteColumn.UseColumnTextForButtonValue = true;
-            this.DeleteColumn.Width = 44;
             // 
             // DoubleScreen
             // 

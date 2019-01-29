@@ -513,15 +513,20 @@ namespace CostToInvoiceButton
         {
             try
             {
+                global.LogMessage("BtnAdd_Click: Inicio");
                 if (ValidateData())
                 {
+                    global.LogMessage("BtnAdd_Click: Valdación de datos");
                     if (dataGridInvoice.RowCount <= dataGridServicios.RowCount - 1)
                     {
+                        global.LogMessage("BtnAdd_Click: Mínimo un servicio");
                         if (ValidateRows())
                         {
+                            global.LogMessage("BtnAdd_Click: Validación de columna");
                             double amount = Math.Round((Convert.ToDouble(txtPrice.Text) * Convert.ToDouble(txtQty.Text)), 2);
                             dataGridInvoice.Rows.Add(Convert.ToBoolean(txtInvoiceReady.Text == "1" ? true : false), txtItem.Text, cboSuppliers.Text, txtQty.Text, txtCost.Text, txtPrice.Text, amount, txtIdService.Text, cboCurrency.Text);
                             ClearTxtBoxes();
+                            global.LogMessage("BtnAdd_Click: Se ingreso columna");
                         }
                         else
                         {

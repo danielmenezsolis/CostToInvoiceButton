@@ -484,6 +484,7 @@ namespace CostToInvoiceButton
                     DgvServicios.DataSource = servicios;
                     
                     // OCULTAR COLUMNAS
+                    
                     DgvServicios.Columns["Supplier"].Visible = false;
                     DgvServicios.Columns["InvoiceInternal"].Visible = false;
                     DgvServicios.Columns["Itinerary"].Visible = false;

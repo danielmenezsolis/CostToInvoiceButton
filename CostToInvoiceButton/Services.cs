@@ -7,10 +7,8 @@ namespace CostToInvoiceButton
 {
     public class Services
     {
-        [JsonProperty(PropertyName = "Invoice Ready")]
         public string InvoiceReady { get; set; }
         public string ID { get; set; }
-        [JsonProperty(PropertyName = "Item Number")]
         public string ItemNumber { get; set; }
         public string Description { get; set; }
         public string Airport { get; set; }

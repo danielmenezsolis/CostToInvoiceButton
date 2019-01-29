@@ -1090,7 +1090,6 @@
             this.Controls.Add(this.txtUtilidad);
             this.Controls.Add(this.txtCurrency);
             this.Controls.Add(this.label16);
-            this.Controls.Add(this.dataGridSuppliers);
             this.Controls.Add(this.label15);
             this.Controls.Add(this.label14);
             this.Controls.Add(this.label13);
@@ -1116,6 +1115,7 @@
             this.Controls.Add(this.BtnAdd);
             this.Controls.Add(this.dataGridServicios);
             this.Controls.Add(this.menuStrip1);
+            this.Controls.Add(this.dataGridSuppliers);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.menuStrip1;

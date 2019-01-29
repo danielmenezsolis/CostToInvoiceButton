@@ -195,7 +195,7 @@ namespace CostToInvoiceButton
                             component.ItemNumber = "ASFIEAP357";
                             if (!String.IsNullOrEmpty(component.ItemNumber))
                             {
-                                component.ItemDescription = ""; 
+                                component.ItemDescription = "";
                                 component = GetComponentData(component);
                                 if (!String.IsNullOrEmpty(component.ItemDescription))
                                 {
@@ -300,7 +300,7 @@ namespace CostToInvoiceButton
                                 string iNumber = "ASORTER237";
                                 Services service = new Services();
                                 component = new ComponentChild();
-                                component.Airport = item.Airport.Replace("-","_");
+                                component.Airport = item.Airport.Replace("-", "_");
                                 component.Itinerary = Convert.ToInt32(item.Itinerary);
                                 component.ItemNumber = iNumber;
                                 component.Incident = IncidentID;
@@ -482,7 +482,7 @@ namespace CostToInvoiceButton
                     doubleScreen = new DoubleScreen(global, recordContext);
                     DgvServicios = ((DataGridView)doubleScreen.Controls["dataGridServicios"]);
                     DgvServicios.DataSource = servicios;
-                    
+
                     // OCULTAR COLUMNAS
                     /*
                     DgvServicios.Columns["Supplier"].Visible = false;
@@ -615,58 +615,82 @@ namespace CostToInvoiceButton
         }
         public string GetFirstAirport()
         {
-            string air = "";
-            ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
-            APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
-            clientInfoHeader.AppID = "Query Example";
-            String queryString = "SELECT DISTINCT ArrivalAirport.ICAO_IATACODE FROM CO.Fueling WHERE Incident = " + IncidentID + " ORDER BY CreatedTime";
-            clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 1, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
-            foreach (CSVTable table in queryCSV.CSVTables)
+            try
             {
-                String[] rowData = table.Rows;
-                foreach (String data in rowData)
+                string air = "";
+                ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
+                APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
+                clientInfoHeader.AppID = "Query Example";
+                String queryString = "SELECT DISTINCT ArrivalAirport.ICAO_IATACODE FROM CO.Fueling WHERE Incident = " + IncidentID + " ORDER BY CreatedTime";
+                clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 1, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
+                foreach (CSVTable table in queryCSV.CSVTables)
                 {
-                    air = data.Replace("-", "_");
+                    String[] rowData = table.Rows;
+                    foreach (String data in rowData)
+                    {
+                        air = data.Replace("-", "_");
+                    }
                 }
+                return air;
             }
-            return air;
+            catch (Exception ex)
+            {
+                MessageBox.Show("GetFirstAirport:" + ex.Message + " Det: " + ex.StackTrace);
+                return "";
+            }
         }
         public string getAirportById(int airportId)
         {
-            string air = "";
-            ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
-            APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
-            clientInfoHeader.AppID = "Query Example";
-            String queryString = "SELECT LookupName FROM CO.Airports WHERE ID = " + airportId.ToString();
-            clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 1, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
-            foreach (CSVTable table in queryCSV.CSVTables)
+            try
             {
-                String[] rowData = table.Rows;
-                foreach (String data in rowData)
+                string air = "";
+                ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
+                APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
+                clientInfoHeader.AppID = "Query Example";
+                String queryString = "SELECT LookupName FROM CO.Airports WHERE ID = " + airportId.ToString();
+                clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 1, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
+                foreach (CSVTable table in queryCSV.CSVTables)
                 {
-                    air = data.Replace("-", "_");
+                    String[] rowData = table.Rows;
+                    foreach (String data in rowData)
+                    {
+                        air = data.Replace("-", "_");
+                    }
                 }
+                MessageBox.Show("Airport: " + air);
+                return air;
             }
-            MessageBox.Show("Airport: " + air);
-            return air;
+            catch (Exception ex)
+            {
+                MessageBox.Show("getAirportById:" + ex.Message + " Det: " + ex.StackTrace);
+                return "";
+            }
         }
         public double GetLitersSum(int FuelingId)
         {
-            double sum = 0;
-            ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
-            APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
-            clientInfoHeader.AppID = "Query Example";
-            String queryString = "SELECT Liters FROM CO.Fueling WHERE ID =" + FuelingId + "";
-            clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 1, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
-            foreach (CSVTable table in queryCSV.CSVTables)
+            try
             {
-                String[] rowData = table.Rows;
-                foreach (String data in rowData)
+                double sum = 0;
+                ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
+                APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
+                clientInfoHeader.AppID = "Query Example";
+                String queryString = "SELECT Liters FROM CO.Fueling WHERE ID =" + FuelingId + "";
+                clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 1, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
+                foreach (CSVTable table in queryCSV.CSVTables)
                 {
-                    sum = Convert.ToDouble(data);
+                    String[] rowData = table.Rows;
+                    foreach (String data in rowData)
+                    {
+                        sum = Convert.ToDouble(data);
+                    }
                 }
+                return sum;
             }
-            return sum;
+            catch (Exception ex)
+            {
+                MessageBox.Show("GetLitersSum:" + ex.Message + " Det: " + ex.StackTrace);
+                return 0;
+            }
         }
         public string GetAirportUse(int Fueling)
         {
@@ -745,7 +769,7 @@ namespace CostToInvoiceButton
             }
             catch (Exception ex)
             {
-                MessageBox.Show("getItemNumber: " + ex.Message + "Detail: " + ex.StackTrace);
+                MessageBox.Show("getFBOItemNumber: " + ex.Message + "Detail: " + ex.StackTrace);
                 return null;
             }
         }
@@ -781,60 +805,84 @@ namespace CostToInvoiceButton
         }
         public int getArrivalAirport(int Itinerarie)
         {
-            int arriv = 0;
-            ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
-            APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
-            clientInfoHeader.AppID = "Query Example";
-            String queryString = "SELECT ArrivalAirport FROM Co.Itinerary  WHERE ID =" + Itinerarie;
-            global.LogMessage("getArrivalAirport query: " + queryString);
-            clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 1, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
-            foreach (CSVTable table in queryCSV.CSVTables)
+            try
             {
-                String[] rowData = table.Rows;
-                foreach (String data in rowData)
+                int arriv = 0;
+                ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
+                APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
+                clientInfoHeader.AppID = "Query Example";
+                String queryString = "SELECT ArrivalAirport FROM Co.Itinerary  WHERE ID =" + Itinerarie;
+                global.LogMessage("getArrivalAirport query: " + queryString);
+                clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 1, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
+                foreach (CSVTable table in queryCSV.CSVTables)
                 {
-                    arriv = String.IsNullOrEmpty(data) ? 0 : Convert.ToInt32(data);
+                    String[] rowData = table.Rows;
+                    foreach (String data in rowData)
+                    {
+                        arriv = String.IsNullOrEmpty(data) ? 0 : Convert.ToInt32(data);
+                    }
                 }
+                return arriv;
             }
-            return arriv;
+            catch (Exception ex)
+            {
+                MessageBox.Show("getArrivalAirport: " + ex.Message + "Detail: " + ex.StackTrace);
+                return 0;
+            }
         }
         public string getOpenArrivalAirport(int Arrival)
         {
-            string opens = "";
-            ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
-            APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
-            clientInfoHeader.AppID = "Query Example";
-            String queryString = "SELECT OpensZuluTime FROM Co.Airport_WorkingHours  WHERE Airports =" + Arrival;
-            global.LogMessage("getOpenArrivalAirport query:" + queryString);
-            clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 1, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
-            foreach (CSVTable table in queryCSV.CSVTables)
+            try
             {
-                String[] rowData = table.Rows;
-                foreach (String data in rowData)
+                string opens = "";
+                ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
+                APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
+                clientInfoHeader.AppID = "Query Example";
+                String queryString = "SELECT OpensZuluTime FROM Co.Airport_WorkingHours  WHERE Airports =" + Arrival;
+                global.LogMessage("getOpenArrivalAirport query:" + queryString);
+                clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 1, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
+                foreach (CSVTable table in queryCSV.CSVTables)
                 {
-                    opens = data;
+                    String[] rowData = table.Rows;
+                    foreach (String data in rowData)
+                    {
+                        opens = data;
+                    }
                 }
+                return opens;
             }
-            return opens;
+            catch (Exception ex)
+            {
+                MessageBox.Show("getOpenArrivalAirport: " + ex.Message + "Detail: " + ex.StackTrace);
+                return "";
+            }
         }
         public string getCloseArrivalAirport(int Arrival)
         {
-            string closes = "";
-            ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
-            APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
-            clientInfoHeader.AppID = "Query Example";
-            String queryString = "SELECT ClosesZuluTime  FROM Co.Airport_WorkingHours  WHERE Airports =" + Arrival;
-            global.LogMessage("getCloseArrivalAirport query:" + queryString);
-            clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 1, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
-            foreach (CSVTable table in queryCSV.CSVTables)
+            try
             {
-                String[] rowData = table.Rows;
-                foreach (String data in rowData)
+                string closes = "";
+                ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
+                APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
+                clientInfoHeader.AppID = "Query Example";
+                String queryString = "SELECT ClosesZuluTime  FROM Co.Airport_WorkingHours  WHERE Airports =" + Arrival;
+                global.LogMessage("getCloseArrivalAirport query:" + queryString);
+                clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 1, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
+                foreach (CSVTable table in queryCSV.CSVTables)
                 {
-                    closes = data;
+                    String[] rowData = table.Rows;
+                    foreach (String data in rowData)
+                    {
+                        closes = data;
+                    }
                 }
+                return closes;
             }
-            return closes;
+            catch (Exception ex)
+            {
+                MessageBox.Show("getCloseArrivalAirport: " + ex.Message + "Detail: " + ex.StackTrace);
+                return "";
+            }
         }
         public DateTime getATAItinerary(int Itinerarie)
         {
@@ -891,7 +939,7 @@ namespace CostToInvoiceButton
             }
             catch (Exception ex)
             {
-                MessageBox.Show("getATAItinerary: " + ex.Message + "Detail: " + ex.StackTrace);
+                MessageBox.Show("getATDItinerary: " + ex.Message + "Detail: " + ex.StackTrace);
                 return DateTime.Now;
             }
         }
@@ -931,7 +979,7 @@ namespace CostToInvoiceButton
             }
             catch (Exception ex)
             {
-                MessageBox.Show("getATAItinerary: " + ex.Message + "Detail: " + ex.StackTrace);
+                MessageBox.Show("CreateAirNavFee: " + ex.Message + "Detail: " + ex.StackTrace);
             }
         }
         public void CreateAirNavICCS()
@@ -1011,7 +1059,7 @@ namespace CostToInvoiceButton
             }
             catch (Exception ex)
             {
-                MessageBox.Show("CreateAirNavICCS: " + ex.Message + "Detail: " + ex.StackTrace);
+                MessageBox.Show("CreateDeposit: " + ex.Message + "Detail: " + ex.StackTrace);
             }
         }
         public bool SENEAMNot()
@@ -1102,7 +1150,6 @@ namespace CostToInvoiceButton
             }
             catch (Exception ex)
             {
-
                 MessageBox.Show("GetSeneamPresDate:" + ex.Message + "Det: " + ex.StackTrace);
                 return "";
             }
@@ -1113,7 +1160,7 @@ namespace CostToInvoiceButton
             return Enumerable.Range(0, (d1.Year - d0.Year) * 12 + (d1.Month - d0.Month + 1))
                              .Select(m => new DateTime(d0.Year, d0.Month, 1).AddMonths(m));
         }
-        
+
         public void CreateOvers()
         {
             try
@@ -1176,7 +1223,7 @@ namespace CostToInvoiceButton
                     double sumaRec = 0;
                     fecha1 = "01-" + fecha1.ToUpper();
 
-                    fecha1 = fecha1.Replace("ENE","01");
+                    fecha1 = fecha1.Replace("ENE", "01");
                     fecha1 = fecha1.Replace("FEB", "02");
                     fecha1 = fecha1.Replace("MAR", "03");
                     fecha1 = fecha1.Replace("ABR", "04");
@@ -1294,47 +1341,54 @@ namespace CostToInvoiceButton
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.InnerException.ToString());
+                MessageBox.Show("GetTasaAnual:" + ex.Message + "Det: " + ex.StackTrace);
                 return 0;
             }
         }
         public void CreateSENEAMFee()
         {
-            double feeper = GetSeneamPercentage(SENCat);
-            ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
-            APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
-            clientInfoHeader.AppID = "Query Example";
-            String queryString = "SELECT ItemNumber, SUM(Precio)*(" + feeper + "/100) FROM CO.Services WHERE Incident = " + IncidentID + " AND (ItemNumber = 'OSSEIAS0185' OR ItemNumber = 'AFVLEAP257')";
-            clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 1, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
-            foreach (CSVTable table in queryCSV.CSVTables)
+            try
             {
-                String[] rowData = table.Rows;
-                foreach (String data in rowData)
+                double feeper = GetSeneamPercentage(SENCat);
+                ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
+                APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
+                clientInfoHeader.AppID = "Query Example";
+                String queryString = "SELECT ItemNumber, SUM(Precio)*(" + feeper + "/100) FROM CO.Services WHERE Incident = " + IncidentID + " AND (ItemNumber = 'OSSEIAS0185' OR ItemNumber = 'AFVLEAP257')";
+                clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 1, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
+                foreach (CSVTable table in queryCSV.CSVTables)
                 {
-                    Char delimiter = '|';
-                    string[] substrings = data.Split(delimiter);
-                    string iNumber = "SOMFEAP325";
-                    if (substrings[0] == "AFVLEAP257")
+                    String[] rowData = table.Rows;
+                    foreach (String data in rowData)
                     {
-                        iNumber = "SOMFEAP260";
-                    }
-                    Services service = new Services();
-                    ComponentChild component = new ComponentChild();
-                    component.Airport = "MTS_ITEM";
-                    component.ItemNumber = iNumber;
-                    component.Incident = IncidentID;
-                    component.ParentPaxId = IncidentID;
-                    component.MCreated = "1";
-                    component.Componente = "0";
-                    component.Costo = "";
-                    component.Precio = substrings[1];
-                    component = GetComponentData(component);
-                    component.Categories = GetCategories(component.ItemNumber, component.Airport);
-                    if (!string.IsNullOrEmpty(component.ItemDescription))
-                    {
-                        InsertComponent(component);
+                        Char delimiter = '|';
+                        string[] substrings = data.Split(delimiter);
+                        string iNumber = "SOMFEAP325";
+                        if (substrings[0] == "AFVLEAP257")
+                        {
+                            iNumber = "SOMFEAP260";
+                        }
+                        Services service = new Services();
+                        ComponentChild component = new ComponentChild();
+                        component.Airport = "MTS_ITEM";
+                        component.ItemNumber = iNumber;
+                        component.Incident = IncidentID;
+                        component.ParentPaxId = IncidentID;
+                        component.MCreated = "1";
+                        component.Componente = "0";
+                        component.Costo = "";
+                        component.Precio = substrings[1];
+                        component = GetComponentData(component);
+                        component.Categories = GetCategories(component.ItemNumber, component.Airport);
+                        if (!string.IsNullOrEmpty(component.ItemDescription))
+                        {
+                            InsertComponent(component);
+                        }
                     }
                 }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("CreateSENEAMFee:" + ex.Message + "Det: " + ex.StackTrace);
             }
         }
         private double GetSeneamPercentage(string Utilidad)
@@ -1363,7 +1417,7 @@ namespace CostToInvoiceButton
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.InnerException.ToString());
+                MessageBox.Show("GetSeneamPercentage:" + ex.Message + "Det: " + ex.StackTrace);
                 return 0;
             }
         }
@@ -1398,7 +1452,7 @@ namespace CostToInvoiceButton
                         service.UnitCost = substrings[5];
                         service.UnitPrice = substrings[6];
                         service.InvoiceInternal = substrings[7];
-                        service.Itinerary = substrings[8];
+                        service.Itinerary = String.IsNullOrEmpty(substrings[8]) ? "0" : substrings[8];
                         service.Pax = substrings[9] == "1" ? "Yes" : "No";
                         service.Task = substrings[10] == "1" ? "Yes" : "No";
                         service.Informative = substrings[11] == "1" ? "Yes" : "No";
@@ -1444,7 +1498,7 @@ namespace CostToInvoiceButton
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message);
+                MessageBox.Show("GetDeleteFuelItems: " + ex.Message + "Detail: " + ex.StackTrace);
             }
         }
         public void GetDeleteMCreated()
@@ -1471,7 +1525,7 @@ namespace CostToInvoiceButton
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message);
+                MessageBox.Show("GetDeleteMCreated: " + ex.Message + "Detail: " + ex.StackTrace);
             }
         }
         public void GetDeleteGF_PF()
@@ -1498,7 +1552,7 @@ namespace CostToInvoiceButton
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message);
+                MessageBox.Show("GetDeleteGF_PF: " + ex.Message + "Detail: " + ex.StackTrace);
             }
         }
         public void DeleteServices(int id)
@@ -1524,7 +1578,7 @@ namespace CostToInvoiceButton
             }
             catch (Exception ex)
             {
-                MessageBox.Show("DElete: " + ex.InnerException.ToString());
+                MessageBox.Show("DeleteServices: " + ex.Message + "Detail: " + ex.StackTrace);
             }
         }
         public void CreateChildComponents()
@@ -1558,7 +1612,7 @@ namespace CostToInvoiceButton
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message);
+                MessageBox.Show("CreateChildComponents: " + ex.Message + "Detail: " + ex.StackTrace);
             }
         }
         public void GetComponents(ComponentChild component)
@@ -1681,9 +1735,9 @@ namespace CostToInvoiceButton
                     }
                 }
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                MessageBox.Show(e.Message);
+                MessageBox.Show("GetComponents: " + ex.Message + "Detail: " + ex.StackTrace);
             }
         }
         public ComponentChild GetComponentData(ComponentChild component)
@@ -1854,7 +1908,7 @@ namespace CostToInvoiceButton
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.StackTrace);
+                MessageBox.Show("GetComponentData: " + ex.Message + "Detail: " + ex.StackTrace);
                 return null;
             }
         }
@@ -2047,7 +2101,7 @@ namespace CostToInvoiceButton
             }
             catch (Exception ex)
             {
-                MessageBox.Show("GetType: " + ex.Message + "Detail: " + ex.StackTrace);
+                MessageBox.Show("GetSRType: " + ex.Message + "Detail: " + ex.StackTrace);
                 return "";
             }
         }
@@ -2081,7 +2135,7 @@ namespace CostToInvoiceButton
             }
             catch (Exception ex)
             {
-                MessageBox.Show("GetType: " + ex.InnerException.ToString());
+                MessageBox.Show("GetClientType: " + ex.Message + "Detail: " + ex.StackTrace);
                 return "";
             }
         }
@@ -2107,7 +2161,7 @@ namespace CostToInvoiceButton
             }
             catch (Exception ex)
             {
-                MessageBox.Show("GetArrivalAirportIncident: " + ex.InnerException.ToString());
+                MessageBox.Show("GetArrivalAirportIncident: " + ex.Message + "Detail: " + ex.StackTrace);
                 return "";
             }
         }
@@ -2133,7 +2187,7 @@ namespace CostToInvoiceButton
             }
             catch (Exception ex)
             {
-                MessageBox.Show("GetDepartureAirportIncident: " + ex.InnerException.ToString());
+                MessageBox.Show("GetDepartureAirportIncident: " + ex.Message + "Detail: " + ex.StackTrace);
                 return "";
             }
         }
@@ -2244,7 +2298,7 @@ namespace CostToInvoiceButton
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.StackTrace);
+                MessageBox.Show("GetItineraryCountries" + ex.Message + "Det" + ex.StackTrace);
                 return true;
             }
         }
@@ -2327,63 +2381,70 @@ namespace CostToInvoiceButton
         }
         public void CreateFuelMinimun(string ClientType, string FuelType, int Itinerar, string Air)
         {
-            string[] LookCountry = new string[2];
-            string ItemN = "AFMURAS0016";
-            if (SRType == "FUEL")
+            try
             {
-                LookCountry = GetCountryLook();
-            }
-            else
-            {
-                ArrivalAirportIncident = Air;
-                LookCountry = GetCountryLookItinerary(Itinerar);
-            }
-            ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
-            APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
-            clientInfoHeader.AppID = "Query Example";
-            String queryString = "SELECT ArrivalAirport.ICAO_IATACODE,ToAirport.Country.LookupName ,ArrivalAirport.FuelType.Name FuelType,Id FROM CO.Fueling WHERE Incident = " + IncidentID + "";
-            clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 1000, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
+                string[] LookCountry = new string[2];
+                string ItemN = "AFMURAS0016";
+                if (SRType == "FUEL")
+                {
+                    LookCountry = GetCountryLook();
+                }
+                else
+                {
+                    ArrivalAirportIncident = Air;
+                    LookCountry = GetCountryLookItinerary(Itinerar);
+                }
+                ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
+                APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
+                clientInfoHeader.AppID = "Query Example";
+                String queryString = "SELECT ArrivalAirport.ICAO_IATACODE,ToAirport.Country.LookupName ,ArrivalAirport.FuelType.Name FuelType,Id FROM CO.Fueling WHERE Incident = " + IncidentID + "";
+                clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 1000, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
 
-            foreach (CSVTable table in queryCSV.CSVTables)
-            {
-                String[] rowData = table.Rows;
-                foreach (String data in rowData)
+                foreach (CSVTable table in queryCSV.CSVTables)
                 {
-                    Char delimiter = '|';
-                    string[] substrings = data.Split(delimiter);
-                    global.LogMessage("LookCountry[0]:" + LookCountry[0] + "ClientType: " + ClientType + "FuelType: " + substrings[2]);
-                    if (ClientType == "Internacional" && LookCountry[0] != "MX" && substrings[2] == "International")
+                    String[] rowData = table.Rows;
+                    foreach (String data in rowData)
                     {
-                        ItemN = "IAFMUAS0271";
+                        Char delimiter = '|';
+                        string[] substrings = data.Split(delimiter);
+                        global.LogMessage("LookCountry[0]:" + LookCountry[0] + "ClientType: " + ClientType + "FuelType: " + substrings[2]);
+                        if (ClientType == "Internacional" && LookCountry[0] != "MX" && substrings[2] == "International")
+                        {
+                            ItemN = "IAFMUAS0271";
+                        }
+                    }
+                }
+                queryString = "SELECT SUM(Liters) Suma,date_trunc(VoucherDateTime,'day'),ID FROM CO.Fueling WHERE Incident = " + IncidentID + " AND ArrivalAirport.AirportUse.Name = 'Federal'  GROUP BY date_trunc(VoucherDateTime,'day')  HAVING SUM(Liters) < 1500";
+                clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 10000, "|", false, false, out queryCSV, out FileData);
+                foreach (CSVTable table in queryCSV.CSVTables)
+                {
+                    String[] rowData = table.Rows;
+                    foreach (String data in rowData)
+                    {
+                        Services service = new Services();
+                        Char delimiter = '|';
+                        string[] substrings = data.Split(delimiter);
+                        ComponentChild component = new ComponentChild();
+                        component.Airport = ArrivalAirportIncident.Replace("-", "_");
+                        component.ItemNumber = ItemN;
+                        component.Incident = IncidentID;
+                        component.ParentPaxId = IncidentID;
+                        component.Itinerary = Itinerar;
+                        component.FuelId = int.Parse(substrings[2]);
+                        component.MCreated = "1";
+                        component.Componente = "0";
+                        component = GetComponentData(component);
+                        component.Categories = GetCategories(component.ItemNumber, component.Airport);
+                        if (!string.IsNullOrEmpty(component.ItemDescription))
+                        {
+                            InsertComponent(component);
+                        }
                     }
                 }
             }
-            queryString = "SELECT SUM(Liters) Suma,date_trunc(VoucherDateTime,'day'),ID FROM CO.Fueling WHERE Incident = " + IncidentID + " AND ArrivalAirport.AirportUse.Name = 'Federal'  GROUP BY date_trunc(VoucherDateTime,'day')  HAVING SUM(Liters) < 1500";
-            clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 10000, "|", false, false, out queryCSV, out FileData);
-            foreach (CSVTable table in queryCSV.CSVTables)
+            catch (Exception ex)
             {
-                String[] rowData = table.Rows;
-                foreach (String data in rowData)
-                {
-                    Services service = new Services();
-                    Char delimiter = '|';
-                    string[] substrings = data.Split(delimiter);
-                    ComponentChild component = new ComponentChild();
-                    component.Airport = ArrivalAirportIncident.Replace("-", "_");
-                    component.ItemNumber = ItemN;
-                    component.Incident = IncidentID;
-                    component.ParentPaxId = IncidentID;
-                    component.Itinerary = Itinerar;
-                    component.FuelId = int.Parse(substrings[2]);
-                    component.MCreated = "1";
-                    component.Componente = "0";
-                    component = GetComponentData(component);
-                    component.Categories = GetCategories(component.ItemNumber, component.Airport);
-                    if (!string.IsNullOrEmpty(component.ItemDescription))
-                    {
-                        InsertComponent(component);
-                    }
-                }
+                MessageBox.Show("CreateFuelMinimun:" + ex.Message + " Det: " + ex.StackTrace);
             }
         }
         public string[] GetCountryLook()
@@ -2410,7 +2471,7 @@ namespace CostToInvoiceButton
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.StackTrace);
+                MessageBox.Show("GetCountryLook:" + ex.Message + " Det: " + ex.StackTrace);
                 return null;
             }
         }
@@ -2438,7 +2499,7 @@ namespace CostToInvoiceButton
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.StackTrace);
+                MessageBox.Show("GetCountryLookItinerary:" + ex.Message + " Det: " + ex.StackTrace);
                 return null;
             }
         }
@@ -2652,7 +2713,7 @@ namespace CostToInvoiceButton
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message + " Det: " + ex.StackTrace);
+                MessageBox.Show("UpdatePackageCost: " + ex.Message + " Det: " + ex.StackTrace);
             }
 
         }
@@ -2809,7 +2870,7 @@ namespace CostToInvoiceButton
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.StackTrace);
+                MessageBox.Show("getMonthINPC:" + ex.Message + " Det: " + ex.StackTrace);
                 return 0;
             }
         }
@@ -2905,7 +2966,7 @@ namespace CostToInvoiceButton
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.StackTrace);
+                MessageBox.Show("getINPC:" + ex.Message + " Det: " + ex.StackTrace);
             }
         }
     }

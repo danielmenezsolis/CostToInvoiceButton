@@ -2037,8 +2037,8 @@ namespace CostToInvoiceButton
                                 Curr = item.str_currency_code;
                                 OUM = item.str_oum_code;
                                 String cClass = "";
-                                cClass = String.IsNullOrEmpty(item.str_client_category) ? " " : item.str_client_category;
-                                if (txtCustomerClass.Text == cClass)
+                                cClass = string.IsNullOrEmpty(item.str_client_category) ? String.Empty : item.str_client_category;
+                                if (txtCustomerClass.Text.Trim() == cClass)
                                 {
                                     break;
                                 }

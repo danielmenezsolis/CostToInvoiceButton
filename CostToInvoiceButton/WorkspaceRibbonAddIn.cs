@@ -127,6 +127,7 @@ namespace CostToInvoiceButton
                         }
                     }
                     IncidentID = Incident.ID;
+
                     ICAO = getICAODesi(IncidentID);
                     cClass = getCustomerClass(IncidentID);
                     if (cClass == "")
@@ -476,7 +477,15 @@ namespace CostToInvoiceButton
                         }
 
                         servicios.Clear();
-                        servicios = GetListServices();
+                        if (SRType == "FCC" || SRType == "FBO")
+                        {
+                            servicios = GetListServices().FindAll(x => x.Itinerary != "0");
+                        }
+                        else
+                        {
+                            servicios = GetListServices();
+                        }
+
                     }
 
                     doubleScreen = new DoubleScreen(global, recordContext);
@@ -484,8 +493,9 @@ namespace CostToInvoiceButton
                     DgvServicios.DataSource = servicios;
 
                     // OCULTAR COLUMNAS
-                    /*
+
                     DgvServicios.Columns["Supplier"].Visible = false;
+                    DgvServicios.Columns["ID"].Visible = false;
                     DgvServicios.Columns["InvoiceInternal"].Visible = false;
                     DgvServicios.Columns["Itinerary"].Visible = false;
                     DgvServicios.Columns["Pax"].Visible = false;
@@ -498,11 +508,16 @@ namespace CostToInvoiceButton
                     DgvServicios.Columns["ParticipacionCobro"].Visible = false;
                     DgvServicios.Columns["Site"].Visible = false;
                     DgvServicios.Columns["Tax"].Visible = false;
-                    */
+
+
+
+
+
                     DgvServicios.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.DisplayedCells;
                     ((System.Windows.Forms.Label)doubleScreen.Controls["lblSrType"]).Text = SRType.ToUpper();
                     ((System.Windows.Forms.Label)doubleScreen.Controls["lblIdIncident"]).Text = IncidentID.ToString();
                     ((System.Windows.Forms.Label)doubleScreen.Controls["lblCurrencyPrice"]).Text = GetCurrency();
+                    ((System.Windows.Forms.Label)doubleScreen.Controls["lblSrNum"]).Text = GetReferenceNumber();
                     ((TextBox)doubleScreen.Controls["txtUtilidad"]).Text = Utilidad;
                     ((TextBox)doubleScreen.Controls["txtClientName"]).Text = ClientName;
                     ((TextBox)doubleScreen.Controls["txtRoyalty"]).Text = Royalty;
@@ -558,6 +573,33 @@ namespace CostToInvoiceButton
             {
                 MessageBox.Show("Error en INIT: " + ex.Message);
                 return false;
+            }
+        }
+        public string GetReferenceNumber()
+        {
+            try
+            {
+                string Reference = "";
+                ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
+                APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
+                clientInfoHeader.AppID = "Query Example";
+                String queryString = "SELECT ReferenceNumber FROM Incident  WHERE ID =  " + IncidentID;
+                clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 1, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
+                foreach (CSVTable table in queryCSV.CSVTables)
+                {
+                    String[] rowData = table.Rows;
+                    foreach (String data in rowData)
+                    {
+                        Reference = data;
+                    }
+                }
+                return Reference;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.StackTrace);
+                return "0";
+
             }
         }
         public double GetMinutesLeg(int Itinerarie)
@@ -1429,7 +1471,7 @@ namespace CostToInvoiceButton
                 ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
                 APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
                 clientInfoHeader.AppID = "Query Example";
-                String queryString = "SELECT ID,ItemNumber,ItemDescription,Airport,IDProveedor,Costo,Precio,InternalInvoice,Itinerary,Paquete,Componente,Informativo,ParentPaxID,Categories,fuel_id,CobroParticipacionNj,ParticipacionCobro,Site,IVA,ListoFactura FROM CO.Services WHERE Incident =" + IncidentID + " AND Informativo = '0' AND (Componente IS NULL OR Componente  = '0') ORDER BY ID ASC, Itinerary ASC, ParentPaxId ASC";
+                String queryString = "SELECT ID,ItemNumber,ItemDescription,Airport,IDProveedor,Costo,Precio,InternalInvoice,Itinerary,Paquete,Componente,Informativo,ParentPaxID,Categories,fuel_id,CobroParticipacionNj,ParticipacionCobro,Site,IVA,ListoFactura,Cantidad,CostCurrency,TotalCost,PriceCurrency,TotalPrice,Fee FROM CO.Services WHERE Incident =" + IncidentID + " AND Informativo = '0' AND (Componente IS NULL OR Componente  = '0') ORDER BY ID ASC, Itinerary ASC, ParentPaxId ASC";
                 /*if (ClientName.Contains("NETJET")) {
                     queryString = "SELECT ID,ItemNumber,ItemDescription,Airport,IDProveedor,Costo,Precio,InternalInvoice,Itinerary,Paquete,Componente,Informativo,ParentPaxID,Categories,fuel_id,CobroParticipacionNj,ParticipacionCobro,Site,IVA FROM CO.Services WHERE Incident =" + IncidentID + " AND Informativo = '0' ORDER BY ID ASC, Itinerary ASC, ParentPaxId ASC";
                 }*/
@@ -1443,7 +1485,6 @@ namespace CostToInvoiceButton
                         Services service = new Services();
                         Char delimiter = '|';
                         string[] substrings = data.Split(delimiter);
-                        service.InvoiceReady = substrings[19] == "1" ? "Yes" : "No";
                         service.ID = substrings[0];
                         service.ItemNumber = substrings[1];
                         service.Description = substrings[2].Replace('"', ' ').Trim();
@@ -1463,6 +1504,13 @@ namespace CostToInvoiceButton
                         service.ParticipacionCobro = substrings[16];
                         service.Site = substrings[17];
                         service.Tax = substrings[18];
+                        service.InvoiceReady = substrings[19] == "1" ? "Yes" : "No";
+                        service.Quantity = substrings[20];
+                        service.CostCurrency = substrings[21];
+                        service.TotalCost = substrings[22];
+                        service.PriceCurrency = substrings[23];
+                        service.TotalPrice = substrings[24];
+                        service.Fee = substrings[25];
                         services.Add(service);
                     }
                 }

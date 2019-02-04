@@ -28,6 +28,7 @@ namespace CostToInvoiceButton
         public List<WHours> WHoursList { get; set; }
         public int HourId;
         private RightNowSyncPortClient clientORN { get; set; }
+        private bool PriceCostValueSet { get; set; }
         public DoubleScreen(IGlobalContext globalContext, IRecordContext record)
         {
             try
@@ -51,6 +52,9 @@ namespace CostToInvoiceButton
                 if (e.RowIndex != -1)
                 {
                     // Etiquetas/Cajas
+                    PriceCostValueSet = false;
+                    bool blnPriceSet = false;
+                    bool blnCostSet = false;
                     lblQty.Text = "Quantity";
                     txtExchangeRate.Hide();
                     lblExchangeRate.Hide();
@@ -71,8 +75,21 @@ namespace CostToInvoiceButton
                     txtItem.Text = dataGridServicios.Rows[e.RowIndex].Cells["Description"].Value.ToString();
                     txtCobroParticipacionNj.Text = dataGridServicios.Rows[e.RowIndex].Cells["CobroParticipacionNj"].Value.ToString();
                     txtParticipacionCobro.Text = dataGridServicios.Rows[e.RowIndex].Cells["ParticipacionCobro"].Value.ToString();
+                    txtFee.Text = dataGridServicios.Rows[e.RowIndex].Cells["Fee"].Value.ToString();
+                    if (!string.IsNullOrEmpty(dataGridServicios.Rows[e.RowIndex].Cells["Quantity"].Value.ToString())) 
+                    {
+                        txtQty.Text = dataGridServicios.Rows[e.RowIndex].Cells["Quantity"].Value.ToString();
+                    }
                     string airtport = dataGridServicios.Rows[e.RowIndex].Cells["Airport"].Value.ToString();
                     txtAirport.Text = "IO_AEREO_" + airtport.Replace("-", "_").Trim();
+                    string supp = dataGridServicios.Rows[e.RowIndex].Cells["Supplier"].Value.ToString();
+
+                    getSuppliers();
+                    if (!string.IsNullOrEmpty(supp))
+                    {
+                        cboSuppliers.Enabled = true;
+                        cboSuppliers.Text = supp;
+                    }
 
                     if (lblSrType.Text == "SENEAM")
                     {
@@ -171,6 +188,7 @@ namespace CostToInvoiceButton
                     else
                     {
                         txtCost.Text = dataGridServicios.Rows[e.RowIndex].Cells["UnitCost"].FormattedValue.ToString();
+                        blnCostSet = true;
                     }
                     // PRECIOS EN LISTA DE SERVICIOS
                     if (String.IsNullOrEmpty(dataGridServicios.Rows[e.RowIndex].Cells["UnitPrice"].FormattedValue.ToString()))
@@ -183,6 +201,12 @@ namespace CostToInvoiceButton
                     else
                     {
                         txtPrice.Text = dataGridServicios.Rows[e.RowIndex].Cells["UnitPrice"].FormattedValue.ToString();
+                        blnPriceSet = true;
+                    }
+                    if (blnCostSet && blnPriceSet)
+                    {
+                        PriceCostValueSet = true;
+                        return;
                     }
 
                     if ((lblSrType.Text == "FBO" && (txtItemNumber.Text == "ASFIEAP357" || txtItemNumber.Text == "AFREISP0179")) || (lblSrType.Text == "FCC" && txtItemNumber.Text == "AFREISP0179"))
@@ -204,7 +228,7 @@ namespace CostToInvoiceButton
                         foreach (DataGridViewRow dgvRenglon in dataGridInvoice.Rows)
                         {
                             int itinerarycompare = Convert.ToInt32(dgvRenglon.Cells["Itinerary"].Value);
-                            double price = Convert.ToDouble(dgvRenglon.Cells["Total Price"].Value);
+                            double price = Convert.ToDouble(dgvRenglon.Cells["Amount"].Value);
                             double fee = 0;
                             double dfee = 0;
 
@@ -318,7 +342,7 @@ namespace CostToInvoiceButton
                         double b;
                         if (double.TryParse(txtCost.Text, out b))
                         {
-                            double hhr = GetMinutesLeg() * 2;
+                            double hhr = Math.Ceiling(GetMinutesLeg() / 30);
                             txtQty.Text = hhr.ToString();
                             // MessageBox.Show("Costo por periodo: " + txtCost.Text);
                             // MessageBox.Show("Periodos: " + hhr.ToString());
@@ -336,10 +360,10 @@ namespace CostToInvoiceButton
                     if (txtUOM.Text == "HHR" && !String.IsNullOrEmpty(txtPrice.Text))
                     {
                         double b;
-                        MessageBox.Show("La UOM es HHR.");
+                        //MessageBox.Show("La UOM es HHR.");
                         if (double.TryParse(txtPrice.Text, out b))
                         {
-                            double hhr = GetMinutesLeg() * 2;
+                            double hhr = Math.Ceiling(GetMinutesLeg() / 30);
                             MessageBox.Show("Total de HHR: " + hhr.ToString());
                             txtQty.Text = hhr.ToString();
                             // MessageBox.Show("Costo por periodo: " + txtCost.Text);
@@ -353,7 +377,7 @@ namespace CostToInvoiceButton
                         double b;
                         if (double.TryParse(txtCost.Text, out b))
                         {
-                            double hr = GetMinutesLeg();
+                            double hr = Math.Ceiling(GetMinutesLeg() / 60);
                             txtQty.Text = hr.ToString();
                             txtCost.Text = (Convert.ToDouble(txtCost.Text) * hr).ToString();
                         }
@@ -407,7 +431,7 @@ namespace CostToInvoiceButton
                             {
                                 if (dgvRenglon.Cells["Item"].Value.ToString().Contains("USO DE INSTALA"))
                                 {
-                                    price += Convert.ToDouble(dgvRenglon.Cells["Total Price"].Value.ToString());
+                                    price += Convert.ToDouble(dgvRenglon.Cells["Amount"].Value.ToString());
                                 }
                             }
                         }
@@ -429,7 +453,7 @@ namespace CostToInvoiceButton
                         txtTotalCostFuel.Text = Math.Round((Convert.ToDouble(txtCost.Text) * Convert.ToDouble(txtQty.Text)), 2, MidpointRounding.AwayFromZero).ToString();
                     }
 
-                    getSuppliers();
+
                     Cursor.Current = Cursors.Default;
                 }
             }
@@ -444,48 +468,10 @@ namespace CostToInvoiceButton
             {
                 if (dataGridInvoice.Rows.Count != 0 && validateFBOFee())
                 {
-                    int i = 0;
                     DialogResult dialogResult = MessageBox.Show("Save before closing?", "Double Screen", MessageBoxButtons.YesNo);
                     if (dialogResult == DialogResult.Yes)
                     {
-                        foreach (DataGridViewRow dgvRenglon in dataGridInvoice.Rows)
-                        {
-                            var client = new RestClient("https://iccsmx.custhelp.com/");
-                            var request = new RestRequest("/services/rest/connect/v1.4/CO.Services/" + dgvRenglon.Cells["Service ID"].Value.ToString() + "", Method.POST)
-                            {
-                                RequestFormat = DataFormat.Json
-                            };
-                            DataGridViewCheckBoxCell chk = (DataGridViewCheckBoxCell)dgvRenglon.Cells["InvoiceReady"];
-                            var body = "{";
-                            // Información de precios costos
-                            body += "\"ListoFactura\":" + chk.EditedFormattedValue.ToString().ToLower() + "\"," +
-                                "\"Precio\":\"" + dgvRenglon.Cells["Price p/unit"].Value.ToString() + "\"," +
-                                "\"Costo\":\"" + dgvRenglon.Cells["Cost p/unit"].Value.ToString() + "\"";
-                            if (!String.IsNullOrEmpty(dgvRenglon.Cells["Vendor"].Value.ToString()))
-                            {
-                                body += ",\"IDProveedor\":\"" + dgvRenglon.Cells["Vendor"].Value.ToString() + "\"";
-                            }
-                            body += "}";
-                            global.LogMessage(body);
-                            request.AddParameter("application/json", body, ParameterType.RequestBody);
-                            request.AddHeader("Authorization", "Basic ZW9saXZhczpTaW5lcmd5KjIwMTg=");
-                            request.AddHeader("X-HTTP-Method-Override", "PATCH");
-                            request.AddHeader("OSvC-CREST-Application-Context", "Update Service {id}");
-                            IRestResponse response = client.Execute(request);
-                            var content = response.Content;
-                            if (content == "")
-                            {
-                                i = i + 1;
-                            }
-                            else
-                            {
-                                MessageBox.Show(response.Content);
-                            }
-                        }
-                        if (i > 0)
-                        {
-                            MessageBox.Show("Data saved");
-                        }
+                        SaveData();
                     }
                 }
                 this.Close();
@@ -516,6 +502,10 @@ namespace CostToInvoiceButton
         }
         private void txtQty_TextChanged(object sender, EventArgs e)
         {
+            if (PriceCostValueSet)
+            {
+                return;
+            }
             try
             {
                 if ((IsFloatValue(txtQty.Text) && IsFloatValue(txtCost.Text)) && (!string.IsNullOrEmpty(txtQty.Text) && !string.IsNullOrEmpty(txtCost.Text)))
@@ -556,66 +546,7 @@ namespace CostToInvoiceButton
         }
         private void saveToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            try
-            {
-                if (validateFBOFee())
-                {
-                    int i = 0;
-                    if (dataGridInvoice.Rows.Count == 0)
-                    {
-                        MessageBox.Show("Cannot be saved if there is no data");
-                    }
-                    else
-                    {
-                        foreach (DataGridViewRow dgvRenglon in dataGridInvoice.Rows)
-                        {
-                            var client = new RestClient("https://iccsmx.custhelp.com/");
-                            var request = new RestRequest("/services/rest/connect/v1.4/CO.Services/" + dgvRenglon.Cells["IdService"].Value.ToString() + "", Method.POST)
-                            {
-                                RequestFormat = DataFormat.Json
-                            };
-                            var body = "{";
-                            // Información de precios costos
-
-                            bool ready = Convert.ToBoolean(dgvRenglon.Cells["InvoiceReady"].Value);
-
-                            body += "\"ListoFactura\":" + ready.ToString().ToLower() + "," +
-                                "\"Precio\":\"" + dgvRenglon.Cells["Price"].Value.ToString() + "\"," +
-                                "\"Costo\":\"" + dgvRenglon.Cells["Cost"].Value.ToString() + "\"";
-                            if (!String.IsNullOrEmpty(dgvRenglon.Cells["Vendor"].Value.ToString()))
-                            {
-                                body += ",\"IDProveedor\":\"" + dgvRenglon.Cells["Vendor"].Value.ToString() + "\"";
-                            }
-                            body += "}";
-                            global.LogMessage(body);
-
-                            request.AddParameter("application/json", body, ParameterType.RequestBody);
-                            request.AddHeader("Authorization", "Basic ZW9saXZhczpTaW5lcmd5KjIwMTg=");
-                            request.AddHeader("X-HTTP-Method-Override", "PATCH");
-                            request.AddHeader("OSvC-CREST-Application-Context", "Update Service {id}");
-                            IRestResponse response = client.Execute(request);
-                            var content = response.Content;
-                            if (content == "")
-                            {
-                                i = i + 1;
-                            }
-                            else
-                            {
-                                MessageBox.Show(response.Content);
-                            }
-                        }
-                    }
-                    if (i > 0)
-                    {
-                        MessageBox.Show("Data saved");
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("saveToolStripMenuItem_Click" + ex.Message + "Det: " + ex.StackTrace);
-            }
-
+            SaveData();
         }
         private void btnDelete_Click(object sender, EventArgs e)
         {
@@ -629,7 +560,6 @@ namespace CostToInvoiceButton
         {
             if (e.RowIndex != -1)
             {
-
                 string action = dataGridInvoice.Rows[e.RowIndex].Cells[e.ColumnIndex].Value.ToString();
                 if (action == "Edit")
                 {
@@ -2036,8 +1966,8 @@ namespace CostToInvoiceButton
                                 price = item.flo_amount;
                                 Curr = item.str_currency_code;
                                 OUM = item.str_oum_code;
-                                String cClass = "";
-                                cClass = string.IsNullOrEmpty(item.str_client_category) ? String.Empty : item.str_client_category;
+                                string cClass = "";
+                                cClass = string.IsNullOrEmpty(item.str_client_category) ? "" : item.str_client_category;
                                 if (txtCustomerClass.Text.Trim() == cClass)
                                 {
                                     break;
@@ -3194,6 +3124,10 @@ namespace CostToInvoiceButton
         }
         private void txtCost_KeyDown(object sender, KeyEventArgs e)
         {
+            if (PriceCostValueSet)
+            {
+                return;
+            }
             if (e.KeyCode == Keys.Enter)
             {
                 try
@@ -3295,20 +3229,16 @@ namespace CostToInvoiceButton
         {
             try
             {
-
                 if (ValidateData())
                 {
-
                     if (dataGridInvoice.RowCount <= dataGridServicios.RowCount - 1)
                     {
-
                         if (ValidateRows())
                         {
-
-                            double amount = Math.Round((Convert.ToDouble(txtPrice.Text) * Convert.ToDouble(txtQty.Text)), 2);
+                            double amountPrice = Math.Round((Convert.ToDouble(txtPrice.Text) * Convert.ToDouble(txtQty.Text)), 2);
+                            double amountCost = Math.Round((Convert.ToDouble(txtCost.Text) * Convert.ToDouble(txtQty.Text)), 2);
                             bool invoi = txtInvoiceReady.Text == "1" ? true : false;
-
-                            dataGridInvoice.Rows.Add(invoi, txtItem.Text, cboSuppliers.Text, txtQty.Text, txtCost.Text, txtPrice.Text, amount, txtIdService.Text, cboCurrency.Text, txtItinerary.Text);
+                            dataGridInvoice.Rows.Add(invoi, txtItem.Text, cboSuppliers.Text, txtQty.Text, cboCurrency.Text, txtCost.Text, amountCost, lblCurrencyPrice.Text, txtPrice.Text, amountPrice, txtIdService.Text, txtItinerary.Text, txtPackage.Text, txtItemNumber.Text,txtFee.Text);
                             ClearTxtBoxes();
 
                         }
@@ -3331,6 +3261,275 @@ namespace CostToInvoiceButton
             {
                 MessageBox.Show("ButtonAddClic: " + ex.Message + "Det:" + ex.StackTrace);
             }
+        }
+        private void SaveData()
+        {
+            try
+            {
+                if (validateFBOFee())
+                {
+                    int i = 0;
+                    if (dataGridInvoice.Rows.Count == 0)
+                    {
+                        MessageBox.Show("Cannot be saved if there is no data");
+                    }
+                    else
+                    {
+                        foreach (DataGridViewRow dgvRenglon in dataGridInvoice.Rows)
+                        {
+
+                            var client = new RestClient("https://iccsmx.custhelp.com/");
+                            var request = new RestRequest("/services/rest/connect/v1.4/CO.Services/" + dgvRenglon.Cells["IdService"].Value.ToString() + "", Method.POST)
+                            {
+                                RequestFormat = DataFormat.Json
+                            };
+                            var body = "{";
+
+                            DataGridViewCheckBoxCell ready = (DataGridViewCheckBoxCell)dgvRenglon.Cells["InvoiceReady"];
+                            body += "\"ListoFactura\":" + ready.EditedFormattedValue.ToString().ToLower() + "," +
+                            "\"Cantidad\":\"" + dgvRenglon.Cells["Quantity"].Value.ToString() + "\"," +
+                            "\"Precio\":\"" + dgvRenglon.Cells["Price"].Value.ToString() + "\"," +
+                            "\"PriceCurrency\":\"" + dgvRenglon.Cells["PriceCurrency"].Value.ToString() + "\"," +
+                            "\"TotalPrice\":\"" + dgvRenglon.Cells["Amount"].Value.ToString() + "\"," +
+                            "\"Costo\":\"" + dgvRenglon.Cells["Cost"].Value.ToString() + "\"," +
+                            "\"CostCurrency\":\"" + dgvRenglon.Cells["Currency"].Value.ToString() + "\"," +
+                            "\"TotalCost\":\"" + dgvRenglon.Cells["TotalCost"].Value.ToString() + "\"";
+                            
+                            if (!String.IsNullOrEmpty(dgvRenglon.Cells["Fee"].Value.ToString()))
+                            {
+                                body += ",\"Fee\":\"" + dgvRenglon.Cells["Fee"].Value.ToString() + "\"";
+                            }
+                                if (!String.IsNullOrEmpty(dgvRenglon.Cells["Vendor"].Value.ToString()))
+                            {
+                                body += ",\"IDProveedor\":\"" + dgvRenglon.Cells["Vendor"].Value.ToString() + "\"";
+                            }
+                            body += "}";
+                            global.LogMessage(body);
+                            request.AddParameter("application/json", body, ParameterType.RequestBody);
+                            request.AddHeader("Authorization", "Basic ZW9saXZhczpTaW5lcmd5KjIwMTg=");
+                            request.AddHeader("X-HTTP-Method-Override", "PATCH");
+                            request.AddHeader("OSvC-CREST-Application-Context", "Update Service {id}");
+                            IRestResponse response = client.Execute(request);
+                            var content = response.Content;
+                            if (content == "")
+                            {
+                                i = i + 1;
+                            }
+                            else
+                            {
+                                MessageBox.Show(response.Content);
+                            }
+
+                            if (dgvRenglon.Cells["Package"].Value.ToString() == "No")
+                            {
+                                if (!hasPayables(dgvRenglon.Cells["IdService"].Value.ToString()))
+                                {
+                                    InsertPayable(dgvRenglon.Cells["IdService"].Value.ToString(), dgvRenglon.Cells["Vendor"].Value.ToString(), dgvRenglon.Cells["Cost"].Value.ToString(), dgvRenglon.Cells["Quantity"].Value.ToString(), dgvRenglon.Cells["Item"].Value.ToString(), dgvRenglon.Cells["ItemNumber"].Value.ToString(), dgvRenglon.Cells["Currency"].Value.ToString());
+                                }
+                            }
+
+                        }
+                    }
+                    if (i > 0)
+                    {
+                        MessageBox.Show("Data saved");
+                        ClearTxtBoxes();
+                        dataGridInvoice.Rows.Clear();
+                        dataGridServicios.DataSource = null;
+                        dataGridServicios.Refresh();
+
+                        if (lblSrType.Text == "FBO" || lblSrType.Text == "FCC")
+                        {
+                            dataGridServicios.DataSource = GetListServices().FindAll(x => x.Itinerary != "0");
+                        }
+                        else
+                        {
+                            dataGridServicios.DataSource = GetListServices();
+                        }
+
+                        dataGridServicios.DataSource = GetListServices();
+                        dataGridServicios.Columns["Supplier"].Visible = false;
+                        dataGridServicios.Columns["ID"].Visible = false;
+                        dataGridServicios.Columns["InvoiceInternal"].Visible = false;
+                        dataGridServicios.Columns["Itinerary"].Visible = false;
+                        dataGridServicios.Columns["Pax"].Visible = false;
+                        dataGridServicios.Columns["Task"].Visible = false;
+                        dataGridServicios.Columns["Informative"].Visible = false;
+                        dataGridServicios.Columns["ParentPax"].Visible = false;
+                        dataGridServicios.Columns["Categorias"].Visible = false;
+                        dataGridServicios.Columns["FuelId"].Visible = false;
+                        dataGridServicios.Columns["CobroParticipacionNJ"].Visible = false;
+                        dataGridServicios.Columns["ParticipacionCobro"].Visible = false;
+                        dataGridServicios.Columns["Site"].Visible = false;
+                        dataGridServicios.Columns["Tax"].Visible = false;
+
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("SaveData" + ex.Message + "Det: " + ex.StackTrace);
+            }
+        }
+        public List<Services> GetListServices()
+        {
+            try
+            {
+                List<Services> services = new List<Services>();
+                ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
+                APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
+                clientInfoHeader.AppID = "Query Example";
+                String queryString = "SELECT ID,ItemNumber,ItemDescription,Airport,IDProveedor,Costo,Precio,InternalInvoice,Itinerary,Paquete,Componente,Informativo,ParentPaxID,Categories,fuel_id,CobroParticipacionNj,ParticipacionCobro,Site,IVA,ListoFactura,Cantidad,CostCurrency,TotalCost,PriceCurrency,TotalPrice,Fee FROM CO.Services WHERE Incident =" + lblIdIncident.Text + " AND Informativo = '0' AND (Componente IS NULL OR Componente  = '0') ORDER BY ID ASC, Itinerary ASC, ParentPaxId ASC";
+                /*if (ClientName.Contains("NETJET")) {
+                    queryString = "SELECT ID,ItemNumber,ItemDescription,Airport,IDProveedor,Costo,Precio,InternalInvoice,Itinerary,Paquete,Componente,Informativo,ParentPaxID,Categories,fuel_id,CobroParticipacionNj,ParticipacionCobro,Site,IVA FROM CO.Services WHERE Incident =" + IncidentID + " AND Informativo = '0' ORDER BY ID ASC, Itinerary ASC, ParentPaxId ASC";
+                }*/
+                global.LogMessage("GetListServices: " + queryString);
+                clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 10000, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
+                foreach (CSVTable table in queryCSV.CSVTables)
+                {
+                    String[] rowData = table.Rows;
+                    foreach (String data in rowData)
+                    {
+                        Services service = new Services();
+                        Char delimiter = '|';
+                        string[] substrings = data.Split(delimiter);
+                        
+                        service.ID = substrings[0];
+                        service.ItemNumber = substrings[1];
+                        service.Description = substrings[2].Replace('"', ' ').Trim();
+                        service.Airport = substrings[3].Replace('_', '-').Trim();
+                        service.Supplier = substrings[4].Replace('"', ' ').Trim();
+                        service.UnitCost = substrings[5];
+                        service.UnitPrice = substrings[6];
+                        service.InvoiceInternal = substrings[7];
+                        service.Itinerary = String.IsNullOrEmpty(substrings[8]) ? "0" : substrings[8];
+                        service.Pax = substrings[9] == "1" ? "Yes" : "No";
+                        service.Task = substrings[10] == "1" ? "Yes" : "No";
+                        service.Informative = substrings[11] == "1" ? "Yes" : "No";
+                        service.ParentPax = substrings[12];
+                        service.Categorias = substrings[13];
+                        service.FuelId = substrings[14];
+                        service.CobroParticipacionNj = substrings[15];
+                        service.ParticipacionCobro = substrings[16];
+                        service.Site = substrings[17];
+                        service.Tax = substrings[18];
+                        service.InvoiceReady = substrings[19] == "1" ? "Yes" : "No";
+                        service.Quantity = substrings[20];
+                        service.CostCurrency = substrings[21];
+                        service.TotalCost = substrings[22];
+                        service.PriceCurrency = substrings[23];
+                        service.TotalPrice = substrings[24];
+                        service.Fee = substrings[25];
+                        services.Add(service);
+                    }
+                }
+                return services;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("GetListServices: " + ex.Message + "Detail: " + ex.StackTrace);
+                return null;
+            }
+        }
+        private void fileToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void DoubleScreen_Load(object sender, EventArgs e)
+        {
+
+        }
+
+        private void txtCost_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void txtPrice_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        public bool hasPayables(string Service)
+        {
+            try
+            {
+                bool has = false;
+                ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
+                APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
+                clientInfoHeader.AppID = "Query Example";
+                String queryString = "SELECT COUNT(ID) FROM CO.Payables WHERE Services =" + Service;
+                global.LogMessage(queryString);
+                clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 1, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
+                foreach (CSVTable table in queryCSV.CSVTables)
+                {
+                    String[] rowData = table.Rows;
+                    foreach (String data in rowData)
+                    {
+                        has = Convert.ToInt32(data) > 0 ? true : false;
+                    }
+                }
+                return has;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message + "Det" + ex.StackTrace);
+                return false;
+            }
+        }
+        public void InsertPayable(string IdService, string Supp, string Costo, string Qty, string ItemDesc, string ItemNum, string Curr)
+        {
+            try
+            {
+
+                Costo = string.IsNullOrEmpty(Costo) ? "0" : Costo;
+                Qty = string.IsNullOrEmpty(Qty) ? "1" : Qty;
+                double Ticket = Math.Round(Convert.ToDouble(Costo) * Convert.ToDouble(Qty), 2);
+                var client = new RestClient("https://iccsmx.custhelp.com/");
+                var request = new RestRequest("/services/rest/connect/v1.4/CO.Payables/", Method.POST)
+                {
+                    RequestFormat = DataFormat.Json
+                };
+
+                string body = "{";
+                body += "\"Supplier\":\"" + Supp + "\",";
+                body += "\"Quantity\":\"" + Qty + "\",";
+                body += "\"UnitCost\":\"" + Costo + "\",";
+                body += "\"TicketAmount\":\"" + Ticket + "\",";
+                body += "\"ItemDescription\":\"" + ItemDesc + "\",";
+                body += "\"ItemNumber\":\"" + ItemNum + "\",";
+                body += "\"Currency\":";
+                body += "{";
+                body += "\"id\":" + (Curr == "MXN" ? 2 : 1).ToString() + "";
+                body += "},";
+                body += "\"Services\":";
+                body += "{";
+                body += "\"id\":" + IdService + "";
+                body += "}";
+                body += "}";
+                global.LogMessage("CPayableIO" + body);
+
+                request.AddParameter("application/json", body, ParameterType.RequestBody);
+                request.AddHeader("Authorization", "Basic ZW9saXZhczpTaW5lcmd5KjIwMTg=");
+                request.AddHeader("X-HTTP-Method-Override", "POST");
+                request.AddHeader("OSvC-CREST-Application-Context", "Create Payable");
+                IRestResponse response = client.Execute(request);
+                var content = response.Content;
+                if (response.StatusCode == HttpStatusCode.Created)
+                {
+
+                }
+                else
+                {
+                    MessageBox.Show("Payable No Creado" + content);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error en creación de child: " + ex.Message + "Det" + ex.StackTrace);
+            }
+
         }
     }
     public class ItiPrices

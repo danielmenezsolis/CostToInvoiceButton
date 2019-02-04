@@ -13,8 +13,13 @@ namespace CostToInvoiceButton
         public string Description { get; set; }
         public string Airport { get; set; }
         public string Supplier { get; set; }
+        public string Quantity { get; set; }
         public string UnitCost { get; set; }
+        public string CostCurrency { get; set; }
+        public string TotalCost { get; set; }
         public string UnitPrice { get; set; }
+        public string PriceCurrency { get; set; }
+        public string TotalPrice { get; set; }
         public string InvoiceInternal { get; set; }
         public string Itinerary { get; set; }
         public string Pax { get; set; }
@@ -27,6 +32,7 @@ namespace CostToInvoiceButton
         public string ParticipacionCobro { get; set; }
         public string Site { get; set; }
         public string Tax { get; set; }
+        public string Fee { get; set; }
     }
     public class ComponentChild
     {

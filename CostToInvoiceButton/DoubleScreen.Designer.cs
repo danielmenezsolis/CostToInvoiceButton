@@ -119,16 +119,29 @@
             this.lblTotalCostFuel = new System.Windows.Forms.Label();
             this.txtInvoiceReady = new System.Windows.Forms.TextBox();
             this.BAdd = new System.Windows.Forms.Button();
+            this.label3 = new System.Windows.Forms.Label();
+            this.label8 = new System.Windows.Forms.Label();
+            this.label17 = new System.Windows.Forms.Label();
+            this.label18 = new System.Windows.Forms.Label();
+            this.label19 = new System.Windows.Forms.Label();
+            this.label20 = new System.Windows.Forms.Label();
+            this.lblSrNum = new System.Windows.Forms.Label();
+            this.txtFee = new System.Windows.Forms.TextBox();
             this.InvoiceReady = new System.Windows.Forms.DataGridViewCheckBoxColumn();
             this.Item = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Vendor = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Quantity = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Currency = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Cost = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.TotalCost = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.PriceCurrency = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Price = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Amount = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.IdService = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Currency = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Itinerary = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Package = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.ItemNumber = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Fee = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.EditColumn = new System.Windows.Forms.DataGridViewButtonColumn();
             this.DeleteColumn = new System.Windows.Forms.DataGridViewButtonColumn();
             this.menuStrip1.SuspendLayout();
@@ -143,7 +156,7 @@
             this.fileToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(961, 24);
+            this.menuStrip1.Size = new System.Drawing.Size(940, 24);
             this.menuStrip1.TabIndex = 3;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -157,26 +170,27 @@
             this.fileToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.F)));
             this.fileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
             this.fileToolStripMenuItem.Text = "&File";
+            this.fileToolStripMenuItem.Click += new System.EventHandler(this.fileToolStripMenuItem_Click);
             // 
             // saveToolStripMenuItem
             // 
             this.saveToolStripMenuItem.Name = "saveToolStripMenuItem";
             this.saveToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.S)));
-            this.saveToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.saveToolStripMenuItem.Size = new System.Drawing.Size(138, 22);
             this.saveToolStripMenuItem.Text = "Save";
             this.saveToolStripMenuItem.Click += new System.EventHandler(this.saveToolStripMenuItem_Click);
             // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(177, 6);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(135, 6);
             // 
             // quitToolStripMenuItem
             // 
             this.quitToolStripMenuItem.Name = "quitToolStripMenuItem";
-            this.quitToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Q)));
-            this.quitToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.quitToolStripMenuItem.Text = "Quit";
+            this.quitToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.E)));
+            this.quitToolStripMenuItem.Size = new System.Drawing.Size(138, 22);
+            this.quitToolStripMenuItem.Text = "Exit";
             this.quitToolStripMenuItem.Click += new System.EventHandler(this.quitToolStripMenuItem_Click);
             // 
             // dataGridSuppliers
@@ -243,29 +257,30 @@
             dataGridViewCellStyle4.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
             this.dataGridServicios.DefaultCellStyle = dataGridViewCellStyle4;
             this.dataGridServicios.EditMode = System.Windows.Forms.DataGridViewEditMode.EditProgrammatically;
-            this.dataGridServicios.Location = new System.Drawing.Point(0, 39);
+            this.dataGridServicios.Location = new System.Drawing.Point(0, 67);
             this.dataGridServicios.MultiSelect = false;
             this.dataGridServicios.Name = "dataGridServicios";
             this.dataGridServicios.RowHeadersVisible = false;
             this.dataGridServicios.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.AutoSizeToDisplayedHeaders;
             this.dataGridServicios.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.dataGridServicios.Size = new System.Drawing.Size(961, 248);
+            this.dataGridServicios.Size = new System.Drawing.Size(940, 207);
             this.dataGridServicios.TabIndex = 4;
             this.dataGridServicios.TabStop = false;
             this.dataGridServicios.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridServicios_CellDoubleClick);
             // 
             // txtIdService
             // 
-            this.txtIdService.Location = new System.Drawing.Point(142, 480);
+            this.txtIdService.Location = new System.Drawing.Point(138, 519);
             this.txtIdService.Name = "txtIdService";
-            this.txtIdService.Size = new System.Drawing.Size(37, 20);
+            this.txtIdService.Size = new System.Drawing.Size(35, 20);
             this.txtIdService.TabIndex = 35;
             this.txtIdService.TabStop = false;
+            this.txtIdService.Visible = false;
             // 
             // label7
             // 
             this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(767, 408);
+            this.label7.Location = new System.Drawing.Point(737, 425);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(62, 13);
             this.label7.TabIndex = 33;
@@ -274,7 +289,7 @@
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(318, 408);
+            this.label6.Location = new System.Drawing.Point(215, 429);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(59, 13);
             this.label6.TabIndex = 32;
@@ -283,7 +298,7 @@
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(21, 421);
+            this.label5.Location = new System.Drawing.Point(21, 391);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(0, 13);
             this.label5.TabIndex = 31;
@@ -291,7 +306,7 @@
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(85, 313);
+            this.label4.Location = new System.Drawing.Point(47, 462);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(45, 13);
             this.label4.TabIndex = 30;
@@ -300,7 +315,7 @@
             // lblQty
             // 
             this.lblQty.AutoSize = true;
-            this.lblQty.Location = new System.Drawing.Point(526, 408);
+            this.lblQty.Location = new System.Drawing.Point(468, 426);
             this.lblQty.Name = "lblQty";
             this.lblQty.Size = new System.Drawing.Size(46, 13);
             this.lblQty.TabIndex = 29;
@@ -309,7 +324,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(274, 362);
+            this.label2.Location = new System.Drawing.Point(490, 344);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(27, 13);
             this.label2.TabIndex = 28;
@@ -318,7 +333,7 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(46, 362);
+            this.label1.Location = new System.Drawing.Point(25, 344);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(67, 13);
             this.label1.TabIndex = 27;
@@ -326,41 +341,43 @@
             // 
             // txtItem
             // 
-            this.txtItem.Location = new System.Drawing.Point(307, 359);
+            this.txtItem.Location = new System.Drawing.Point(531, 340);
             this.txtItem.Name = "txtItem";
             this.txtItem.ReadOnly = true;
-            this.txtItem.Size = new System.Drawing.Size(390, 20);
+            this.txtItem.Size = new System.Drawing.Size(371, 20);
             this.txtItem.TabIndex = 26;
             this.txtItem.TabStop = false;
             // 
             // txtClientName
             // 
-            this.txtClientName.Location = new System.Drawing.Point(614, 310);
+            this.txtClientName.Location = new System.Drawing.Point(98, 299);
             this.txtClientName.Name = "txtClientName";
             this.txtClientName.ReadOnly = true;
-            this.txtClientName.Size = new System.Drawing.Size(253, 20);
+            this.txtClientName.Size = new System.Drawing.Size(282, 20);
             this.txtClientName.TabIndex = 25;
             this.txtClientName.TabStop = false;
             // 
             // txtAmount
             // 
-            this.txtAmount.Location = new System.Drawing.Point(185, 480);
+            this.txtAmount.Location = new System.Drawing.Point(181, 519);
             this.txtAmount.Name = "txtAmount";
-            this.txtAmount.Size = new System.Drawing.Size(37, 20);
+            this.txtAmount.Size = new System.Drawing.Size(35, 20);
             this.txtAmount.TabIndex = 24;
             this.txtAmount.TabStop = false;
+            this.txtAmount.Visible = false;
             // 
             // txtCost
             // 
-            this.txtCost.Location = new System.Drawing.Point(383, 405);
+            this.txtCost.Location = new System.Drawing.Point(280, 424);
             this.txtCost.Name = "txtCost";
             this.txtCost.Size = new System.Drawing.Size(100, 20);
             this.txtCost.TabIndex = 22;
+            this.txtCost.TextChanged += new System.EventHandler(this.txtCost_TextChanged);
             this.txtCost.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txtCost_KeyDown);
             // 
             // txtQty
             // 
-            this.txtQty.Location = new System.Drawing.Point(595, 405);
+            this.txtQty.Location = new System.Drawing.Point(530, 424);
             this.txtQty.Name = "txtQty";
             this.txtQty.Size = new System.Drawing.Size(100, 20);
             this.txtQty.TabIndex = 21;
@@ -369,28 +386,29 @@
             // 
             // txtPrice
             // 
-            this.txtPrice.Location = new System.Drawing.Point(833, 405);
+            this.txtPrice.Location = new System.Drawing.Point(810, 421);
             this.txtPrice.Name = "txtPrice";
-            this.txtPrice.Size = new System.Drawing.Size(100, 20);
+            this.txtPrice.Size = new System.Drawing.Size(92, 20);
             this.txtPrice.TabIndex = 23;
+            this.txtPrice.TextChanged += new System.EventHandler(this.txtPrice_TextChanged);
             // 
             // txtItemNumber
             // 
-            this.txtItemNumber.Location = new System.Drawing.Point(114, 359);
+            this.txtItemNumber.Location = new System.Drawing.Point(98, 340);
             this.txtItemNumber.Name = "txtItemNumber";
             this.txtItemNumber.ReadOnly = true;
-            this.txtItemNumber.Size = new System.Drawing.Size(133, 20);
+            this.txtItemNumber.Size = new System.Drawing.Size(282, 20);
             this.txtItemNumber.TabIndex = 20;
             this.txtItemNumber.TabStop = false;
             // 
             // BtnAdd
             // 
             this.BtnAdd.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.BtnAdd.Location = new System.Drawing.Point(6, 469);
+            this.BtnAdd.Location = new System.Drawing.Point(4, 506);
             this.BtnAdd.Name = "BtnAdd";
             this.BtnAdd.Size = new System.Drawing.Size(75, 23);
             this.BtnAdd.TabIndex = 24;
-            this.BtnAdd.Text = "Add";
+            this.BtnAdd.Text = "AddN/A";
             this.BtnAdd.UseVisualStyleBackColor = true;
             this.BtnAdd.Visible = false;
             this.BtnAdd.Click += new System.EventHandler(this.BtnAdd_Click);
@@ -419,12 +437,17 @@
             this.Item,
             this.Vendor,
             this.Quantity,
+            this.Currency,
             this.Cost,
+            this.TotalCost,
+            this.PriceCurrency,
             this.Price,
             this.Amount,
             this.IdService,
-            this.Currency,
             this.Itinerary,
+            this.Package,
+            this.ItemNumber,
+            this.Fee,
             this.EditColumn,
             this.DeleteColumn});
             dataGridViewCellStyle6.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
@@ -437,7 +460,7 @@
             this.dataGridInvoice.DefaultCellStyle = dataGridViewCellStyle6;
             this.dataGridInvoice.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.dataGridInvoice.EditMode = System.Windows.Forms.DataGridViewEditMode.EditOnF2;
-            this.dataGridInvoice.Location = new System.Drawing.Point(0, 518);
+            this.dataGridInvoice.Location = new System.Drawing.Point(0, 541);
             this.dataGridInvoice.MultiSelect = false;
             this.dataGridInvoice.Name = "dataGridInvoice";
             dataGridViewCellStyle7.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
@@ -450,7 +473,7 @@
             this.dataGridInvoice.RowHeadersDefaultCellStyle = dataGridViewCellStyle7;
             this.dataGridInvoice.RowHeadersVisible = false;
             this.dataGridInvoice.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.dataGridInvoice.Size = new System.Drawing.Size(961, 133);
+            this.dataGridInvoice.Size = new System.Drawing.Size(940, 160);
             this.dataGridInvoice.TabIndex = 40;
             this.dataGridInvoice.TabStop = false;
             this.dataGridInvoice.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridInvoice_CellContentClick);
@@ -458,31 +481,31 @@
             // label10
             // 
             this.label10.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.label10.Location = new System.Drawing.Point(-2, 31);
+            this.label10.Location = new System.Drawing.Point(-2, 56);
             this.label10.Name = "label10";
-            this.label10.Size = new System.Drawing.Size(828, 1);
+            this.label10.Size = new System.Drawing.Size(970, 1);
             this.label10.TabIndex = 41;
             // 
             // label11
             // 
             this.label11.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.label11.Location = new System.Drawing.Point(0, 297);
+            this.label11.Location = new System.Drawing.Point(0, 282);
             this.label11.Name = "label11";
-            this.label11.Size = new System.Drawing.Size(829, 1);
+            this.label11.Size = new System.Drawing.Size(970, 1);
             this.label11.TabIndex = 42;
             // 
             // label12
             // 
             this.label12.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.label12.Location = new System.Drawing.Point(-4, 502);
+            this.label12.Location = new System.Drawing.Point(-4, 540);
             this.label12.Name = "label12";
-            this.label12.Size = new System.Drawing.Size(914, 2);
+            this.label12.Size = new System.Drawing.Size(970, 2);
             this.label12.TabIndex = 43;
             // 
             // label13
             // 
             this.label13.AutoSize = true;
-            this.label13.Location = new System.Drawing.Point(1, 23);
+            this.label13.Location = new System.Drawing.Point(1, 48);
             this.label13.Name = "label13";
             this.label13.Size = new System.Drawing.Size(102, 13);
             this.label13.TabIndex = 44;
@@ -491,7 +514,7 @@
             // label14
             // 
             this.label14.AutoSize = true;
-            this.label14.Location = new System.Drawing.Point(3, 290);
+            this.label14.Location = new System.Drawing.Point(3, 275);
             this.label14.Name = "label14";
             this.label14.Size = new System.Drawing.Size(30, 13);
             this.label14.TabIndex = 45;
@@ -500,7 +523,7 @@
             // label15
             // 
             this.label15.AutoSize = true;
-            this.label15.Location = new System.Drawing.Point(3, 495);
+            this.label15.Location = new System.Drawing.Point(3, 532);
             this.label15.Name = "label15";
             this.label15.Size = new System.Drawing.Size(45, 13);
             this.label15.TabIndex = 46;
@@ -509,7 +532,7 @@
             // label16
             // 
             this.label16.AutoSize = true;
-            this.label16.Location = new System.Drawing.Point(26, 408);
+            this.label16.Location = new System.Drawing.Point(19, 427);
             this.label16.Name = "label16";
             this.label16.Size = new System.Drawing.Size(73, 13);
             this.label16.TabIndex = 48;
@@ -518,7 +541,7 @@
             // txtCurrency
             // 
             this.txtCurrency.Enabled = false;
-            this.txtCurrency.Location = new System.Drawing.Point(6, 443);
+            this.txtCurrency.Location = new System.Drawing.Point(816, 519);
             this.txtCurrency.MaxLength = 5;
             this.txtCurrency.Name = "txtCurrency";
             this.txtCurrency.ReadOnly = true;
@@ -529,178 +552,201 @@
             // 
             // txtUtilidad
             // 
-            this.txtUtilidad.Location = new System.Drawing.Point(185, 456);
+            this.txtUtilidad.Location = new System.Drawing.Point(181, 495);
             this.txtUtilidad.Name = "txtUtilidad";
-            this.txtUtilidad.Size = new System.Drawing.Size(37, 20);
+            this.txtUtilidad.ReadOnly = true;
+            this.txtUtilidad.Size = new System.Drawing.Size(35, 20);
             this.txtUtilidad.TabIndex = 50;
             this.txtUtilidad.TabStop = false;
+            this.txtUtilidad.Visible = false;
             // 
             // txtRoyalty
             // 
-            this.txtRoyalty.Location = new System.Drawing.Point(271, 456);
+            this.txtRoyalty.Location = new System.Drawing.Point(267, 495);
             this.txtRoyalty.Name = "txtRoyalty";
-            this.txtRoyalty.Size = new System.Drawing.Size(37, 20);
+            this.txtRoyalty.Size = new System.Drawing.Size(35, 20);
             this.txtRoyalty.TabIndex = 51;
             this.txtRoyalty.TabStop = false;
+            this.txtRoyalty.Visible = false;
             // 
             // txtCombustible
             // 
-            this.txtCombustible.Location = new System.Drawing.Point(228, 456);
+            this.txtCombustible.Location = new System.Drawing.Point(224, 495);
             this.txtCombustible.Name = "txtCombustible";
-            this.txtCombustible.Size = new System.Drawing.Size(37, 20);
+            this.txtCombustible.Size = new System.Drawing.Size(35, 20);
             this.txtCombustible.TabIndex = 52;
             this.txtCombustible.TabStop = false;
+            this.txtCombustible.Visible = false;
             // 
             // txtCombustibleI
             // 
-            this.txtCombustibleI.Location = new System.Drawing.Point(314, 456);
+            this.txtCombustibleI.Location = new System.Drawing.Point(310, 495);
             this.txtCombustibleI.Name = "txtCombustibleI";
-            this.txtCombustibleI.Size = new System.Drawing.Size(37, 20);
+            this.txtCombustibleI.Size = new System.Drawing.Size(35, 20);
             this.txtCombustibleI.TabIndex = 53;
             this.txtCombustibleI.TabStop = false;
+            this.txtCombustibleI.Visible = false;
             // 
             // txtSemeam
             // 
-            this.txtSemeam.Location = new System.Drawing.Point(357, 456);
+            this.txtSemeam.Location = new System.Drawing.Point(353, 495);
             this.txtSemeam.Name = "txtSemeam";
-            this.txtSemeam.Size = new System.Drawing.Size(37, 20);
+            this.txtSemeam.Size = new System.Drawing.Size(35, 20);
             this.txtSemeam.TabIndex = 54;
             this.txtSemeam.TabStop = false;
+            this.txtSemeam.Visible = false;
             // 
             // cboSuppliers
             // 
             this.cboSuppliers.Enabled = false;
             this.cboSuppliers.FormattingEnabled = true;
-            this.cboSuppliers.Location = new System.Drawing.Point(139, 309);
+            this.cboSuppliers.Location = new System.Drawing.Point(98, 458);
             this.cboSuppliers.Name = "cboSuppliers";
-            this.cboSuppliers.Size = new System.Drawing.Size(361, 21);
+            this.cboSuppliers.Size = new System.Drawing.Size(282, 21);
             this.cboSuppliers.TabIndex = 55;
             // 
             // txtAirport
             // 
-            this.txtAirport.Location = new System.Drawing.Point(228, 480);
+            this.txtAirport.Location = new System.Drawing.Point(224, 519);
             this.txtAirport.Name = "txtAirport";
-            this.txtAirport.Size = new System.Drawing.Size(37, 20);
+            this.txtAirport.Size = new System.Drawing.Size(35, 20);
             this.txtAirport.TabIndex = 56;
             this.txtAirport.TabStop = false;
+            this.txtAirport.Visible = false;
             // 
             // lblSrType
             // 
-            this.lblSrType.BackColor = System.Drawing.Color.GhostWhite;
-            this.lblSrType.Location = new System.Drawing.Point(311, 2);
+            this.lblSrType.BackColor = System.Drawing.SystemColors.ButtonFace;
+            this.lblSrType.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblSrType.Location = new System.Drawing.Point(299, 28);
             this.lblSrType.Name = "lblSrType";
-            this.lblSrType.Size = new System.Drawing.Size(133, 22);
+            this.lblSrType.Size = new System.Drawing.Size(133, 23);
             this.lblSrType.TabIndex = 57;
+            this.lblSrType.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // txtICAOD
             // 
-            this.txtICAOD.Location = new System.Drawing.Point(271, 480);
+            this.txtICAOD.Location = new System.Drawing.Point(267, 519);
             this.txtICAOD.Name = "txtICAOD";
-            this.txtICAOD.Size = new System.Drawing.Size(37, 20);
+            this.txtICAOD.Size = new System.Drawing.Size(35, 20);
             this.txtICAOD.TabIndex = 58;
             this.txtICAOD.TabStop = false;
+            this.txtICAOD.Visible = false;
             // 
             // lblIdIncident
             // 
             this.lblIdIncident.BackColor = System.Drawing.SystemColors.Control;
-            this.lblIdIncident.Location = new System.Drawing.Point(623, 2);
+            this.lblIdIncident.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblIdIncident.Location = new System.Drawing.Point(633, 29);
             this.lblIdIncident.Name = "lblIdIncident";
             this.lblIdIncident.Size = new System.Drawing.Size(133, 22);
             this.lblIdIncident.TabIndex = 59;
+            this.lblIdIncident.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.lblIdIncident.Visible = false;
             // 
             // txtATA
             // 
-            this.txtATA.Location = new System.Drawing.Point(400, 456);
+            this.txtATA.Location = new System.Drawing.Point(396, 495);
             this.txtATA.Name = "txtATA";
-            this.txtATA.Size = new System.Drawing.Size(37, 20);
+            this.txtATA.Size = new System.Drawing.Size(35, 20);
             this.txtATA.TabIndex = 60;
             this.txtATA.TabStop = false;
+            this.txtATA.Visible = false;
             // 
             // txtATD
             // 
-            this.txtATD.Location = new System.Drawing.Point(357, 480);
+            this.txtATD.Location = new System.Drawing.Point(353, 519);
             this.txtATD.Name = "txtATD";
-            this.txtATD.Size = new System.Drawing.Size(37, 20);
+            this.txtATD.Size = new System.Drawing.Size(35, 20);
             this.txtATD.TabIndex = 61;
             this.txtATD.TabStop = false;
+            this.txtATD.Visible = false;
             // 
             // txtFromAirport
             // 
-            this.txtFromAirport.Location = new System.Drawing.Point(443, 456);
+            this.txtFromAirport.Location = new System.Drawing.Point(439, 495);
             this.txtFromAirport.Name = "txtFromAirport";
-            this.txtFromAirport.Size = new System.Drawing.Size(37, 20);
+            this.txtFromAirport.Size = new System.Drawing.Size(35, 20);
             this.txtFromAirport.TabIndex = 62;
             this.txtFromAirport.TabStop = false;
+            this.txtFromAirport.Visible = false;
             // 
             // txtToAirtport
             // 
-            this.txtToAirtport.Location = new System.Drawing.Point(400, 480);
+            this.txtToAirtport.Location = new System.Drawing.Point(396, 519);
             this.txtToAirtport.Name = "txtToAirtport";
-            this.txtToAirtport.Size = new System.Drawing.Size(37, 20);
+            this.txtToAirtport.Size = new System.Drawing.Size(35, 20);
             this.txtToAirtport.TabIndex = 63;
             this.txtToAirtport.TabStop = false;
+            this.txtToAirtport.Visible = false;
             // 
             // txtArrivalAiport
             // 
-            this.txtArrivalAiport.Location = new System.Drawing.Point(486, 456);
+            this.txtArrivalAiport.Location = new System.Drawing.Point(482, 495);
             this.txtArrivalAiport.Name = "txtArrivalAiport";
-            this.txtArrivalAiport.Size = new System.Drawing.Size(37, 20);
+            this.txtArrivalAiport.Size = new System.Drawing.Size(35, 20);
             this.txtArrivalAiport.TabIndex = 64;
             this.txtArrivalAiport.TabStop = false;
+            this.txtArrivalAiport.Visible = false;
             // 
             // txtMainHour
             // 
-            this.txtMainHour.Location = new System.Drawing.Point(443, 480);
+            this.txtMainHour.Location = new System.Drawing.Point(98, 375);
             this.txtMainHour.Name = "txtMainHour";
-            this.txtMainHour.Size = new System.Drawing.Size(37, 20);
+            this.txtMainHour.ReadOnly = true;
+            this.txtMainHour.Size = new System.Drawing.Size(87, 20);
             this.txtMainHour.TabIndex = 65;
             this.txtMainHour.TabStop = false;
             // 
             // txtCategorias
             // 
-            this.txtCategorias.Location = new System.Drawing.Point(314, 480);
+            this.txtCategorias.Location = new System.Drawing.Point(310, 519);
             this.txtCategorias.Name = "txtCategorias";
-            this.txtCategorias.Size = new System.Drawing.Size(37, 20);
+            this.txtCategorias.Size = new System.Drawing.Size(35, 20);
             this.txtCategorias.TabIndex = 66;
             this.txtCategorias.TabStop = false;
+            this.txtCategorias.Visible = false;
             // 
             // txtGpoAero
             // 
-            this.txtGpoAero.Location = new System.Drawing.Point(529, 456);
+            this.txtGpoAero.Location = new System.Drawing.Point(525, 495);
             this.txtGpoAero.Name = "txtGpoAero";
-            this.txtGpoAero.Size = new System.Drawing.Size(37, 20);
+            this.txtGpoAero.Size = new System.Drawing.Size(35, 20);
             this.txtGpoAero.TabIndex = 67;
             this.txtGpoAero.TabStop = false;
+            this.txtGpoAero.Visible = false;
             // 
             // txtLimit
             // 
-            this.txtLimit.Location = new System.Drawing.Point(486, 480);
+            this.txtLimit.Location = new System.Drawing.Point(482, 519);
             this.txtLimit.Name = "txtLimit";
-            this.txtLimit.Size = new System.Drawing.Size(37, 20);
+            this.txtLimit.Size = new System.Drawing.Size(35, 20);
             this.txtLimit.TabIndex = 68;
             this.txtLimit.TabStop = false;
+            this.txtLimit.Visible = false;
             // 
             // txtClientInfo
             // 
-            this.txtClientInfo.Location = new System.Drawing.Point(572, 456);
+            this.txtClientInfo.Location = new System.Drawing.Point(568, 495);
             this.txtClientInfo.Name = "txtClientInfo";
             this.txtClientInfo.Size = new System.Drawing.Size(35, 20);
             this.txtClientInfo.TabIndex = 69;
             this.txtClientInfo.TabStop = false;
+            this.txtClientInfo.Visible = false;
             // 
             // txtFuelDateCharge
             // 
-            this.txtFuelDateCharge.Location = new System.Drawing.Point(654, 480);
+            this.txtFuelDateCharge.Location = new System.Drawing.Point(650, 519);
             this.txtFuelDateCharge.Name = "txtFuelDateCharge";
             this.txtFuelDateCharge.Size = new System.Drawing.Size(35, 20);
             this.txtFuelDateCharge.TabIndex = 70;
             this.txtFuelDateCharge.TabStop = false;
+            this.txtFuelDateCharge.Visible = false;
             // 
             // lblGalons
             // 
             this.lblGalons.AutoSize = true;
-            this.lblGalons.Location = new System.Drawing.Point(825, 434);
+            this.lblGalons.Location = new System.Drawing.Point(484, 462);
             this.lblGalons.Name = "lblGalons";
             this.lblGalons.Size = new System.Drawing.Size(40, 13);
             this.lblGalons.TabIndex = 71;
@@ -709,7 +755,7 @@
             // 
             // txtGalones
             // 
-            this.txtGalones.Location = new System.Drawing.Point(871, 431);
+            this.txtGalones.Location = new System.Drawing.Point(530, 458);
             this.txtGalones.Name = "txtGalones";
             this.txtGalones.Size = new System.Drawing.Size(62, 20);
             this.txtGalones.TabIndex = 72;
@@ -721,56 +767,61 @@
             this.cboCurrency.Items.AddRange(new object[] {
             "MXN",
             "USD"});
-            this.cboCurrency.Location = new System.Drawing.Point(105, 405);
+            this.cboCurrency.Location = new System.Drawing.Point(98, 423);
             this.cboCurrency.Name = "cboCurrency";
-            this.cboCurrency.Size = new System.Drawing.Size(139, 21);
+            this.cboCurrency.Size = new System.Drawing.Size(87, 21);
             this.cboCurrency.TabIndex = 73;
             this.cboCurrency.SelectedIndexChanged += new System.EventHandler(this.cboCurrency_SelectedIndexChanged);
             // 
             // txtAirportFee
             // 
-            this.txtAirportFee.Location = new System.Drawing.Point(529, 480);
+            this.txtAirportFee.Location = new System.Drawing.Point(525, 519);
             this.txtAirportFee.Name = "txtAirportFee";
             this.txtAirportFee.Size = new System.Drawing.Size(35, 20);
             this.txtAirportFee.TabIndex = 74;
             this.txtAirportFee.TabStop = false;
+            this.txtAirportFee.Visible = false;
             // 
             // txtFBO
             // 
-            this.txtFBO.Location = new System.Drawing.Point(613, 456);
+            this.txtFBO.Location = new System.Drawing.Point(609, 495);
             this.txtFBO.Name = "txtFBO";
             this.txtFBO.Size = new System.Drawing.Size(35, 20);
             this.txtFBO.TabIndex = 75;
             this.txtFBO.TabStop = false;
+            this.txtFBO.Visible = false;
             // 
             // txtItinerary
             // 
-            this.txtItinerary.Location = new System.Drawing.Point(99, 480);
+            this.txtItinerary.Location = new System.Drawing.Point(95, 519);
             this.txtItinerary.Name = "txtItinerary";
-            this.txtItinerary.Size = new System.Drawing.Size(37, 20);
+            this.txtItinerary.Size = new System.Drawing.Size(35, 20);
             this.txtItinerary.TabIndex = 76;
             this.txtItinerary.TabStop = false;
+            this.txtItinerary.Visible = false;
             // 
             // txtDailyRate
             // 
-            this.txtDailyRate.Location = new System.Drawing.Point(142, 456);
+            this.txtDailyRate.Location = new System.Drawing.Point(138, 495);
             this.txtDailyRate.Name = "txtDailyRate";
-            this.txtDailyRate.Size = new System.Drawing.Size(37, 20);
+            this.txtDailyRate.Size = new System.Drawing.Size(35, 20);
             this.txtDailyRate.TabIndex = 77;
             this.txtDailyRate.TabStop = false;
+            this.txtDailyRate.Visible = false;
             // 
             // txtWeekRate
             // 
-            this.txtWeekRate.Location = new System.Drawing.Point(99, 456);
+            this.txtWeekRate.Location = new System.Drawing.Point(95, 495);
             this.txtWeekRate.Name = "txtWeekRate";
-            this.txtWeekRate.Size = new System.Drawing.Size(37, 20);
+            this.txtWeekRate.Size = new System.Drawing.Size(35, 20);
             this.txtWeekRate.TabIndex = 78;
             this.txtWeekRate.TabStop = false;
+            this.txtWeekRate.Visible = false;
             // 
             // label9
             // 
             this.label9.AutoSize = true;
-            this.label9.Location = new System.Drawing.Point(526, 313);
+            this.label9.Location = new System.Drawing.Point(10, 303);
             this.label9.Name = "label9";
             this.label9.Size = new System.Drawing.Size(82, 13);
             this.label9.TabIndex = 79;
@@ -779,7 +830,7 @@
             // lblCurrencyPrice
             // 
             this.lblCurrencyPrice.AutoSize = true;
-            this.lblCurrencyPrice.Location = new System.Drawing.Point(830, 389);
+            this.lblCurrencyPrice.Location = new System.Drawing.Point(813, 403);
             this.lblCurrencyPrice.Name = "lblCurrencyPrice";
             this.lblCurrencyPrice.Size = new System.Drawing.Size(31, 13);
             this.lblCurrencyPrice.TabIndex = 80;
@@ -787,55 +838,61 @@
             // 
             // txtCateringCollection
             // 
-            this.txtCateringCollection.Location = new System.Drawing.Point(572, 480);
+            this.txtCateringCollection.Location = new System.Drawing.Point(568, 519);
             this.txtCateringCollection.Name = "txtCateringCollection";
             this.txtCateringCollection.Size = new System.Drawing.Size(35, 20);
             this.txtCateringCollection.TabIndex = 81;
             this.txtCateringCollection.TabStop = false;
+            this.txtCateringCollection.Visible = false;
             // 
             // txtCollectionDeduction
             // 
-            this.txtCollectionDeduction.Location = new System.Drawing.Point(613, 480);
+            this.txtCollectionDeduction.Location = new System.Drawing.Point(609, 519);
             this.txtCollectionDeduction.Name = "txtCollectionDeduction";
             this.txtCollectionDeduction.Size = new System.Drawing.Size(35, 20);
             this.txtCollectionDeduction.TabIndex = 82;
             this.txtCollectionDeduction.TabStop = false;
+            this.txtCollectionDeduction.Visible = false;
             // 
             // txtCobroParticipacionNj
             // 
-            this.txtCobroParticipacionNj.Location = new System.Drawing.Point(736, 480);
+            this.txtCobroParticipacionNj.Location = new System.Drawing.Point(732, 519);
             this.txtCobroParticipacionNj.Name = "txtCobroParticipacionNj";
             this.txtCobroParticipacionNj.Size = new System.Drawing.Size(35, 20);
             this.txtCobroParticipacionNj.TabIndex = 83;
             this.txtCobroParticipacionNj.TabStop = false;
+            this.txtCobroParticipacionNj.Visible = false;
             // 
             // txtDepartureIncident
             // 
-            this.txtDepartureIncident.Location = new System.Drawing.Point(769, 336);
+            this.txtDepartureIncident.Location = new System.Drawing.Point(439, 519);
             this.txtDepartureIncident.Name = "txtDepartureIncident";
             this.txtDepartureIncident.Size = new System.Drawing.Size(35, 20);
             this.txtDepartureIncident.TabIndex = 85;
             this.txtDepartureIncident.TabStop = false;
+            this.txtDepartureIncident.Visible = false;
             // 
             // txtArrivalIncident
             // 
-            this.txtArrivalIncident.Location = new System.Drawing.Point(728, 336);
+            this.txtArrivalIncident.Location = new System.Drawing.Point(775, 495);
             this.txtArrivalIncident.Name = "txtArrivalIncident";
             this.txtArrivalIncident.Size = new System.Drawing.Size(35, 20);
             this.txtArrivalIncident.TabIndex = 84;
             this.txtArrivalIncident.TabStop = false;
+            this.txtArrivalIncident.Visible = false;
             // 
             // txtUOM
             // 
-            this.txtUOM.Location = new System.Drawing.Point(49, 336);
+            this.txtUOM.Location = new System.Drawing.Point(690, 495);
             this.txtUOM.Name = "txtUOM";
-            this.txtUOM.Size = new System.Drawing.Size(39, 20);
+            this.txtUOM.Size = new System.Drawing.Size(35, 20);
             this.txtUOM.TabIndex = 86;
+            this.txtUOM.Visible = false;
             // 
             // lblCurrencyCost
             // 
             this.lblCurrencyCost.AutoSize = true;
-            this.lblCurrencyCost.Location = new System.Drawing.Point(380, 389);
+            this.lblCurrencyCost.Location = new System.Drawing.Point(283, 403);
             this.lblCurrencyCost.Name = "lblCurrencyCost";
             this.lblCurrencyCost.Size = new System.Drawing.Size(31, 13);
             this.lblCurrencyCost.TabIndex = 87;
@@ -843,54 +900,60 @@
             // 
             // txtCateringDDate
             // 
-            this.txtCateringDDate.Location = new System.Drawing.Point(695, 480);
+            this.txtCateringDDate.Location = new System.Drawing.Point(691, 519);
             this.txtCateringDDate.Name = "txtCateringDDate";
             this.txtCateringDDate.Size = new System.Drawing.Size(35, 20);
             this.txtCateringDDate.TabIndex = 88;
             this.txtCateringDDate.TabStop = false;
+            this.txtCateringDDate.Visible = false;
             // 
             // txtCargoGroup
             // 
-            this.txtCargoGroup.Location = new System.Drawing.Point(6, 336);
+            this.txtCargoGroup.Location = new System.Drawing.Point(531, 375);
             this.txtCargoGroup.Name = "txtCargoGroup";
-            this.txtCargoGroup.Size = new System.Drawing.Size(37, 20);
+            this.txtCargoGroup.ReadOnly = true;
+            this.txtCargoGroup.Size = new System.Drawing.Size(80, 20);
             this.txtCargoGroup.TabIndex = 89;
             this.txtCargoGroup.TabStop = false;
             // 
             // txtParticipacionCobro
             // 
-            this.txtParticipacionCobro.Location = new System.Drawing.Point(777, 480);
+            this.txtParticipacionCobro.Location = new System.Drawing.Point(775, 519);
             this.txtParticipacionCobro.Name = "txtParticipacionCobro";
-            this.txtParticipacionCobro.Size = new System.Drawing.Size(29, 20);
+            this.txtParticipacionCobro.Size = new System.Drawing.Size(35, 20);
             this.txtParticipacionCobro.TabIndex = 90;
             this.txtParticipacionCobro.TabStop = false;
+            this.txtParticipacionCobro.Visible = false;
             // 
             // txtCustomerClass
             // 
-            this.txtCustomerClass.Location = new System.Drawing.Point(94, 336);
+            this.txtCustomerClass.Location = new System.Drawing.Point(531, 299);
             this.txtCustomerClass.Name = "txtCustomerClass";
-            this.txtCustomerClass.Size = new System.Drawing.Size(39, 20);
+            this.txtCustomerClass.ReadOnly = true;
+            this.txtCustomerClass.Size = new System.Drawing.Size(99, 20);
             this.txtCustomerClass.TabIndex = 91;
             // 
             // txtCreationIncidentDate
             // 
-            this.txtCreationIncidentDate.Location = new System.Drawing.Point(685, 336);
+            this.txtCreationIncidentDate.Location = new System.Drawing.Point(732, 495);
             this.txtCreationIncidentDate.Name = "txtCreationIncidentDate";
-            this.txtCreationIncidentDate.Size = new System.Drawing.Size(37, 20);
+            this.txtCreationIncidentDate.Size = new System.Drawing.Size(35, 20);
             this.txtCreationIncidentDate.TabIndex = 92;
             this.txtCreationIncidentDate.TabStop = false;
+            this.txtCreationIncidentDate.Visible = false;
             // 
             // txtPaxGroup
             // 
-            this.txtPaxGroup.Location = new System.Drawing.Point(139, 336);
+            this.txtPaxGroup.Location = new System.Drawing.Point(280, 375);
             this.txtPaxGroup.Name = "txtPaxGroup";
-            this.txtPaxGroup.Size = new System.Drawing.Size(39, 20);
+            this.txtPaxGroup.ReadOnly = true;
+            this.txtPaxGroup.Size = new System.Drawing.Size(100, 20);
             this.txtPaxGroup.TabIndex = 93;
             // 
             // lblExchangeRate
             // 
             this.lblExchangeRate.AutoSize = true;
-            this.lblExchangeRate.Location = new System.Drawing.Point(739, 362);
+            this.lblExchangeRate.Location = new System.Drawing.Point(718, 378);
             this.lblExchangeRate.Name = "lblExchangeRate";
             this.lblExchangeRate.Size = new System.Drawing.Size(81, 13);
             this.lblExchangeRate.TabIndex = 95;
@@ -899,7 +962,7 @@
             // 
             // txtExchangeRate
             // 
-            this.txtExchangeRate.Location = new System.Drawing.Point(826, 359);
+            this.txtExchangeRate.Location = new System.Drawing.Point(810, 375);
             this.txtExchangeRate.Name = "txtExchangeRate";
             this.txtExchangeRate.ReadOnly = true;
             this.txtExchangeRate.Size = new System.Drawing.Size(92, 20);
@@ -909,24 +972,25 @@
             // 
             // txtPackage
             // 
-            this.txtPackage.Location = new System.Drawing.Point(810, 336);
+            this.txtPackage.Location = new System.Drawing.Point(816, 495);
             this.txtPackage.Name = "txtPackage";
             this.txtPackage.Size = new System.Drawing.Size(35, 20);
             this.txtPackage.TabIndex = 96;
             this.txtPackage.TabStop = false;
+            this.txtPackage.Visible = false;
             // 
             // txtTotalCostFuel
             // 
-            this.txtTotalCostFuel.Location = new System.Drawing.Point(383, 431);
+            this.txtTotalCostFuel.Location = new System.Drawing.Point(810, 458);
             this.txtTotalCostFuel.Name = "txtTotalCostFuel";
-            this.txtTotalCostFuel.Size = new System.Drawing.Size(100, 20);
+            this.txtTotalCostFuel.Size = new System.Drawing.Size(92, 20);
             this.txtTotalCostFuel.TabIndex = 98;
             this.txtTotalCostFuel.Visible = false;
             // 
             // lblTotalCostFuel
             // 
             this.lblTotalCostFuel.AutoSize = true;
-            this.lblTotalCostFuel.Location = new System.Drawing.Point(322, 434);
+            this.lblTotalCostFuel.Location = new System.Drawing.Point(744, 462);
             this.lblTotalCostFuel.Name = "lblTotalCostFuel";
             this.lblTotalCostFuel.Size = new System.Drawing.Size(55, 13);
             this.lblTotalCostFuel.TabIndex = 97;
@@ -935,15 +999,16 @@
             // 
             // txtInvoiceReady
             // 
-            this.txtInvoiceReady.Location = new System.Drawing.Point(654, 456);
+            this.txtInvoiceReady.Location = new System.Drawing.Point(650, 495);
             this.txtInvoiceReady.Name = "txtInvoiceReady";
             this.txtInvoiceReady.Size = new System.Drawing.Size(35, 20);
             this.txtInvoiceReady.TabIndex = 99;
             this.txtInvoiceReady.TabStop = false;
+            this.txtInvoiceReady.Visible = false;
             // 
             // BAdd
             // 
-            this.BAdd.Location = new System.Drawing.Point(6, 469);
+            this.BAdd.Location = new System.Drawing.Point(5, 506);
             this.BAdd.Name = "BAdd";
             this.BAdd.Size = new System.Drawing.Size(75, 23);
             this.BAdd.TabIndex = 100;
@@ -951,11 +1016,87 @@
             this.BAdd.UseVisualStyleBackColor = true;
             this.BAdd.Click += new System.EventHandler(this.BAdd_Click);
             // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(438, 303);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(79, 13);
+            this.label3.TabIndex = 101;
+            this.label3.Text = "Customer Class";
+            // 
+            // label8
+            // 
+            this.label8.AutoSize = true;
+            this.label8.Location = new System.Drawing.Point(36, 378);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(56, 13);
+            this.label8.TabIndex = 102;
+            this.label8.Text = "Main Hour";
+            // 
+            // label17
+            // 
+            this.label17.AutoSize = true;
+            this.label17.Location = new System.Drawing.Point(217, 378);
+            this.label17.Name = "label17";
+            this.label17.Size = new System.Drawing.Size(57, 13);
+            this.label17.TabIndex = 103;
+            this.label17.Text = "Pax Group";
+            // 
+            // label18
+            // 
+            this.label18.AutoSize = true;
+            this.label18.Location = new System.Drawing.Point(449, 378);
+            this.label18.Name = "label18";
+            this.label18.Size = new System.Drawing.Size(67, 13);
+            this.label18.TabIndex = 104;
+            this.label18.Text = "Cargo Group";
+            // 
+            // label19
+            // 
+            this.label19.AutoSize = true;
+            this.label19.Location = new System.Drawing.Point(240, 34);
+            this.label19.Name = "label19";
+            this.label19.Size = new System.Drawing.Size(55, 13);
+            this.label19.TabIndex = 105;
+            this.label19.Text = "SR Type: ";
+            // 
+            // label20
+            // 
+            this.label20.AutoSize = true;
+            this.label20.Location = new System.Drawing.Point(535, 34);
+            this.label20.Name = "label20";
+            this.label20.Size = new System.Drawing.Size(92, 13);
+            this.label20.TabIndex = 106;
+            this.label20.Text = "Service Request: ";
+            // 
+            // lblSrNum
+            // 
+            this.lblSrNum.BackColor = System.Drawing.SystemColors.Control;
+            this.lblSrNum.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblSrNum.Location = new System.Drawing.Point(633, 29);
+            this.lblSrNum.Name = "lblSrNum";
+            this.lblSrNum.Size = new System.Drawing.Size(133, 22);
+            this.lblSrNum.TabIndex = 107;
+            this.lblSrNum.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // txtFee
+            // 
+            this.txtFee.Enabled = false;
+            this.txtFee.Location = new System.Drawing.Point(857, 519);
+            this.txtFee.MaxLength = 5;
+            this.txtFee.Name = "txtFee";
+            this.txtFee.ReadOnly = true;
+            this.txtFee.Size = new System.Drawing.Size(35, 20);
+            this.txtFee.TabIndex = 108;
+            this.txtFee.TabStop = false;
+            this.txtFee.Visible = false;
+            // 
             // InvoiceReady
             // 
             this.InvoiceReady.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
             this.InvoiceReady.FalseValue = "";
-            this.InvoiceReady.HeaderText = "InvoiceReady";
+            this.InvoiceReady.HeaderText = "Invoice Ready?";
             this.InvoiceReady.Name = "InvoiceReady";
             this.InvoiceReady.Resizable = System.Windows.Forms.DataGridViewTriState.True;
             this.InvoiceReady.TrueValue = "";
@@ -979,11 +1120,28 @@
             this.Quantity.Name = "Quantity";
             this.Quantity.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
             // 
+            // Currency
+            // 
+            this.Currency.HeaderText = "Cost Currency";
+            this.Currency.Name = "Currency";
+            this.Currency.ReadOnly = true;
+            this.Currency.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            // 
             // Cost
             // 
             this.Cost.HeaderText = "Cost p/unit";
             this.Cost.Name = "Cost";
             this.Cost.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            // 
+            // TotalCost
+            // 
+            this.TotalCost.HeaderText = "Total Cost";
+            this.TotalCost.Name = "TotalCost";
+            // 
+            // PriceCurrency
+            // 
+            this.PriceCurrency.HeaderText = "Price Currency";
+            this.PriceCurrency.Name = "PriceCurrency";
             // 
             // Price
             // 
@@ -1004,18 +1162,29 @@
             this.IdService.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
             this.IdService.Visible = false;
             // 
-            // Currency
-            // 
-            this.Currency.HeaderText = "Currency";
-            this.Currency.Name = "Currency";
-            this.Currency.ReadOnly = true;
-            this.Currency.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            // 
             // Itinerary
             // 
             this.Itinerary.HeaderText = "Itinerary";
             this.Itinerary.Name = "Itinerary";
             this.Itinerary.Visible = false;
+            // 
+            // Package
+            // 
+            this.Package.HeaderText = "Package";
+            this.Package.Name = "Package";
+            this.Package.Visible = false;
+            // 
+            // ItemNumber
+            // 
+            this.ItemNumber.HeaderText = "Item Number";
+            this.ItemNumber.Name = "ItemNumber";
+            this.ItemNumber.Visible = false;
+            // 
+            // Fee
+            // 
+            this.Fee.HeaderText = "Fee";
+            this.Fee.Name = "Fee";
+            this.Fee.Visible = false;
             // 
             // EditColumn
             // 
@@ -1036,59 +1205,33 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(961, 651);
-            this.Controls.Add(this.BAdd);
-            this.Controls.Add(this.txtInvoiceReady);
+            this.ClientSize = new System.Drawing.Size(940, 701);
+            this.ControlBox = false;
+            this.Controls.Add(this.txtFee);
+            this.Controls.Add(this.lblSrNum);
+            this.Controls.Add(this.label20);
+            this.Controls.Add(this.label19);
+            this.Controls.Add(this.label18);
+            this.Controls.Add(this.label17);
+            this.Controls.Add(this.label8);
+            this.Controls.Add(this.label3);
             this.Controls.Add(this.txtTotalCostFuel);
             this.Controls.Add(this.lblTotalCostFuel);
-            this.Controls.Add(this.txtPackage);
             this.Controls.Add(this.lblExchangeRate);
             this.Controls.Add(this.txtExchangeRate);
             this.Controls.Add(this.txtPaxGroup);
-            this.Controls.Add(this.txtCreationIncidentDate);
             this.Controls.Add(this.txtCustomerClass);
-            this.Controls.Add(this.txtParticipacionCobro);
             this.Controls.Add(this.txtCargoGroup);
-            this.Controls.Add(this.txtCateringDDate);
             this.Controls.Add(this.lblCurrencyCost);
-            this.Controls.Add(this.txtUOM);
-            this.Controls.Add(this.txtDepartureIncident);
-            this.Controls.Add(this.txtArrivalIncident);
-            this.Controls.Add(this.txtCobroParticipacionNj);
-            this.Controls.Add(this.txtCollectionDeduction);
-            this.Controls.Add(this.txtCateringCollection);
             this.Controls.Add(this.lblCurrencyPrice);
             this.Controls.Add(this.label9);
-            this.Controls.Add(this.txtWeekRate);
-            this.Controls.Add(this.txtDailyRate);
-            this.Controls.Add(this.txtItinerary);
-            this.Controls.Add(this.txtFBO);
-            this.Controls.Add(this.txtAirportFee);
             this.Controls.Add(this.cboCurrency);
             this.Controls.Add(this.txtGalones);
             this.Controls.Add(this.lblGalons);
-            this.Controls.Add(this.txtFuelDateCharge);
-            this.Controls.Add(this.txtClientInfo);
-            this.Controls.Add(this.txtLimit);
-            this.Controls.Add(this.txtGpoAero);
-            this.Controls.Add(this.txtCategorias);
             this.Controls.Add(this.txtMainHour);
-            this.Controls.Add(this.txtArrivalAiport);
-            this.Controls.Add(this.txtToAirtport);
-            this.Controls.Add(this.txtFromAirport);
-            this.Controls.Add(this.txtATD);
-            this.Controls.Add(this.txtATA);
             this.Controls.Add(this.lblIdIncident);
-            this.Controls.Add(this.txtICAOD);
             this.Controls.Add(this.lblSrType);
-            this.Controls.Add(this.txtAirport);
             this.Controls.Add(this.cboSuppliers);
-            this.Controls.Add(this.txtSemeam);
-            this.Controls.Add(this.txtCombustibleI);
-            this.Controls.Add(this.txtCombustible);
-            this.Controls.Add(this.txtRoyalty);
-            this.Controls.Add(this.txtUtilidad);
-            this.Controls.Add(this.txtCurrency);
             this.Controls.Add(this.label16);
             this.Controls.Add(this.label15);
             this.Controls.Add(this.label14);
@@ -1097,7 +1240,6 @@
             this.Controls.Add(this.label11);
             this.Controls.Add(this.label10);
             this.Controls.Add(this.dataGridInvoice);
-            this.Controls.Add(this.txtIdService);
             this.Controls.Add(this.label7);
             this.Controls.Add(this.label6);
             this.Controls.Add(this.label5);
@@ -1107,15 +1249,51 @@
             this.Controls.Add(this.label1);
             this.Controls.Add(this.txtItem);
             this.Controls.Add(this.txtClientName);
-            this.Controls.Add(this.txtAmount);
             this.Controls.Add(this.txtCost);
             this.Controls.Add(this.txtQty);
             this.Controls.Add(this.txtPrice);
             this.Controls.Add(this.txtItemNumber);
-            this.Controls.Add(this.BtnAdd);
             this.Controls.Add(this.dataGridServicios);
             this.Controls.Add(this.menuStrip1);
             this.Controls.Add(this.dataGridSuppliers);
+            this.Controls.Add(this.BAdd);
+            this.Controls.Add(this.BtnAdd);
+            this.Controls.Add(this.txtInvoiceReady);
+            this.Controls.Add(this.txtPackage);
+            this.Controls.Add(this.txtCreationIncidentDate);
+            this.Controls.Add(this.txtParticipacionCobro);
+            this.Controls.Add(this.txtCateringDDate);
+            this.Controls.Add(this.txtUOM);
+            this.Controls.Add(this.txtDepartureIncident);
+            this.Controls.Add(this.txtArrivalIncident);
+            this.Controls.Add(this.txtCobroParticipacionNj);
+            this.Controls.Add(this.txtCollectionDeduction);
+            this.Controls.Add(this.txtCateringCollection);
+            this.Controls.Add(this.txtWeekRate);
+            this.Controls.Add(this.txtDailyRate);
+            this.Controls.Add(this.txtItinerary);
+            this.Controls.Add(this.txtFBO);
+            this.Controls.Add(this.txtAirportFee);
+            this.Controls.Add(this.txtFuelDateCharge);
+            this.Controls.Add(this.txtClientInfo);
+            this.Controls.Add(this.txtLimit);
+            this.Controls.Add(this.txtGpoAero);
+            this.Controls.Add(this.txtCategorias);
+            this.Controls.Add(this.txtArrivalAiport);
+            this.Controls.Add(this.txtToAirtport);
+            this.Controls.Add(this.txtFromAirport);
+            this.Controls.Add(this.txtATD);
+            this.Controls.Add(this.txtATA);
+            this.Controls.Add(this.txtICAOD);
+            this.Controls.Add(this.txtAirport);
+            this.Controls.Add(this.txtSemeam);
+            this.Controls.Add(this.txtCombustibleI);
+            this.Controls.Add(this.txtCombustible);
+            this.Controls.Add(this.txtRoyalty);
+            this.Controls.Add(this.txtUtilidad);
+            this.Controls.Add(this.txtCurrency);
+            this.Controls.Add(this.txtIdService);
+            this.Controls.Add(this.txtAmount);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.menuStrip1;
@@ -1124,6 +1302,7 @@
             this.Name = "DoubleScreen";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "DoubleScreen";
+            this.Load += new System.EventHandler(this.DoubleScreen_Load);
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridSuppliers)).EndInit();
@@ -1219,16 +1398,29 @@
         private System.Windows.Forms.Label lblTotalCostFuel;
         private System.Windows.Forms.TextBox txtInvoiceReady;
         private System.Windows.Forms.Button BAdd;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.Label label8;
+        private System.Windows.Forms.Label label17;
+        private System.Windows.Forms.Label label18;
+        private System.Windows.Forms.Label label19;
+        private System.Windows.Forms.Label label20;
+        private System.Windows.Forms.Label lblSrNum;
+        private System.Windows.Forms.TextBox txtFee;
         private System.Windows.Forms.DataGridViewCheckBoxColumn InvoiceReady;
         private System.Windows.Forms.DataGridViewTextBoxColumn Item;
         private System.Windows.Forms.DataGridViewTextBoxColumn Vendor;
         private System.Windows.Forms.DataGridViewTextBoxColumn Quantity;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Currency;
         private System.Windows.Forms.DataGridViewTextBoxColumn Cost;
+        private System.Windows.Forms.DataGridViewTextBoxColumn TotalCost;
+        private System.Windows.Forms.DataGridViewTextBoxColumn PriceCurrency;
         private System.Windows.Forms.DataGridViewTextBoxColumn Price;
         private System.Windows.Forms.DataGridViewTextBoxColumn Amount;
         private System.Windows.Forms.DataGridViewTextBoxColumn IdService;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Currency;
         private System.Windows.Forms.DataGridViewTextBoxColumn Itinerary;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Package;
+        private System.Windows.Forms.DataGridViewTextBoxColumn ItemNumber;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Fee;
         private System.Windows.Forms.DataGridViewButtonColumn EditColumn;
         private System.Windows.Forms.DataGridViewButtonColumn DeleteColumn;
     }

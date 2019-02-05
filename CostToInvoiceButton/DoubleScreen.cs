@@ -51,7 +51,13 @@ namespace CostToInvoiceButton
                 // txtUOM.Text = "";
                 if (e.RowIndex != -1)
                 {
-                    // Etiquetas/Cajas
+                    //Etiquetas/Cajas
+                    ClearTxtBoxes();
+                    cboSuppliers.Enabled = true;
+                    txtPrice.Enabled = true;
+                    txtQty.Enabled = true;
+                    txtCost.Enabled = true;
+                    cboCurrency.Enabled = true;
                     PriceCostValueSet = false;
                     bool blnPriceSet = false;
                     bool blnCostSet = false;
@@ -62,10 +68,6 @@ namespace CostToInvoiceButton
                     lblTotalCostFuel.Hide();
                     txtGalones.Hide();
                     txtTotalCostFuel.Hide();
-                    txtPrice.Enabled = true;
-                    txtCost.Enabled = true;
-                    cboCurrency.Enabled = true;
-                    ClearTxtBoxes();
                     dataGridSuppliers.DataSource = null;
                     txtInvoiceReady.Text = dataGridServicios.Rows[e.RowIndex].Cells["InvoiceReady"].Value.ToString() == "Yes" ? "1" : "0";
                     txtIdService.Text = dataGridServicios.Rows[e.RowIndex].Cells["ID"].Value.ToString();
@@ -76,7 +78,7 @@ namespace CostToInvoiceButton
                     txtCobroParticipacionNj.Text = dataGridServicios.Rows[e.RowIndex].Cells["CobroParticipacionNj"].Value.ToString();
                     txtParticipacionCobro.Text = dataGridServicios.Rows[e.RowIndex].Cells["ParticipacionCobro"].Value.ToString();
                     txtFee.Text = dataGridServicios.Rows[e.RowIndex].Cells["Fee"].Value.ToString();
-                    if (!string.IsNullOrEmpty(dataGridServicios.Rows[e.RowIndex].Cells["Quantity"].Value.ToString())) 
+                    if (!string.IsNullOrEmpty(dataGridServicios.Rows[e.RowIndex].Cells["Quantity"].Value.ToString()))
                     {
                         txtQty.Text = dataGridServicios.Rows[e.RowIndex].Cells["Quantity"].Value.ToString();
                     }
@@ -1460,11 +1462,16 @@ namespace CostToInvoiceButton
                 txtAmount.Text = "0";
                 txtCost.Text = "";
                 txtIdService.Text = "";
-
                 txtItem.Text = "";
                 txtItemNumber.Text = "";
                 txtPrice.Text = "";
                 txtQty.Text = "1";
+                cboSuppliers.DataSource = null;
+                cboSuppliers.Enabled = false;
+                txtPrice.Enabled = false;
+                txtQty.Enabled = false;
+                txtCost.Enabled = false;
+                cboCurrency.Enabled = false;
             }
             catch (Exception ex)
             {
@@ -1526,6 +1533,7 @@ namespace CostToInvoiceButton
                 }
                 string OUM = "";
                 string Curr = "";
+                string supplier = "NO SUPPLIER";
                 double cost = 0;
 
                 if (lblSrType.Text == "CATERING")
@@ -1622,6 +1630,7 @@ namespace CostToInvoiceButton
                             //definicion = "?totalResults=true&q={str_item_number:'" + txtItemNumber.Text + "',str_icao_iata_code:'" + txtAirport.Text + "',str_aircraft_type:'" + txtICAOD.Text + "'}";
                             definicion += "str_item_number:'" + txtItemNumber.Text + "',str_icao_iata_code:'" + txtAirport.Text + "',$or:[{str_ft_arrival:'" + arr_type.ToString() + "'},{str_ft_arrival:{$exists: false}}],$or:[{str_client_category:{$exists:false}},{str_client_category:'" + txtCustomerClass.Text.Replace("&", "%") + "'}]}";
                         }
+                        /*
                         else if (txtItemNumber.Text == "OHANIAS0129" || txtItemNumber.Text == "OPLAIAS0128" || txtItemNumber.Text == "OFPLIAS0130")
                         {
                             definicion += "str_item_number:'" + txtItemNumber.Text + "',str_icao_iata_code:'" + txtAirport.Text + "'}";
@@ -1675,7 +1684,7 @@ namespace CostToInvoiceButton
                     {
                         definicion = "?totalResults=true&q={str_item_number:'" + txtItemNumber.Text + "'}";
                     }
-                    global.LogMessage("GETCostDef:" + definicion + "SRType:" + lblSrType.Text);
+                    global.LogMessage("GETCostDef: " + definicion + " SRType: " + lblSrType.Text);
                     var request = new RestRequest("rest/v6/customCostos/" + definicion, Method.GET);
                     IRestResponse response = client.Execute(request);
                     ClaseParaCostos.RootObject rootObjectCosts = JsonConvert.DeserializeObject<ClaseParaCostos.RootObject>(response.Content);
@@ -1694,6 +1703,7 @@ namespace CostToInvoiceButton
                                     cost = item.flo_cost;
                                     Curr = item.str_currency_code;
                                     OUM = item.str_uom_code;
+                                    supplier = item.str_vendor_name;
                                 }
                             }
                         }
@@ -1711,6 +1721,7 @@ namespace CostToInvoiceButton
                                     cost = item.flo_cost;
                                     Curr = item.str_currency_code;
                                     OUM = item.str_uom_code;
+                                    supplier = item.str_vendor_name;
                                     // MessageBox.Show("Cost FBO/FCC dentro de fechas " + cost.ToString());
                                 }
                             }
@@ -1729,6 +1740,7 @@ namespace CostToInvoiceButton
                                     cost = item.flo_cost;
                                     Curr = item.str_currency_code;
                                     OUM = item.str_uom_code;
+                                    supplier = item.str_vendor_name;
                                 }
                             }
                         }
@@ -1737,6 +1749,7 @@ namespace CostToInvoiceButton
                             cost = rootObjectCosts.items[0].flo_cost;
                             Curr = rootObjectCosts.items[0].str_currency_code;
                             OUM = rootObjectCosts.items[0].str_uom_code;
+                            cboSuppliers.Text = supplier;
                             // MessageBox.Show("Cost OTROS: " + cost.ToString());
                         }
                         txtUOM.Text = OUM;
@@ -1750,6 +1763,7 @@ namespace CostToInvoiceButton
                 // MessageBox.Show("Cost FINAL: " + cost.ToString());
                 Currency = Curr;
                 lblCurrencyCost.Text = Currency;
+                cboSuppliers.Text = supplier;
                 return cost;
             }
             catch (Exception ex)
@@ -1931,7 +1945,7 @@ namespace CostToInvoiceButton
                     }
                     // definicion += "&orderby=flo_amount,flo_amount:asc";
                 }
-                global.LogMessage("GETPricesdef:" + definicion + "SRType:" + lblSrType.Text);
+                global.LogMessage("GETPricesDef:" + definicion + "SRType:" + lblSrType.Text);
                 var request = new RestRequest("rest/v6/customPrecios/" + definicion, Method.GET);
                 IRestResponse response = client.Execute(request);
                 ClaseParaPrecios.RootObject rootObjectPrices = JsonConvert.DeserializeObject<ClaseParaPrecios.RootObject>(response.Content);
@@ -1967,8 +1981,10 @@ namespace CostToInvoiceButton
                                 Curr = item.str_currency_code;
                                 OUM = item.str_oum_code;
                                 string cClass = "";
-                                cClass = string.IsNullOrEmpty(item.str_client_category) ? "" : item.str_client_category;
-                                if (txtCustomerClass.Text.Trim() == cClass)
+
+                                cClass = string.IsNullOrEmpty(item.str_client_category) ? "" : item.str_client_category.Trim();
+                                global.LogMessage("Clase: " + cClass);
+                                if (txtCustomerClass.Text == cClass.Trim())
                                 {
                                     break;
                                 }
@@ -3229,32 +3245,39 @@ namespace CostToInvoiceButton
         {
             try
             {
-                if (ValidateData())
+                if (!string.IsNullOrEmpty(txtItem.Text) && !string.IsNullOrEmpty(txtItemNumber.Text))
                 {
-                    if (dataGridInvoice.RowCount <= dataGridServicios.RowCount - 1)
+                    if (ValidateData())
                     {
-                        if (ValidateRows())
+                        if (dataGridInvoice.RowCount <= dataGridServicios.RowCount - 1)
                         {
-                            double amountPrice = Math.Round((Convert.ToDouble(txtPrice.Text) * Convert.ToDouble(txtQty.Text)), 2);
-                            double amountCost = Math.Round((Convert.ToDouble(txtCost.Text) * Convert.ToDouble(txtQty.Text)), 2);
-                            bool invoi = txtInvoiceReady.Text == "1" ? true : false;
-                            dataGridInvoice.Rows.Add(invoi, txtItem.Text, cboSuppliers.Text, txtQty.Text, cboCurrency.Text, txtCost.Text, amountCost, lblCurrencyPrice.Text, txtPrice.Text, amountPrice, txtIdService.Text, txtItinerary.Text, txtPackage.Text, txtItemNumber.Text,txtFee.Text);
-                            ClearTxtBoxes();
+                            if (ValidateRows())
+                            {
+                                double amountPrice = Math.Round((Convert.ToDouble(txtPrice.Text) * Convert.ToDouble(txtQty.Text)), 2);
+                                double amountCost = Math.Round((Convert.ToDouble(txtCost.Text) * Convert.ToDouble(txtQty.Text)), 2);
+                                bool invoi = txtInvoiceReady.Text == "1" ? true : false;
+                                dataGridInvoice.Rows.Add(invoi, txtItem.Text, cboSuppliers.Text, txtQty.Text, cboCurrency.Text, txtCost.Text, amountCost, lblCurrencyPrice.Text, txtPrice.Text, amountPrice, txtIdService.Text, txtItinerary.Text, txtPackage.Text, txtItemNumber.Text, txtFee.Text);
+                                ClearTxtBoxes();
 
+                            }
+                            else
+                            {
+                                MessageBox.Show("Item has been already added");
+                            }
                         }
                         else
                         {
-                            MessageBox.Show("Item has been already added");
+                            MessageBox.Show("Cannot add more suppliers than services");
                         }
                     }
                     else
                     {
-                        MessageBox.Show("Cannot add more suppliers than services");
+                        MessageBox.Show("All data must be filled correctly");
                     }
                 }
                 else
                 {
-                    MessageBox.Show("All data must be filled correctly");
+                    MessageBox.Show("Select a service");
                 }
             }
             catch (Exception ex)
@@ -3294,12 +3317,12 @@ namespace CostToInvoiceButton
                             "\"Costo\":\"" + dgvRenglon.Cells["Cost"].Value.ToString() + "\"," +
                             "\"CostCurrency\":\"" + dgvRenglon.Cells["Currency"].Value.ToString() + "\"," +
                             "\"TotalCost\":\"" + dgvRenglon.Cells["TotalCost"].Value.ToString() + "\"";
-                            
+
                             if (!String.IsNullOrEmpty(dgvRenglon.Cells["Fee"].Value.ToString()))
                             {
                                 body += ",\"Fee\":\"" + dgvRenglon.Cells["Fee"].Value.ToString() + "\"";
                             }
-                                if (!String.IsNullOrEmpty(dgvRenglon.Cells["Vendor"].Value.ToString()))
+                            if (!String.IsNullOrEmpty(dgvRenglon.Cells["Vendor"].Value.ToString()))
                             {
                                 body += ",\"IDProveedor\":\"" + dgvRenglon.Cells["Vendor"].Value.ToString() + "\"";
                             }
@@ -3393,7 +3416,7 @@ namespace CostToInvoiceButton
                         Services service = new Services();
                         Char delimiter = '|';
                         string[] substrings = data.Split(delimiter);
-                        
+
                         service.ID = substrings[0];
                         service.ItemNumber = substrings[1];
                         service.Description = substrings[2].Replace('"', ' ').Trim();
@@ -3529,6 +3552,11 @@ namespace CostToInvoiceButton
             {
                 MessageBox.Show("Error en creación de child: " + ex.Message + "Det" + ex.StackTrace);
             }
+
+        }
+
+        private void cboSuppliers_SelectedIndexChanged(object sender, EventArgs e)
+        {
 
         }
     }

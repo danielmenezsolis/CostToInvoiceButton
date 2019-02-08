@@ -127,7 +127,6 @@ namespace CostToInvoiceButton
                         }
                     }
                     IncidentID = Incident.ID;
-
                     ICAO = getICAODesi(IncidentID);
                     cClass = getCustomerClass(IncidentID);
                     if (cClass == "")

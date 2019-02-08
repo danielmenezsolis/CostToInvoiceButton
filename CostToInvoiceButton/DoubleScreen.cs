@@ -220,13 +220,13 @@ namespace CostToInvoiceButton
                         }
                         double pricesum = 0;
                         int arrival = GetArrivalAirport(Convert.ToInt32(txtItinerary.Text));
-                        //MessageBox.Show("ID de aeropuerto: " + arrival.ToString());
+                        MessageBox.Show("ID de aeropuerto: " + arrival.ToString());
                         double catcollectionfee = Convert.ToDouble(getAirportCateringCollectionFee(arrival)) / 100;
-                        //MessageBox.Show("ID de CatCollFee: " + catcollectionfee.ToString());
+                        MessageBox.Show("ID de CatCollFee: " + catcollectionfee.ToString());
                         double airportfee = Convert.ToDouble(getAirportCollectionFee(arrival)) / 100;
-                        //MessageBox.Show("ID de AirCollFee: " + airportfee.ToString());
+                        MessageBox.Show("ID de AirCollFee: " + airportfee.ToString());
                         double deductionfee = Convert.ToDouble(getAirportCollectionDeductionFee(arrival)) / 100;
-                        //MessageBox.Show("ID de DedCollFee: " + deductionfee.ToString());
+                        MessageBox.Show("ID de DedCollFee: " + deductionfee.ToString());
                         foreach (DataGridViewRow dgvRenglon in dataGridInvoice.Rows)
                         {
                             int itinerarycompare = Convert.ToInt32(dgvRenglon.Cells["Itinerary"].Value);
@@ -239,19 +239,19 @@ namespace CostToInvoiceButton
                                 if (dgvRenglon.Cells[indice].Value.ToString() == "1" && dgvRenglon.Cells["Item"].Value.ToString().Contains("CATERING"))
                                 {
                                     fee = price * catcollectionfee;
-                                    //MessageBox.Show("Item de Catering");
+                                    MessageBox.Show("Item de Catering");
                                 }
                                 if (dgvRenglon.Cells[indice].Value.ToString() == "1" && !dgvRenglon.Cells["Item"].Value.ToString().Contains("CATERING"))
                                 {
                                     fee = price * airportfee;
-                                    //MessageBox.Show("Item normal");
+                                    MessageBox.Show("Item normal");
                                 }
-                                //MessageBox.Show("ItemFee: " + fee.ToString());
+                                MessageBox.Show("ItemFee: " + fee.ToString());
                                 dfee = fee * deductionfee;
-                                //MessageBox.Show("ItemDedFee: " + dfee.ToString());
+                                MessageBox.Show("ItemDedFee: " + dfee.ToString());
                                 pricesum = pricesum + (fee - dfee);
                             }
-                            //MessageBox.Show("AFeeActual: " + pricesum.ToString());
+                            MessageBox.Show("AFeeActual: " + pricesum.ToString());
                         }
                         MessageBox.Show("Total Fee: " + pricesum.ToString());
                         txtPrice.Text = Math.Round((pricesum), 4).ToString();
@@ -3374,7 +3374,7 @@ namespace CostToInvoiceButton
                         dataGridServicios.Columns["Supplier"].Visible = false;
                         dataGridServicios.Columns["ID"].Visible = false;
                         dataGridServicios.Columns["InvoiceInternal"].Visible = false;
-                        dataGridServicios.Columns["Itinerary"].Visible = false;
+                        //dataGridServicios.Columns["Itinerary"].Visible = false;
                         dataGridServicios.Columns["Pax"].Visible = false;
                         dataGridServicios.Columns["Task"].Visible = false;
                         dataGridServicios.Columns["Informative"].Visible = false;

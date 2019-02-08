@@ -195,7 +195,8 @@ namespace CostToInvoiceButton
                     // PRECIOS EN LISTA DE SERVICIOS
                     if (String.IsNullOrEmpty(dataGridServicios.Rows[e.RowIndex].Cells["UnitPrice"].FormattedValue.ToString()))
                     {
-                        if (lblSrType.Text != "FUEL" || (lblSrType.Text != "FCC" && Convert.ToDouble(txtPrice.Text) == 0))
+                        
+                        if (lblSrType.Text != "FUEL" || (lblSrType.Text != "FCC" && Convert.ToInt32(txtPrice.Text) == 0))
                         {
                             txtPrice.Text = GetPrices().ToString();
                         }
@@ -3369,8 +3370,6 @@ namespace CostToInvoiceButton
                         {
                             dataGridServicios.DataSource = GetListServices();
                         }
-
-                        dataGridServicios.DataSource = GetListServices();
                         dataGridServicios.Columns["Supplier"].Visible = false;
                         dataGridServicios.Columns["ID"].Visible = false;
                         dataGridServicios.Columns["InvoiceInternal"].Visible = false;
@@ -3454,10 +3453,7 @@ namespace CostToInvoiceButton
                 return null;
             }
         }
-        private void fileToolStripMenuItem_Click(object sender, EventArgs e)
-        {
 
-        }
 
         private void DoubleScreen_Load(object sender, EventArgs e)
         {

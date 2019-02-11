@@ -29,6 +29,13 @@ namespace CostToInvoiceButton
         public int HourId;
         private RightNowSyncPortClient clientORN { get; set; }
         private bool PriceCostValueSet { get; set; }
+        // Campos por tipo de SR
+        // Uso GENERAL
+        // FCC
+        int arrival = 0;
+        double catcollectionfee = 0;
+        double airportfee = 0;
+        double deductionfee = 0;
         public DoubleScreen(IGlobalContext globalContext, IRecordContext record)
         {
             try
@@ -143,6 +150,17 @@ namespace CostToInvoiceButton
                         txtFBO.Text = GetFBOValue((string.IsNullOrEmpty(dataGridServicios.Rows[e.RowIndex].Cells["Itinerary"].FormattedValue.ToString()) ? 0 : Convert.ToInt32(dataGridServicios.Rows[e.RowIndex].Cells["Itinerary"].FormattedValue.ToString())));
                         GetItineraryHours(string.IsNullOrEmpty(dataGridServicios.Rows[e.RowIndex].Cells["Itinerary"].FormattedValue.ToString()) ? 0 : Convert.ToInt32(dataGridServicios.Rows[e.RowIndex].Cells["Itinerary"].FormattedValue.ToString()));
                         txtMainHour.Text = GetMainHourFBOFCC(txtATA.Text, txtATD.Text);
+
+                        arrival = GetArrivalAirport(Convert.ToInt32(txtItinerary.Text));
+                        catcollectionfee = Convert.ToDouble(getAirportCateringCollectionFee(arrival)) / 100;
+                        airportfee = Convert.ToDouble(getAirportCollectionFee(arrival)) / 100;
+                        deductionfee = Convert.ToDouble(getAirportCollectionDeductionFee(arrival)) / 100;
+
+                        global.LogMessage("ID de aeropuerto: " + arrival.ToString() +
+                            "\nID de CatCollFee: " + catcollectionfee.ToString() +
+                            "\nID de AirCollFee: " + airportfee.ToString() +
+                            "\nID de DedCollFee: " + deductionfee.ToString());
+
                         if (lblSrType.Text == "FCC")
                         {
                             lblExchangeRate.Show();
@@ -195,8 +213,7 @@ namespace CostToInvoiceButton
                     // PRECIOS EN LISTA DE SERVICIOS
                     if (String.IsNullOrEmpty(dataGridServicios.Rows[e.RowIndex].Cells["UnitPrice"].FormattedValue.ToString()))
                     {
-                        
-                        if (lblSrType.Text != "FUEL" || (lblSrType.Text != "FCC" && Convert.ToInt32(txtPrice.Text) == 0))
+                        if (lblSrType.Text != "FUEL" || (lblSrType.Text != "FCC" && String.IsNullOrEmpty(txtPrice.Text)))
                         {
                             txtPrice.Text = GetPrices().ToString();
                         }
@@ -211,50 +228,15 @@ namespace CostToInvoiceButton
                         PriceCostValueSet = true;
                         return;
                     }
-
+                    
                     if ((lblSrType.Text == "FBO" && (txtItemNumber.Text == "ASFIEAP357" || txtItemNumber.Text == "AFREISP0179")) || (lblSrType.Text == "FCC" && txtItemNumber.Text == "AFREISP0179"))
                     {
-                        int indice = 10;
-                        if (txtItemNumber.Text == "AFREISP0179")
-                        {
-                            indice = 9;
-                        }
                         double pricesum = 0;
-                        int arrival = GetArrivalAirport(Convert.ToInt32(txtItinerary.Text));
-                        MessageBox.Show("ID de aeropuerto: " + arrival.ToString());
-                        double catcollectionfee = Convert.ToDouble(getAirportCateringCollectionFee(arrival)) / 100;
-                        MessageBox.Show("ID de CatCollFee: " + catcollectionfee.ToString());
-                        double airportfee = Convert.ToDouble(getAirportCollectionFee(arrival)) / 100;
-                        MessageBox.Show("ID de AirCollFee: " + airportfee.ToString());
-                        double deductionfee = Convert.ToDouble(getAirportCollectionDeductionFee(arrival)) / 100;
-                        MessageBox.Show("ID de DedCollFee: " + deductionfee.ToString());
                         foreach (DataGridViewRow dgvRenglon in dataGridInvoice.Rows)
                         {
-                            int itinerarycompare = Convert.ToInt32(dgvRenglon.Cells["Itinerary"].Value);
-                            double price = Convert.ToDouble(dgvRenglon.Cells["Amount"].Value);
-                            double fee = 0;
-                            double dfee = 0;
-
-                            if (Convert.ToInt32(txtItinerary.Text) == itinerarycompare)
-                            {
-                                if (dgvRenglon.Cells[indice].Value.ToString() == "1" && dgvRenglon.Cells["Item"].Value.ToString().Contains("CATERING"))
-                                {
-                                    fee = price * catcollectionfee;
-                                    MessageBox.Show("Item de Catering");
-                                }
-                                if (dgvRenglon.Cells[indice].Value.ToString() == "1" && !dgvRenglon.Cells["Item"].Value.ToString().Contains("CATERING"))
-                                {
-                                    fee = price * airportfee;
-                                    MessageBox.Show("Item normal");
-                                }
-                                MessageBox.Show("ItemFee: " + fee.ToString());
-                                dfee = fee * deductionfee;
-                                MessageBox.Show("ItemDedFee: " + dfee.ToString());
-                                pricesum = pricesum + (fee - dfee);
-                            }
-                            MessageBox.Show("AFeeActual: " + pricesum.ToString());
+                            pricesum = pricesum + Convert.ToDouble(dgvRenglon.Cells["Fee"].Value);
                         }
-                        MessageBox.Show("Total Fee: " + pricesum.ToString());
+                        global.LogMessage("Total Fee: " + pricesum.ToString());
                         txtPrice.Text = Math.Round((pricesum), 4).ToString();
                         txtPrice.Enabled = false;
                         txtCost.Enabled = false;
@@ -280,24 +262,6 @@ namespace CostToInvoiceButton
                             txtPrice.Text = Math.Round(GetPrices(), 2).ToString();
                         }
                     }
-
-                    // MANEJO DE FUEL EN FBO/FCC
-                    /* 
-                     * Se definio manejar los servicios de FUEL en SR por separado.
-                     *
-                    if (lblSrType.Text == "FBO" || lblSrType.Text == "FCC")
-                    {
-                        if (txtItemNumber.Text == "AGASIAS0270" || txtItemNumber.Text == "JFUEIAS0269" || txtItemNumber.Text == "AGASIAS0011" || txtItemNumber.Text == "JFUEIAS0010")
-                        {
-                            double b;
-                            if (double.TryParse(txtCost.Text, out b))
-                            {
-                                txtPrice.Text = GetFuelPrice().ToString();
-                            }
-                        }
-                    }
-                    */
-
 
                     if (lblSrType.Text == "FCC")
                     {
@@ -579,7 +543,6 @@ namespace CostToInvoiceButton
                 }
             }
         }
-
         /*
          * private void txtCost_TextChanged(object sender, EventArgs e)
         {
@@ -680,7 +643,6 @@ namespace CostToInvoiceButton
                 global.LogMessage("Error en txtCost.Text:" + ex.Message + "Det:" + ex.StackTrace);
             }
         } */
-
         // Functions
         // IS COMPONENT - EO
         private bool isComponent()
@@ -798,7 +760,7 @@ namespace CostToInvoiceButton
                 }
                 //MessageBox.Show("Fecha de carga: " + datecharge);
                 double rate = getExchangeRateSemanal(datecharge);
-                // MessageBox.Show("Tipo de cambio: $ " + rate);
+                MessageBox.Show("Exchange Rate: $ " + rate);
                 double galonrate = galonprice / rate; // costo por galon
                 //MessageBox.Show("Costo por galon USD: " + galonrate);
                 double catcombus = GetCombCents(txtCombustible.Text);
@@ -818,7 +780,7 @@ namespace CostToInvoiceButton
                 //MessageBox.Show("Galones : " + galones);
                 galonrate = galonrate * galones;
                 //MessageBox.Show("Costo total : " + galonrate);
-                return Math.Round((galonrate), 4);
+                return Math.Round((galonrate), 2);
             }
             catch (Exception ex)
             {
@@ -1551,7 +1513,6 @@ namespace CostToInvoiceButton
                 else if (GetTicketSumCatA() > 0)
                 {
                     cost = GetTicketSumCatA();
-
                 }
                 else if (lblSrType.Text == "GYCUSTODIA" && txtItemNumber.Text == "MHSPSAS0091")
                 {
@@ -2222,9 +2183,12 @@ namespace CostToInvoiceButton
                         String[] substrings = data.Split(delimiter);
                         cost = Convert.ToDouble(substrings[0]);
                         cur = substrings[1];
-
                         if (cur == "2")
                         {
+                            if (lblSrType.Text == "FCC")
+                            {
+
+                            }
                             double tipoCambio = getExchangeRate(DateTime.Today);
                             sum = sum + (cost * tipoCambio);
                         }
@@ -3241,7 +3205,6 @@ namespace CostToInvoiceButton
                 }
             }
         }
-
         private void BAdd_Click(object sender, EventArgs e)
         {
             try
@@ -3257,6 +3220,7 @@ namespace CostToInvoiceButton
                                 double amountPrice = Math.Round((Convert.ToDouble(txtPrice.Text) * Convert.ToDouble(txtQty.Text)), 2);
                                 double amountCost = Math.Round((Convert.ToDouble(txtCost.Text) * Convert.ToDouble(txtQty.Text)), 2);
                                 bool invoi = txtInvoiceReady.Text == "1" ? true : false;
+                                txtFee.Text = obtenerFee(txtItem.Text, amountPrice);
                                 dataGridInvoice.Rows.Add(invoi, txtItem.Text, cboSuppliers.Text, txtQty.Text, cboCurrency.Text, txtCost.Text, amountCost, lblCurrencyPrice.Text, txtPrice.Text, amountPrice, txtIdService.Text, txtItinerary.Text, txtPackage.Text, txtItemNumber.Text, txtFee.Text);
                                 ClearTxtBoxes();
 
@@ -3285,6 +3249,24 @@ namespace CostToInvoiceButton
             {
                 MessageBox.Show("ButtonAddClic: " + ex.Message + "Det:" + ex.StackTrace);
             }
+        }
+        private string obtenerFee(string nombreItem, double price)
+        {
+            double itemFee = 0,
+                fee, dfee;
+            if (txtCobroParticipacionNj.Text == "1" || txtParticipacionCobro.Text == "1")
+            {
+                if (nombreItem.Contains("CATERING"))
+                {
+                    fee = price * catcollectionfee;
+                } else
+                {
+                    fee = price * airportfee;
+                }
+                dfee = fee * deductionfee;
+                itemFee = fee - dfee;
+            }
+            return Math.Round(itemFee,2).ToString();
         }
         private void SaveData()
         {
@@ -3373,7 +3355,7 @@ namespace CostToInvoiceButton
                         dataGridServicios.Columns["Supplier"].Visible = false;
                         dataGridServicios.Columns["ID"].Visible = false;
                         dataGridServicios.Columns["InvoiceInternal"].Visible = false;
-                        //dataGridServicios.Columns["Itinerary"].Visible = false;
+                        dataGridServicios.Columns["Itinerary"].Visible = false;
                         dataGridServicios.Columns["Pax"].Visible = false;
                         dataGridServicios.Columns["Task"].Visible = false;
                         dataGridServicios.Columns["Informative"].Visible = false;
@@ -3453,23 +3435,18 @@ namespace CostToInvoiceButton
                 return null;
             }
         }
-
-
         private void DoubleScreen_Load(object sender, EventArgs e)
         {
 
         }
-
         private void txtCost_TextChanged(object sender, EventArgs e)
         {
 
         }
-
         private void txtPrice_TextChanged(object sender, EventArgs e)
         {
 
         }
-
         public bool hasPayables(string Service)
         {
             try
@@ -3550,7 +3527,6 @@ namespace CostToInvoiceButton
             }
 
         }
-
         private void cboSuppliers_SelectedIndexChanged(object sender, EventArgs e)
         {
 

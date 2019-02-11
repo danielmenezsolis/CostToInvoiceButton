@@ -41,6 +41,7 @@ namespace CostToInvoiceButton
         public string SRType { get; set; }
         public string SENCat { get; set; }
         public string ClientName { get; set; }
+
         public WorkspaceRibbonAddIn(bool inDesignMode, IRecordContext RecordContext, IGlobalContext globalContext)
         {
             if (inDesignMode == false)
@@ -1195,13 +1196,11 @@ namespace CostToInvoiceButton
                 return "";
             }
         }
-
         static IEnumerable<DateTime> monthsBetween(DateTime d0, DateTime d1)
         {
             return Enumerable.Range(0, (d1.Year - d0.Year) * 12 + (d1.Month - d0.Month + 1))
                              .Select(m => new DateTime(d0.Year, d0.Month, 1).AddMonths(m));
         }
-
         public void CreateOvers()
         {
             try

@@ -170,7 +170,6 @@
             this.fileToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.F)));
             this.fileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
             this.fileToolStripMenuItem.Text = "&File";
-
             // 
             // saveToolStripMenuItem
             // 
@@ -1170,6 +1169,7 @@
             // 
             this.Itinerary.HeaderText = "Itinerary";
             this.Itinerary.Name = "Itinerary";
+            this.Itinerary.Visible = false;
             // 
             // Package
             // 
@@ -1187,7 +1187,6 @@
             // 
             this.Fee.HeaderText = "Fee";
             this.Fee.Name = "Fee";
-            this.Fee.Visible = false;
             // 
             // EditColumn
             // 

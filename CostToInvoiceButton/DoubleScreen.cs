@@ -27,11 +27,15 @@ namespace CostToInvoiceButton
         private IGlobalContext global { get; set; }
         public List<WHours> WHoursList { get; set; }
         public int HourId;
+        public List<G_N_ITEMSUP> ListaSupplier { get; set; }
+        public Dictionary<string, string> DictionarySuppliers { get; set; }
         private RightNowSyncPortClient clientORN { get; set; }
         private bool PriceCostValueSet { get; set; }
         // Campos por tipo de SR
         // Uso GENERAL
         // FCC
+        bool blnPriceSet = false;
+        bool blnCostSet = false;
         int arrival = 0;
         double catcollectionfee = 0;
         double airportfee = 0;
@@ -66,8 +70,6 @@ namespace CostToInvoiceButton
                     txtCost.Enabled = true;
                     cboCurrency.Enabled = true;
                     PriceCostValueSet = false;
-                    bool blnPriceSet = false;
-                    bool blnCostSet = false;
                     lblQty.Text = "Quantity";
                     txtExchangeRate.Hide();
                     lblExchangeRate.Hide();
@@ -93,7 +95,7 @@ namespace CostToInvoiceButton
                     txtAirport.Text = "IO_AEREO_" + airtport.Replace("-", "_").Trim();
                     string supp = dataGridServicios.Rows[e.RowIndex].Cells["Supplier"].Value.ToString();
 
-                    getSuppliers();
+                    GetSuppliers();
                     if (!string.IsNullOrEmpty(supp))
                     {
                         cboSuppliers.Enabled = true;
@@ -228,7 +230,7 @@ namespace CostToInvoiceButton
                         PriceCostValueSet = true;
                         return;
                     }
-                    
+
                     if ((lblSrType.Text == "FBO" && (txtItemNumber.Text == "ASFIEAP357" || txtItemNumber.Text == "AFREISP0179")) || (lblSrType.Text == "FCC" && txtItemNumber.Text == "AFREISP0179"))
                     {
                         double pricesum = 0;
@@ -257,9 +259,10 @@ namespace CostToInvoiceButton
                                 if (lblCurrencyPrice.Text == "USD")
                                 {
                                     txtPrice.Text = GetFuelPrice().ToString();
-                                } else
+                                }
+                                else
                                 {
-                                    txtPrice.Text = Math.Round(GetFuelPrice() * getExchangeRateSemanal(DateTime.Parse(txtFuelDateCharge.Text)),2).ToString();
+                                    txtPrice.Text = Math.Round(GetFuelPrice() * getExchangeRateSemanal(DateTime.Parse(txtFuelDateCharge.Text)), 2).ToString();
                                 }
                             }
                         }
@@ -482,7 +485,7 @@ namespace CostToInvoiceButton
         }
         private void txtQty_TextChanged(object sender, EventArgs e)
         {
-            if (PriceCostValueSet)
+            if (blnPriceSet)
             {
                 return;
             }
@@ -1051,10 +1054,38 @@ namespace CostToInvoiceButton
 
             }
         }
-        private void getSuppliers()
+
+        private void GetSuppliers()
         {
             cboSuppliers.DataSource = null;
             cboSuppliers.Enabled = false;
+            List<Sup> sups = new List<Sup>();
+            var listaII = ListaSupplier.Find(x => (x.ORGANIZATION_CODE.Trim() == txtAirport.Text)).G_1_ITEMSUP.ToList();
+            if (listaII != null)
+            {
+                foreach (var item in listaII)
+                {
+                    if (item.ITEM_NUMBER == txtItemNumber.Text.Trim())
+                    {
+                        Sup sup = new Sup();
+                        sup.Id = item.VENDOR_ID;
+                        sup.Name = item.PARTY_NAME;
+                        sups.Add(sup);
+                    }
+                }
+            }
+            DictionarySuppliers = sups.DistinctBy(y => y.Id).ToDictionary(k => k.Id, k => k.Name);
+            DictionarySuppliers.Add("0", "NO SUPPLIER");
+            cboSuppliers.DataSource = DictionarySuppliers.ToArray();
+            cboSuppliers.DisplayMember = "Value";
+            cboSuppliers.ValueMember = "Key";
+            cboSuppliers.Enabled = true;
+        }
+
+        private void getAllSuppliers()
+        {
+            //cboSuppliers.DataSource = null;
+            //cboSuppliers.Enabled = false;
             try
             {
 
@@ -1096,7 +1127,7 @@ namespace CostToInvoiceButton
                 XDocument doc;
                 XmlDocument docu = new XmlDocument();
                 string result;
-                Dictionary<string, string> test = new Dictionary<string, string>();
+                Dictionary<string, string> DictionarySuppliers = new Dictionary<string, string>();
                 List<Sup> sups = new List<Sup>();
                 using (WebResponse response = request.GetResponse())
                 {
@@ -1126,32 +1157,17 @@ namespace CostToInvoiceButton
                                         reader.Read();
                                         XmlSerializer serializer = new XmlSerializer(typeof(DATA_DS_ITEMSUP));
                                         DATA_DS_ITEMSUP res = (DATA_DS_ITEMSUP)serializer.Deserialize(reader);
-                                        var lista = res.G_N_ITEMSUP.Find(x => (x.ORGANIZATION_CODE.Trim() == txtAirport.Text));
-                                        if (lista != null)
-                                        {
-                                            foreach (G_1_ITEMSUP item in lista.G_1_ITEMSUP)
-                                            {
-                                                if (item.ITEM_NUMBER == txtItemNumber.Text.Trim())
-                                                {
-                                                    Sup sup = new Sup();
-                                                    sup.Id = item.VENDOR_ID;
-                                                    sup.Name = item.PARTY_NAME;
-                                                    sups.Add(sup);
-                                                }
-                                            }
-                                        }
+
+                                        //List<G_N_ITEMSUP> lista = res.G_N_ITEMSUP;
+                                        //var lista = res.G_N_ITEMSUP.Find(x => (x.ORGANIZATION_CODE.Trim() == txtAirport.Text));
+                                        ListaSupplier = res.G_N_ITEMSUP.ToList();
                                     }
                                 }
                             }
                         }
                     }
                 }
-                test = sups.DistinctBy(y => y.Id).ToDictionary(k => k.Id, k => k.Name);
-                test.Add("0", "NO SUPPLIER");
-                cboSuppliers.DataSource = test.ToArray();
-                cboSuppliers.DisplayMember = "Value";
-                cboSuppliers.ValueMember = "Key";
-                cboSuppliers.Enabled = true;
+
             }
             catch (Exception ex)
             {
@@ -1428,6 +1444,8 @@ namespace CostToInvoiceButton
         {
             try
             {
+                blnPriceSet = false;
+                blnCostSet = false;
                 txtAmount.Text = "0";
                 txtCost.Text = "";
                 txtIdService.Text = "";
@@ -1445,7 +1463,6 @@ namespace CostToInvoiceButton
             catch (Exception ex)
             {
                 MessageBox.Show("ClearTxtBoxes" + ex.Message + "DEtalle: " + ex.StackTrace);
-
             }
         }
         public bool IsFloatValue(string text)
@@ -1934,6 +1951,7 @@ namespace CostToInvoiceButton
 
                             if (fecha.CompareTo(inicio) >= 0 && fecha.CompareTo(fin) <= 0)
                             {
+                                blnPriceSet = true;
                                 price = item.flo_amount;
                                 Curr = item.str_currency_code;
                                 OUM = item.str_oum_code;
@@ -1949,6 +1967,7 @@ namespace CostToInvoiceButton
                             DateTime fecha = DateTime.Parse(txtATA.Text);
                             if (fecha.CompareTo(inicio) >= 0 && fecha.CompareTo(fin) <= 0)
                             {
+                                blnPriceSet = true;
                                 //MessageBox.Show("Precio: " + item.flo_amount);
                                 price = item.flo_amount;
                                 Curr = item.str_currency_code;
@@ -1973,6 +1992,7 @@ namespace CostToInvoiceButton
                             DateTime fecha = DateTime.Parse(GetSRCreationDate(Convert.ToInt32(lblIdIncident.Text)));
                             if (fecha.CompareTo(inicio) >= 0 && fecha.CompareTo(fin) <= 0)
                             {
+                                blnPriceSet = true;
                                 price = item.flo_amount;
                                 Curr = item.str_currency_code;
                                 OUM = item.str_oum_code;
@@ -1982,6 +2002,7 @@ namespace CostToInvoiceButton
                     }
                     else
                     {
+                        blnPriceSet = true;
                         price = rootObjectPrices.items[0].flo_amount;
                         Curr = rootObjectPrices.items[0].str_currency_code;
                         OUM = rootObjectPrices.items[0].str_oum_code;
@@ -1989,15 +2010,18 @@ namespace CostToInvoiceButton
                 }
                 else
                 {
+                    blnPriceSet = false;
                     price = 0;
                 }
                 if (lblSrType.Text == "FBO" && price == 0)
                 {
+                    blnPriceSet = false;
                     price = Math.Round(((double.Parse(txtQty.Text) * double.Parse(txtCost.Text)) * 1.30), 4);
                 }
                 if (lblSrType.Text == "FCC" && price == 0 && txtPackage.Text != "Yes")
                 {
                     // cboCurrency.Text = "USD";
+                    blnPriceSet = false;
                     DateTime date = DateTime.Parse(txtATA.Text);
                     price = ((Convert.ToDouble(txtCost.Text) + (Convert.ToDouble(txtCost.Text) * GetUtilidadPercentage(txtUtilidad.Text) / 100)) / getExchangeRateSemanal(date));
                 }
@@ -2009,6 +2033,7 @@ namespace CostToInvoiceButton
                 */
                 if (lblSrType.Text == "CATERING")
                 {
+                    blnPriceSet = false;
                     price = Convert.ToDouble(txtPrice.Text);
                 }
                 return price;
@@ -3116,7 +3141,7 @@ namespace CostToInvoiceButton
         }
         private void txtCost_KeyDown(object sender, KeyEventArgs e)
         {
-            if (PriceCostValueSet)
+            if (blnPriceSet)
             {
                 return;
             }
@@ -3270,14 +3295,15 @@ namespace CostToInvoiceButton
                 if (nombreItem.Contains("CATERING"))
                 {
                     fee = price * catcollectionfee;
-                } else
+                }
+                else
                 {
                     fee = price * airportfee;
                 }
                 dfee = fee * deductionfee;
                 itemFee = fee - dfee;
             }
-            return Math.Round(itemFee,2).ToString();
+            return Math.Round(itemFee, 2).ToString();
         }
         private void SaveData()
         {
@@ -3448,7 +3474,7 @@ namespace CostToInvoiceButton
         }
         private void DoubleScreen_Load(object sender, EventArgs e)
         {
-
+            getAllSuppliers();
         }
         private void txtCost_TextChanged(object sender, EventArgs e)
         {

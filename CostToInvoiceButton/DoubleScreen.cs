@@ -258,11 +258,12 @@ namespace CostToInvoiceButton
                             {
                                 if (lblCurrencyPrice.Text == "USD")
                                 {
-                                    txtPrice.Text = GetFuelPrice().ToString();
+                                    // Obtencion precio por litro
+                                    txtPrice.Text = ( GetFuelPrice() / 3.7853 ).ToString();
                                 }
                                 else
                                 {
-                                    txtPrice.Text = Math.Round(GetFuelPrice() * getExchangeRateSemanal(DateTime.Parse(txtFuelDateCharge.Text)), 2).ToString();
+                                    txtPrice.Text = Math.Round((GetFuelPrice() / 3.7853) * getExchangeRateSemanal(DateTime.Parse(txtFuelDateCharge.Text)), 2).ToString();
                                 }
                             }
                         }
@@ -789,6 +790,7 @@ namespace CostToInvoiceButton
                 //MessageBox.Show("Galones : " + galones);
                 // galonrate = galonrate * galones;
                 //MessageBox.Show("Costo total : " + galonrate);
+
                 return Math.Round((galonrate), 2);
             }
             catch (Exception ex)

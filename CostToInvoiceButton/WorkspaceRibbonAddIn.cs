@@ -477,6 +477,7 @@ namespace CostToInvoiceButton
                         }
 
                         servicios.Clear();
+                        UpdatePackageCost();
                         if (SRType == "FCC" || SRType == "FBO")
                         {
                             servicios = GetListServices().FindAll(x => x.Itinerary != "0");
@@ -534,7 +535,7 @@ namespace CostToInvoiceButton
                     ((TextBox)doubleScreen.Controls["txtSemeam"]).Text = SeneamCat;
                     ((TextBox)doubleScreen.Controls["txtCreationIncidentDate"]).Text = incidentCreation.ToString();
                     ((ComboBox)doubleScreen.Controls["cboCurrency"]).Text = SRType == "FUEL" ? "MXN" : GetCurrency();
-                    UpdatePackageCost();
+                    
                     doubleScreen.ShowDialog();
                 }
             }
@@ -1469,7 +1470,7 @@ namespace CostToInvoiceButton
                 ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
                 APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
                 clientInfoHeader.AppID = "Query Example";
-            String queryString = "SELECT ID,ItemNumber,ItemDescription,Airport,IDProveedor,Costo,Precio,InternalInvoice,Itinerary,Paquete,Componente,Informativo,ParentPaxID,Categories,fuel_id,CobroParticipacionNj,ParticipacionCobro,Site,IVA,ListoFactura,Cantidad,CostCurrency,TotalCost,PriceCurrency,TotalPrice,Fee FROM CO.Services WHERE Incident =" + IncidentID + " AND Informativo = '0' AND (Componente IS NULL OR Componente  = '0') ORDER BY ID ASC, Itinerary ASC, ParentPaxId ASC";
+                String queryString = "SELECT ID,ItemNumber,ItemDescription,Airport,IDProveedor,Costo,Precio,InternalInvoice,Itinerary,Paquete,Componente,Informativo,ParentPaxID,Categories,fuel_id,CobroParticipacionNj,ParticipacionCobro,Site,IVA,ListoFactura,Cantidad,CostCurrency,TotalCost,PriceCurrency,TotalPrice,Fee FROM CO.Services WHERE Incident =" + IncidentID + " AND Informativo = '0' AND (Componente IS NULL OR Componente  = '0') ORDER BY ID ASC, Itinerary ASC, ParentPaxId ASC";
                 /*if (ClientName.Contains("NETJET")) {
                     queryString = "SELECT ID,ItemNumber,ItemDescription,Airport,IDProveedor,Costo,Precio,InternalInvoice,Itinerary,Paquete,Componente,Informativo,ParentPaxID,Categories,fuel_id,CobroParticipacionNj,ParticipacionCobro,Site,IVA FROM CO.Services WHERE Incident =" + IncidentID + " AND Informativo = '0' ORDER BY ID ASC, Itinerary ASC, ParentPaxId ASC";
                 }*/
@@ -2741,18 +2742,20 @@ namespace CostToInvoiceButton
                         double price = 0;
                         double priceP = 0;
                         double PriceCh = 0;
+
+                        string cur = "";
                         if (!String.IsNullOrEmpty(item.ParentPax))
                         {
-                            priceP = getPaxPrice(item.ParentPax);
-                            PriceCh = getPaxPrice(item.ID);
+                            priceP = getPaxPrice(item.ParentPax, out cur);
+                            PriceCh = getPaxPrice(item.ID, out cur);
                             price = PriceCh + priceP;
-                            UpdatePaxPrice(item.ID, PriceCh);
-                            UpdatePaxPrice(item.ParentPax, price);
+                            UpdatePaxPrice(item.ID, PriceCh, cur);
+                            UpdatePaxPrice(item.ParentPax, price, cur);
                         }
                         else
                         {
-                            price = getPaxPrice(item.ID);
-                            UpdatePaxPrice(item.ID, price);
+                            price = getPaxPrice(item.ID, out cur);
+                            UpdatePaxPrice(item.ID, price, cur);
                         }
                     }
                 }
@@ -2763,7 +2766,7 @@ namespace CostToInvoiceButton
             }
 
         }
-        public void UpdatePaxPrice(string id, double price)
+        public void UpdatePaxPrice(string id, double price, string cur)
         {
             try
             {
@@ -2775,12 +2778,22 @@ namespace CostToInvoiceButton
                 var body = "{";
                 // Información de precios costos
                 body +=
-                    "\"Costo\":\"" + price + "\"";
+                    "\"Costo\":\"" + price + "\",";
+                if (!string.IsNullOrEmpty(cur))
+                {
+
+                    body += "\"CostCurrency\":\"" + cur + "\"";
+                }
+                else
+                {
+                    body += "\"CostCurrency\":null";
+                }
 
                 body += "}";
                 global.LogMessage(body);
                 request.AddParameter("application/json", body, ParameterType.RequestBody);
                 // easily add HTTP Headers
+
                 request.AddHeader("Authorization", "Basic ZW9saXZhczpTaW5lcmd5KjIwMTg=");
                 request.AddHeader("X-HTTP-Method-Override", "PATCH");
                 request.AddHeader("OSvC-CREST-Application-Context", "Update Service {id}");
@@ -2802,33 +2815,209 @@ namespace CostToInvoiceButton
             }
 
         }
-        public double getPaxPrice(string PaxId)
+        public double getPaxPrice(string PaxId, out string currency)
         {
             try
             {
                 double price = 0;
+                double TicketAmount = 0;
+                DateTime ATA = DateTime.Now;
+
+                Char delimiterto = '|';
+                string totcurr = getTotalCurrency(PaxId);
+                string[] totcur = totcurr.Split(delimiterto);
+
                 ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
                 APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
                 clientInfoHeader.AppID = "Query Example";
-                String queryString = "SELECT SUM(TicketAmount) FROM CO.Payables WHERE Services.Incident =" + IncidentID + "  AND Services.Services = " + PaxId + " GROUP BY Services.Services   ";
-                clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 1, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
-                foreach (CSVTable table in queryCSV.CSVTables)
+                String queryString = "";
+                if (Convert.ToInt32(totcur[0]) == 2)
                 {
-                    String[] rowData = table.Rows;
-                    foreach (String data in rowData)
+                    queryString = "SELECT TicketAmount,Currency,Services.Itinerary.ATA FROM CO.Payables WHERE Services.Incident =" + IncidentID + "  AND Services.Services = " + PaxId;
+                    global.LogMessage(queryString);
+                    clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 200, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
+                    foreach (CSVTable table in queryCSV.CSVTables)
                     {
-                        price = String.IsNullOrEmpty(data) ? 0 : Convert.ToDouble(data);
+                        String[] rowData = table.Rows;
+                        foreach (String data in rowData)
+                        {
+                            Char delimiter = '|';
+                            string[] substrings = data.Split(delimiter);
+                            TicketAmount = String.IsNullOrEmpty(substrings[0]) ? 0 : Convert.ToDouble(substrings[0]);
+                            if (substrings[1] == "1")
+                            {
+                                ATA = Convert.ToDateTime(substrings[2]);
+                                TicketAmount = Math.Round((TicketAmount * getExchangeRateSemanal(ATA)), 2);
+                            }
+                          
+                            price = price + TicketAmount;
+                        }
                     }
                 }
+                else if (Convert.ToInt32(totcur[0]) == 1)
+                {
+                    queryString = "SELECT SUM(TicketAmount) FROM CO.Payables WHERE Services.Incident =" + IncidentID + "  AND Services.Services = " + PaxId + " GROUP BY Services.Services   ";
+                    clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 200, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
+                    foreach (CSVTable table in queryCSV.CSVTables)
+                    {
+                        String[] rowData = table.Rows;
+                        foreach (String data in rowData)
+                        {
+                            price = string.IsNullOrEmpty(data) ? 0 : Convert.ToDouble(data);
+                        }
+                    }
+                }
+
+                global.LogMessage(queryString);
+                currency = totcur[1];
                 return price;
             }
             catch (Exception ex)
             {
                 MessageBox.Show("getPaxPrice:" + ex.Message + " Det: " + ex.StackTrace);
+                currency = "USD";
                 return 0;
             }
         }
-        public double getMonthINPC(string fechaF)
+
+        public string getTotalCurrency(string PaxId)
+        {
+            string TotCur = "USD";
+            int i = 0;
+            ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
+            APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
+            clientInfoHeader.AppID = "Query Example";
+            String queryString = "SELECT Currency FROM CO.Payables WHERE Services.Incident =" + IncidentID + "  AND Services.Services = " + PaxId + " GROUP BY Currency";
+            global.LogMessage(queryString);
+            clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 200, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
+            foreach (CSVTable table in queryCSV.CSVTables)
+            {
+                i = table.Rows.Count();
+                if (i == 2)
+                {
+                    TotCur = "MXN";
+                }
+                else
+                {
+                    String[] rowData = table.Rows;
+                    foreach (String data in rowData)
+                    {
+                        if (data == "1")
+                        {
+                            TotCur = "USD";
+                        }
+                        else
+                        {
+                            TotCur = "MXN";
+                        }
+                    }
+                }
+            }
+            
+            return i + "|" + TotCur;
+        }
+
+        private double getExchangeRateSemanal(DateTime date)
+        {
+            try
+            {
+                double rate = 1;
+                string envelope = "<soap:Envelope " +
+                "	xmlns:soap=\"http://www.w3.org/2003/05/soap-envelope\"" +
+     "	xmlns:pub=\"http://xmlns.oracle.com/oxp/service/PublicReportService\">" +
+       "<soap:Header/>" +
+     "	<soap:Body>" +
+     "		<pub:runReport>" +
+     "			<pub:reportRequest>" +
+     "			<pub:attributeFormat>xml</pub:attributeFormat>" +
+     "				<pub:attributeLocale>en</pub:attributeLocale>" +
+     "				<pub:attributeTemplate>default</pub:attributeTemplate>" +
+
+                 "<pub:parameterNameValues>" +
+                      "<pub:item>" +
+                   "<pub:name>P_EXCHANGE_DATE</pub:name>" +
+                   "<pub:values>" +
+                      "<pub:item>" + date.ToString("yyyy-MM-dd") + "</pub:item>" +
+                   "</pub:values>" +
+                "</pub:item>" +
+                 "</pub:parameterNameValues>" +
+
+     "				<pub:reportAbsolutePath>Custom/Integracion/XX_DAILY_RATES_REP.xdo</pub:reportAbsolutePath>" +
+     "				<pub:sizeOfDataChunkDownload>-1</pub:sizeOfDataChunkDownload>" +
+     "			</pub:reportRequest>" +
+     "		</pub:runReport>" +
+     "	</soap:Body>" +
+     "</soap:Envelope>";
+                global.LogMessage(envelope);
+                byte[] byteArray = Encoding.UTF8.GetBytes(envelope);
+                // Construct the base 64 encoded string used as credentials for the service call
+                byte[] toEncodeAsBytes = ASCIIEncoding.ASCII.GetBytes("itotal" + ":" + "Oracle123");
+                string credentials = Convert.ToBase64String(toEncodeAsBytes);
+                // Create HttpWebRequest connection to the service
+                HttpWebRequest request =
+                 (HttpWebRequest)WebRequest.Create("https://egqy-test.fa.us6.oraclecloud.com:443/xmlpserver/services/ExternalReportWSSService");
+                // Configure the request content type to be xml, HTTP method to be POST, and set the content length
+                request.Method = "POST";
+                request.ContentType = "application/soap+xml; charset=UTF-8;action=\"\"";
+                request.ContentLength = byteArray.Length;
+                // Configure the request to use basic authentication, with base64 encoded user name and password, to invoke the service.
+                request.Headers.Add("Authorization", "Basic " + credentials);
+                // Set the SOAP action to be invoked; while the call works without this, the value is expected to be set based as per standards
+                //request.Headers.Add("SOAPAction", "http://xmlns.oracle.com/apps/cdm/foundation/parties/organizationService/applicationModule/findOrganizationProfile");
+                // Write the xml payload to the request
+                Stream dataStream = request.GetRequestStream();
+                dataStream.Write(byteArray, 0, byteArray.Length);
+                dataStream.Close();
+                // Write the xml payload to the request
+                XDocument doc;
+                XmlDocument docu = new XmlDocument();
+                string result;
+
+                using (WebResponse response = request.GetResponse())
+                {
+                    using (Stream stream = response.GetResponseStream())
+                    {
+                        doc = XDocument.Load(stream);
+                        result = doc.ToString();
+                        XmlDocument xmlDoc = new XmlDocument();
+                        xmlDoc.LoadXml(result);
+                        XmlNamespaceManager nms = new XmlNamespaceManager(xmlDoc.NameTable);
+                        nms.AddNamespace("env", "http://schemas.xmlsoap.org/soap/envelope/");
+                        nms.AddNamespace("ns2", "http://xmlns.oracle.com/oxp/service/PublicReportService");
+
+                        XmlNode desiredNode = xmlDoc.SelectSingleNode("//ns2:runReportReturn", nms);
+                        if (desiredNode.HasChildNodes)
+                        {
+                            for (int i = 0; i < desiredNode.ChildNodes.Count; i++)
+                            {
+                                if (desiredNode.ChildNodes[i].LocalName == "reportBytes")
+                                {
+                                    byte[] data = Convert.FromBase64String(desiredNode.ChildNodes[i].InnerText);
+                                    string decodedString = Encoding.UTF8.GetString(data);
+                                    XmlTextReader reader = new XmlTextReader(new System.IO.StringReader(decodedString));
+                                    reader.Read();
+                                    XmlSerializer serializer = new XmlSerializer(typeof(DATA_DS_RATES));
+                                    DATA_DS_RATES res = (DATA_DS_RATES)serializer.Deserialize(reader);
+                                    var lista = res.G_N_RATES.Find(x => (x.USER_CONVERSION_TYPE.Trim() == "Semanal"));
+                                    if (lista != null)
+                                    {
+                                        rate = Convert.ToDouble(lista.G_1_RATES.CONVERSION_RATE);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                return rate;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.StackTrace);
+                return 1;
+            }
+        }
+
+        private double getMonthINPC(string fechaF)
         {
             double inpc = 0;
             try

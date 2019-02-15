@@ -23,6 +23,7 @@ namespace CostToInvoiceButton
 {
     public partial class DoubleScreen : Form
     {
+        private ClaseParaPrecios.RootObject rootObjectPricesFCCFBO { get; set; }
         private IRecordContext recordContext { get; set; }
         private IGlobalContext global { get; set; }
         public List<WHours> WHoursList { get; set; }
@@ -30,7 +31,7 @@ namespace CostToInvoiceButton
         public List<G_N_ITEMSUP> ListaSupplier { get; set; }
         public Dictionary<string, string> DictionarySuppliers { get; set; }
         private RightNowSyncPortClient clientORN { get; set; }
-        private bool PriceCostValueSet { get; set; }
+        public bool PriceCostValueSet { get; set; }
         // Campos por tipo de SR
         // Uso GENERAL
         // FCC
@@ -215,7 +216,7 @@ namespace CostToInvoiceButton
                     // PRECIOS EN LISTA DE SERVICIOS
                     if (String.IsNullOrEmpty(dataGridServicios.Rows[e.RowIndex].Cells["UnitPrice"].FormattedValue.ToString()) && lblSrType.Text != "FUEL")
                     {
-                        if (/*lblSrType.Text != "FUEL" || */(lblSrType.Text != "FCC" && String.IsNullOrEmpty(txtPrice.Text)))
+                        if ((lblSrType.Text != "FCC" && String.IsNullOrEmpty(txtPrice.Text)))
                         {
                             txtPrice.Text = GetPrices().ToString();
                         }
@@ -225,11 +226,16 @@ namespace CostToInvoiceButton
                         txtPrice.Text = dataGridServicios.Rows[e.RowIndex].Cells["UnitPrice"].FormattedValue.ToString();
                         blnPriceSet = true;
                     }
+
+                    MessageBox.Show("Price: " + blnPriceSet.ToString() + "Cost: " + blnCostSet.ToString() + "PriceCost" + PriceCostValueSet);
+
                     if (blnCostSet && blnPriceSet)
                     {
                         PriceCostValueSet = true;
                         return;
                     }
+
+                    MessageBox.Show("Sigue");
 
                     if ((lblSrType.Text == "FBO" && (txtItemNumber.Text == "ASFIEAP357" || txtItemNumber.Text == "AFREISP0179")) || (lblSrType.Text == "FCC" && txtItemNumber.Text == "AFREISP0179"))
                     {
@@ -259,7 +265,7 @@ namespace CostToInvoiceButton
                                 if (lblCurrencyPrice.Text == "USD")
                                 {
                                     // Obtencion precio por litro
-                                    txtPrice.Text = ( GetFuelPrice() / 3.7853 ).ToString();
+                                    txtPrice.Text = (GetFuelPrice() / 3.7853).ToString();
                                 }
                                 else
                                 {
@@ -1756,6 +1762,7 @@ namespace CostToInvoiceButton
         }
         private double GetPrices()
         {
+            MessageBox.Show("EntraGetPrices");
             string arr_type = "DOMESTIC";
             string dep_type = "DOMESTIC";
 
@@ -1943,6 +1950,7 @@ namespace CostToInvoiceButton
                 ClaseParaPrecios.RootObject rootObjectPrices = JsonConvert.DeserializeObject<ClaseParaPrecios.RootObject>(response.Content);
                 if (rootObjectPrices != null && rootObjectPrices.items.Count > 0)
                 {
+                    rootObjectPricesFCCFBO = rootObjectPrices;
                     if (lblSrType.Text == "FUEL")
                     {
                         foreach (ClaseParaPrecios.Item item in rootObjectPrices.items)
@@ -3151,6 +3159,7 @@ namespace CostToInvoiceButton
             {
                 try
                 {
+
                     double pricefinal = 0;
                     if (txtItemNumber.Text == "SOMFEAP325" || txtItemNumber.Text == "SOMFEAP260" || lblSrType.Text == "SENEAM")
                     {
@@ -3247,6 +3256,8 @@ namespace CostToInvoiceButton
         {
             try
             {
+                
+
                 if (!string.IsNullOrEmpty(txtItem.Text) && !string.IsNullOrEmpty(txtItemNumber.Text))
                 {
                     if (ValidateData())
@@ -3442,8 +3453,9 @@ namespace CostToInvoiceButton
                         service.Description = substrings[2].Replace('"', ' ').Trim();
                         service.Airport = substrings[3].Replace('_', '-').Trim();
                         service.Supplier = substrings[4].Replace('"', ' ').Trim();
-                        service.UnitCost = substrings[5];
-                        service.UnitPrice = substrings[6];
+
+                        service.UnitCost = substrings[5] == "0" ? "" : substrings[5];
+                        service.UnitPrice = substrings[6] == "0" ? "" : substrings[6];
                         service.InvoiceInternal = substrings[7];
                         service.Itinerary = String.IsNullOrEmpty(substrings[8]) ? "0" : substrings[8];
                         service.Pax = substrings[9] == "1" ? "Yes" : "No";
@@ -3477,6 +3489,7 @@ namespace CostToInvoiceButton
         private void DoubleScreen_Load(object sender, EventArgs e)
         {
             getAllSuppliers();
+            rootObjectPricesFCCFBO = new ClaseParaPrecios.RootObject();
         }
         private void txtCost_TextChanged(object sender, EventArgs e)
         {

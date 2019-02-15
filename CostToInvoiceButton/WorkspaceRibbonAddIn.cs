@@ -9,7 +9,6 @@ using System;
 using System.AddIn;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -535,7 +534,7 @@ namespace CostToInvoiceButton
                     ((TextBox)doubleScreen.Controls["txtSemeam"]).Text = SeneamCat;
                     ((TextBox)doubleScreen.Controls["txtCreationIncidentDate"]).Text = incidentCreation.ToString();
                     ((ComboBox)doubleScreen.Controls["cboCurrency"]).Text = SRType == "FUEL" ? "MXN" : GetCurrency();
-                    
+
                     doubleScreen.ShowDialog();
                 }
             }
@@ -1489,8 +1488,9 @@ namespace CostToInvoiceButton
                         service.Description = substrings[2].Replace('"', ' ').Trim();
                         service.Airport = substrings[3].Replace('_', '-').Trim();
                         service.Supplier = substrings[4].Replace('"', ' ').Trim();
-                        service.UnitCost = substrings[5];
-                        service.UnitPrice = substrings[6];
+
+                        service.UnitCost = substrings[5] == "0" ? "" : substrings[5];
+                        service.UnitPrice = substrings[6] == "0" ? "" : substrings[6];
                         service.InvoiceInternal = substrings[7];
                         service.Itinerary = String.IsNullOrEmpty(substrings[8]) ? "0" : substrings[8];
                         service.Pax = substrings[9] == "1" ? "Yes" : "No";
@@ -2746,15 +2746,18 @@ namespace CostToInvoiceButton
                         string cur = "";
                         if (!String.IsNullOrEmpty(item.ParentPax))
                         {
-                            priceP = getPaxPrice(item.ParentPax, out cur);
-                            PriceCh = getPaxPrice(item.ID, out cur);
+                            global.LogMessage("Entra al hijo");
+                            priceP = getPaxPrice(item.ParentPax, out cur, false);
+                            global.LogMessage("Entra al padre del hijo");
+                            PriceCh = getPaxPrice(item.ID, out cur, true);
                             price = PriceCh + priceP;
                             UpdatePaxPrice(item.ID, PriceCh, cur);
                             UpdatePaxPrice(item.ParentPax, price, cur);
                         }
                         else
                         {
-                            price = getPaxPrice(item.ID, out cur);
+                            global.LogMessage("Entra al padre");
+                            price = getPaxPrice(item.ID, out cur, true);
                             UpdatePaxPrice(item.ID, price, cur);
                         }
                     }
@@ -2815,7 +2818,7 @@ namespace CostToInvoiceButton
             }
 
         }
-        public double getPaxPrice(string PaxId, out string currency)
+        public double getPaxPrice(string PaxId, out string currency, bool parent)
         {
             try
             {
@@ -2824,7 +2827,7 @@ namespace CostToInvoiceButton
                 DateTime ATA = DateTime.Now;
 
                 Char delimiterto = '|';
-                string totcurr = getTotalCurrency(PaxId);
+                string totcurr = getTotalCurrency(PaxId, parent);
                 string[] totcur = totcurr.Split(delimiterto);
 
                 ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
@@ -2849,7 +2852,7 @@ namespace CostToInvoiceButton
                                 ATA = Convert.ToDateTime(substrings[2]);
                                 TicketAmount = Math.Round((TicketAmount * getExchangeRateSemanal(ATA)), 2);
                             }
-                          
+
                             price = price + TicketAmount;
                         }
                     }
@@ -2868,26 +2871,36 @@ namespace CostToInvoiceButton
                     }
                 }
 
-                global.LogMessage(queryString);
+                global.LogMessage("getPaxPrice: " + queryString);
                 currency = totcur[1];
                 return price;
             }
             catch (Exception ex)
             {
                 MessageBox.Show("getPaxPrice:" + ex.Message + " Det: " + ex.StackTrace);
-                currency = "USD";
+                currency = "";
                 return 0;
             }
         }
 
-        public string getTotalCurrency(string PaxId)
+        public string getTotalCurrency(string PaxId, bool parent)
         {
-            string TotCur = "USD";
+            string TotCur = "";
             int i = 0;
             ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
             APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
             clientInfoHeader.AppID = "Query Example";
             String queryString = "SELECT Currency FROM CO.Payables WHERE Services.Incident =" + IncidentID + "  AND Services.Services = " + PaxId + " GROUP BY Currency";
+            /*
+            if (parent)
+            {
+                queryString = 
+            }
+            else
+            {
+                queryString = "SELECT Currency FROM CO.Payables WHERE Services.Incident =" + IncidentID + "  AND Services = " + PaxId + " GROUP BY Currency";
+            }
+            */
             global.LogMessage(queryString);
             clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 200, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
             foreach (CSVTable table in queryCSV.CSVTables)
@@ -2913,7 +2926,6 @@ namespace CostToInvoiceButton
                     }
                 }
             }
-            
             return i + "|" + TotCur;
         }
 

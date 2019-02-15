@@ -1556,7 +1556,7 @@ namespace CostToInvoiceButton
                     var client = new RestClient("https://iccs.bigmachines.com/");
                     //string User = Encoding.UTF8.GetString(Convert.FromBase64String("aW1wbGVtZW50YWRvcg=="));
                     //string Pass = Encoding.UTF8.GetString(Convert.FromBase64String("U2luZXJIwMTgu"));
-                    client.Authenticator = new HttpBasicAuthenticator("servicios", "Sinergy*2018");
+                    client.Authenticator = new HttpBasicAuthenticator("servicios", "Sinergy2019.");
                     // string definicion = "?totalResults=false&q={str_item_number:'" + dataGridServicios.Rows[e.RowIndex].Cells[1].FormattedValue.ToString().Trim() + "',str_icao_iata_code:'" + airtport + "'}";
                     if (lblSrType.Text == "FBO")
                     {
@@ -1800,7 +1800,7 @@ namespace CostToInvoiceButton
                 var client = new RestClient("https://iccs.bigmachines.com/");
                 //string User = Encoding.UTF8.GetString(Convert.FromBase64String("aW1wbGVtZW50YWRvcg=="));
                 //string Pass = Encoding.UTF8.GetString(Convert.FromBase64String("U2luZXJneTIwMTgu"));
-                client.Authenticator = new HttpBasicAuthenticator("servicios", "Sinergy*2018");
+                client.Authenticator = new HttpBasicAuthenticator("servicios", "Sinergy2019.");
                 string definicion = "";
                 // string definicion = "?totalResults=false&q={str_item_number:'" + dataGridServicios.Rows[e.RowIndex].Cells[1].FormattedValue.ToString().Trim() + "',str_icao_iata_code:'" + airtport + "'}";
                 // string definicion = "?totalResults=true&q={str_item_number:'" + txtItemNumber.Text + "',str_icao_iata_code:'" + txtAirport.Text + "'}";
@@ -2063,7 +2063,7 @@ namespace CostToInvoiceButton
                 var client = new RestClient("https://iccs.bigmachines.com/");
                 string User = Encoding.UTF8.GetString(Convert.FromBase64String("aW1wbGVtZW50YWRvcg=="));
                 string Pass = Encoding.UTF8.GetString(Convert.FromBase64String("U2luZXJneSoyMDE4"));
-                client.Authenticator = new HttpBasicAuthenticator("servicios", "Sinergy*2018");
+                client.Authenticator = new HttpBasicAuthenticator("servicios", "Sinergy2019.");
                 string definicion = "?q={str_tipo:'SENEAM',str_categoria:'" + Utilidad + "'} ";
                 var request = new RestRequest("rest/v6/customCategorias/" + definicion, Method.GET);
                 IRestResponse response = client.Execute(request);
@@ -2096,7 +2096,7 @@ namespace CostToInvoiceButton
                 var client = new RestClient("https://iccs.bigmachines.com/");
                 string User = Encoding.UTF8.GetString(Convert.FromBase64String("aW1wbGVtZW50YWRvcg=="));
                 string Pass = Encoding.UTF8.GetString(Convert.FromBase64String("U2luZXJneSoyMDE4"));
-                client.Authenticator = new HttpBasicAuthenticator("servicios", "Sinergy*2018");
+                client.Authenticator = new HttpBasicAuthenticator("servicios", "Sinergy2019.");
                 string definicion = "?q={str_tipo:'UTILIDAD',str_categoria:'" + Utilidad + "'} ";
                 var request = new RestRequest("rest/v6/customCategorias/" + definicion, Method.GET);
                 IRestResponse response = client.Execute(request);
@@ -2127,7 +2127,7 @@ namespace CostToInvoiceButton
                 var client = new RestClient("https://iccs.bigmachines.com/");
                 string User = Encoding.UTF8.GetString(Convert.FromBase64String("aW1wbGVtZW50YWRvcg=="));
                 string Pass = Encoding.UTF8.GetString(Convert.FromBase64String("U2luZXJneSoyMDE4"));
-                client.Authenticator = new HttpBasicAuthenticator("servicios", "Sinergy*2018");
+                client.Authenticator = new HttpBasicAuthenticator("servicios", "Sinergy2019.");
                 //string definicion = "?totalResults=false&q={str_item_number:'" + dataGridServicios.Rows[e.RowIndex].Cells[1].FormattedValue.ToString().Trim() + "',str_icao_iata_code:'" + airtport + "'}";
                 string definicion = "?q={str_tipo:'FUEL',str_categoria:'" + Combustible + "'} ";
                 var request = new RestRequest("rest/v6/customCategorias/" + definicion, Method.GET);
@@ -2159,7 +2159,7 @@ namespace CostToInvoiceButton
                 var client = new RestClient("https://iccs.bigmachines.com/");
                 string User = Encoding.UTF8.GetString(Convert.FromBase64String("aW1wbGVtZW50YWRvcg=="));
                 string Pass = Encoding.UTF8.GetString(Convert.FromBase64String("U2luZXJneSoyMDE4"));
-                client.Authenticator = new HttpBasicAuthenticator("servicios", "Sinergy*2018");
+                client.Authenticator = new HttpBasicAuthenticator("servicios", "Sinergy2019.");
                 string definicion = "?q={str_tipo:'FUEL_I',str_categoria:'" + Combustible + "'} ";
                 var request = new RestRequest("rest/v6/customCategorias/" + definicion, Method.GET);
                 IRestResponse response = client.Execute(request);
@@ -3022,7 +3022,7 @@ namespace CostToInvoiceButton
                 var client = new RestClient("https://iccs.bigmachines.com/");
                 string User = Encoding.UTF8.GetString(Convert.FromBase64String("aW1wbGVtZW50YWRvcg=="));
                 string Pass = Encoding.UTF8.GetString(Convert.FromBase64String("U2luZXJneSoyMDE4"));
-                client.Authenticator = new HttpBasicAuthenticator("servicios", "Sinergy*2018");
+                client.Authenticator = new HttpBasicAuthenticator("servicios", "Sinergy2019.");
 
                 //string definicion = "?totalResults=false&q={str_item_number:'" + dataGridServicios.Rows[e.RowIndex].Cells[1].FormattedValue.ToString().Trim() + "',str_icao_iata_code:'" + airtport + "'}";
                 string definicion = "?q={str_tipo:'HANGAR_SPACE',str_categoria:'" + Utilidad + "'} ";
@@ -3110,7 +3110,7 @@ namespace CostToInvoiceButton
                 var client = new RestClient("https://iccs.bigmachines.com/");
                 //string User = Encoding.UTF8.GetString(Convert.FromBase64String("aW1wbGVtZW50YWRvcg=="));
                 //string Pass = Encoding.UTF8.GetString(Convert.FromBase64String("U2luZXJIwMTgu"));
-                client.Authenticator = new HttpBasicAuthenticator("servicios", "Sinergy*2018");
+                client.Authenticator = new HttpBasicAuthenticator("servicios", "Sinergy2019.");
 
                 global.LogMessage("GETFinanzasFBO:" + definicion + "SRType:" + lblSrType.Text);
                 var request = new RestRequest("rest/v6/customFinanzas_FBO/" + definicion, Method.GET);

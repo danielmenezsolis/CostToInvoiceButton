@@ -1364,7 +1364,7 @@ namespace CostToInvoiceButton
                 var client = new RestClient("https://iccs.bigmachines.com/");
                 string User = Encoding.UTF8.GetString(Convert.FromBase64String("aW1wbGVtZW50YWRvcg=="));
                 string Pass = Encoding.UTF8.GetString(Convert.FromBase64String("U2luZXJneSoyMDE4"));
-                client.Authenticator = new HttpBasicAuthenticator("servicios", "Sinergy*2018");
+                client.Authenticator = new HttpBasicAuthenticator("servicios", "Sinergy2019.");
                 string definicion = "?totalResults=true&q={inicio_tasa:'" + ano + "'}";
                 var request = new RestRequest("rest/v6/customRecargos_Seneam/" + definicion, Method.GET);
                 IRestResponse response = client.Execute(request);
@@ -1439,7 +1439,7 @@ namespace CostToInvoiceButton
                 var client = new RestClient("https://iccs.bigmachines.com/");
                 string User = Encoding.UTF8.GetString(Convert.FromBase64String("aW1wbGVtZW50YWRvcg=="));
                 string Pass = Encoding.UTF8.GetString(Convert.FromBase64String("U2luZXJneSoyMDE4"));
-                client.Authenticator = new HttpBasicAuthenticator("servicios", "Sinergy*2018");
+                client.Authenticator = new HttpBasicAuthenticator("servicios", "Sinergy2019.");
                 string definicion = "?q={str_tipo:'SENEAM',str_categoria:'" + Utilidad + "'} ";
                 var request = new RestRequest("rest/v6/customCategorias/" + definicion, Method.GET);
                 IRestResponse response = client.Execute(request);

@@ -216,10 +216,11 @@ namespace CostToInvoiceButton
                     // PRECIOS EN LISTA DE SERVICIOS
                     if (String.IsNullOrEmpty(dataGridServicios.Rows[e.RowIndex].Cells["UnitPrice"].FormattedValue.ToString()) && lblSrType.Text != "FUEL")
                     {
-                        if ((lblSrType.Text != "FCC" && String.IsNullOrEmpty(txtPrice.Text)))
+                        global.LogMessage("Sin precio asignado. Buscando precio.");
+                        if (String.IsNullOrEmpty(txtPrice.Text))
                         {
                             txtPrice.Text = GetPrices().ToString();
-                        }
+                        } 
                     }
                     else
                     {

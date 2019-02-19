@@ -2764,11 +2764,11 @@ namespace CostToInvoiceButton
                             priceP = getPaxPrice(item.ParentPax, out cur, false);
 
                             curcambio = cur;
-                            global.LogMessage("(Hijo) Moneda: " + cur + "MonedaCambio: " + curcambio);
+
 
                             PriceCh = getPaxPrice(item.ID, out cur, true);
 
-                            global.LogMessage("(HijoPadre) Moneda: " + cur + "MonedaCambio: " + curcambio);
+
 
                             price = PriceCh + priceP;
                             UpdatePaxPrice(item.ID, PriceCh, curcambio);
@@ -2777,7 +2777,7 @@ namespace CostToInvoiceButton
                         else
                         {
                             price = getPaxPrice(item.ID, out cur, true);
-                            global.LogMessage("(Padre) Moneda: " + cur + "MonedaCambio: " + curcambio);
+
                             UpdatePaxPrice(item.ID, price, curcambio);
                         }
                     }

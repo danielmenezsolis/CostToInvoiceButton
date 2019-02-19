@@ -2757,23 +2757,28 @@ namespace CostToInvoiceButton
                         double price = 0;
                         double priceP = 0;
                         double PriceCh = 0;
-
+                        string curcambio = "";
                         string cur = "";
                         if (!String.IsNullOrEmpty(item.ParentPax))
                         {
-                            global.LogMessage("Entra al hijo");
                             priceP = getPaxPrice(item.ParentPax, out cur, false);
-                            global.LogMessage("Entra al padre del hijo");
+
+                            curcambio = cur;
+                            global.LogMessage("(Hijo) Moneda: " + cur + "MonedaCambio: " + curcambio);
+
                             PriceCh = getPaxPrice(item.ID, out cur, true);
+
+                            global.LogMessage("(HijoPadre) Moneda: " + cur + "MonedaCambio: " + curcambio);
+
                             price = PriceCh + priceP;
-                            UpdatePaxPrice(item.ID, PriceCh, cur);
-                            UpdatePaxPrice(item.ParentPax, price, cur);
+                            UpdatePaxPrice(item.ID, PriceCh, curcambio);
+                            UpdatePaxPrice(item.ParentPax, price, curcambio);
                         }
                         else
                         {
-                            global.LogMessage("Entra al padre");
                             price = getPaxPrice(item.ID, out cur, true);
-                            UpdatePaxPrice(item.ID, price, cur);
+                            global.LogMessage("(Padre) Moneda: " + cur + "MonedaCambio: " + curcambio);
+                            UpdatePaxPrice(item.ID, price, curcambio);
                         }
                     }
                 }
@@ -2886,7 +2891,7 @@ namespace CostToInvoiceButton
                     }
                 }
 
-                global.LogMessage("getPaxPrice: " + queryString);
+                global.LogMessage("getPaxPrice: " + queryString + " MonedaBack: " + totcur[1]);
                 currency = totcur[1];
                 return price;
             }
@@ -2906,21 +2911,13 @@ namespace CostToInvoiceButton
             APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
             clientInfoHeader.AppID = "Query Example";
             String queryString = "SELECT Currency FROM CO.Payables WHERE Services.Incident =" + IncidentID + "  AND Services.Services = " + PaxId + " GROUP BY Currency";
-            /*
-            if (parent)
-            {
-                queryString = 
-            }
-            else
-            {
-                queryString = "SELECT Currency FROM CO.Payables WHERE Services.Incident =" + IncidentID + "  AND Services = " + PaxId + " GROUP BY Currency";
-            }
-            */
             global.LogMessage(queryString);
             clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 200, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
             foreach (CSVTable table in queryCSV.CSVTables)
             {
+
                 i = table.Rows.Count();
+
                 if (i == 2)
                 {
                     TotCur = "MXN";
@@ -2940,6 +2937,7 @@ namespace CostToInvoiceButton
                         }
                     }
                 }
+                global.LogMessage("TotalMonedasPorSe:" + i + " Moneda: " + TotCur);
             }
             return i + "|" + TotCur;
         }

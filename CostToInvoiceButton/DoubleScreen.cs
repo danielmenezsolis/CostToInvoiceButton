@@ -221,7 +221,7 @@ namespace CostToInvoiceButton
                         if (String.IsNullOrEmpty(txtPrice.Text))
                         {
                             txtPrice.Text = GetPrices().ToString();
-                        } 
+                        }
                     }
                     else
                     {
@@ -229,7 +229,7 @@ namespace CostToInvoiceButton
                         blnPriceSet = true;
                     }
 
-                    MessageBox.Show("Price: " + blnPriceSet.ToString() + "Cost: " + blnCostSet.ToString() + "PriceCost" + PriceCostValueSet);
+                    global.LogMessage("Price: " + blnPriceSet.ToString() + "Cost: " + blnCostSet.ToString() + "PriceCost" + PriceCostValueSet);
 
                     if (blnCostSet && blnPriceSet)
                     {
@@ -237,7 +237,7 @@ namespace CostToInvoiceButton
                         return;
                     }
 
-                    MessageBox.Show("Sigue");
+
 
                     if ((lblSrType.Text == "FBO" && (txtItemNumber.Text == "ASFIEAP357" || txtItemNumber.Text == "AFREISP0179")) || (lblSrType.Text == "FCC" && txtItemNumber.Text == "AFREISP0179"))
                     {
@@ -1782,7 +1782,7 @@ namespace CostToInvoiceButton
         }
         private double GetPrices()
         {
-            MessageBox.Show("EntraGetPrices");
+            global.LogMessage("EntraGetPrices");
             string arr_type = "DOMESTIC";
             string dep_type = "DOMESTIC";
 
@@ -1915,13 +1915,13 @@ namespace CostToInvoiceButton
                     {
 
                         definicion += "str_item_number:'" + txtItemNumber.Text + "'" +
-                                ",str_ft_arrival:'" + arr_type.ToString() + "'" +
-                                ",str_ft_depart:'" + dep_type.ToString() + "'" +
-                                ",str_schedule_type:'" + txtMainHour.Text + "'" +
-                                ",bol_int_flight_cargo:'0'" +
-                                ",str_client_category:'NTJET'" +
-                                ",$and:[{$or:[{str_icao_iata_code:'" + txtAirport.Text + "'},{str_icao_iata_code:{$exists:false}}]}," +
-                                "{$or:[{str_aircraft_type:'" + txtICAOD.Text + "'},{str_aircraft_type:{$exists:false}}]}]}";
+                                   ",str_ft_arrival:'" + arr_type.ToString() + "'" +
+                                   ",str_ft_depart:'" + dep_type.ToString() + "'" +
+                                   ",str_schedule_type:'" + txtMainHour.Text + "'" +
+                                   ",bol_int_flight_cargo:" + cargo.ToString() +
+                                   ",str_client_category:'" + txtCustomerClass.Text + "'" +
+                                   ",$and:[{$or:[{str_icao_iata_code:'" + txtAirport.Text + "'},{str_icao_iata_code:{$exists:false}}]}," +
+                                   "{$or:[{str_aircraft_type:'" + txtICAOD.Text + "'},{str_aircraft_type:{$exists:false}}]}]}";
                     }
                     // MANEJO DE ITEMS ADICIONALES ANTERIORES
                     /*
@@ -3276,7 +3276,7 @@ namespace CostToInvoiceButton
         {
             try
             {
-                
+
 
                 if (!string.IsNullOrEmpty(txtItem.Text) && !string.IsNullOrEmpty(txtItemNumber.Text))
                 {

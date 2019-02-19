@@ -24,6 +24,7 @@ namespace CostToInvoiceButton
 {
     public class WorkspaceRibbonAddIn : Panel, IWorkspaceRibbonButton
     {
+        public string pswCPQ { get; set; }
         DoubleScreen doubleScreen;
         public static List<G_1_INPC> INPC { get; set; }
         public List<RootObject> InsertedServices { get; set; }
@@ -32,6 +33,7 @@ namespace CostToInvoiceButton
         private bool inDesignMode { get; set; }
         private RightNowSyncPortClient clientORN { get; set; }
         public DataGridView DgvServicios { get; set; }
+        public DataGridView DgvInvoice { get; set; }
         public List<Services> servicios { get; set; }
         public IIncident Incident { get; set; }
         public int IncidentID { get; set; }
@@ -40,6 +42,7 @@ namespace CostToInvoiceButton
         public string SRType { get; set; }
         public string SENCat { get; set; }
         public string ClientName { get; set; }
+        public string cClass { get; set; }
 
         public WorkspaceRibbonAddIn(bool inDesignMode, IRecordContext RecordContext, IGlobalContext globalContext)
         {
@@ -83,7 +86,8 @@ namespace CostToInvoiceButton
                     string CateringDeliveryDate = "";
                     string AircraftCategory = "";
                     string AircraftPCategory = "";
-                    string cClass = "";
+                    cClass = "";
+                    pswCPQ = getPassword("CPQ");
                     Incident = (IIncident)recordContext.GetWorkspaceRecord(WorkspaceRecordType.Incident);
                     IList<ICfVal> IncCustomFieldList = Incident.CustomField;
                     DateTime? incidentCreation = Incident.Created;
@@ -489,6 +493,7 @@ namespace CostToInvoiceButton
                     }
 
                     doubleScreen = new DoubleScreen(global, recordContext);
+                    DgvInvoice = ((DataGridView)doubleScreen.Controls["dataGridInvoice"]);
                     DgvServicios = ((DataGridView)doubleScreen.Controls["dataGridServicios"]);
                     DgvServicios.DataSource = servicios;
 
@@ -509,9 +514,19 @@ namespace CostToInvoiceButton
                     DgvServicios.Columns["Site"].Visible = false;
                     DgvServicios.Columns["Tax"].Visible = false;
 
-
-
-
+                    // Columna Fee
+                    if (SRType == "FBO" || (SRType == "FCC" && cClass == "NTJET"))
+                    {
+                        // Mostrar columna Fee
+                        DgvServicios.Columns["Fee"].Visible = true;
+                        DgvInvoice.Columns["Fee"].Visible = true;
+                    }
+                    else
+                    {
+                        // Ocultar columna Fee
+                        DgvServicios.Columns["Fee"].Visible = false;
+                        DgvInvoice.Columns["Fee"].Visible = false;
+                    }
 
                     DgvServicios.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.DisplayedCells;
                     ((System.Windows.Forms.Label)doubleScreen.Controls["lblSrType"]).Text = SRType.ToUpper();
@@ -1364,7 +1379,7 @@ namespace CostToInvoiceButton
                 var client = new RestClient("https://iccs.bigmachines.com/");
                 string User = Encoding.UTF8.GetString(Convert.FromBase64String("aW1wbGVtZW50YWRvcg=="));
                 string Pass = Encoding.UTF8.GetString(Convert.FromBase64String("U2luZXJneSoyMDE4"));
-                client.Authenticator = new HttpBasicAuthenticator("servicios", "Sinergy2019.");
+                client.Authenticator = new HttpBasicAuthenticator("servicios", pswCPQ);
                 string definicion = "?totalResults=true&q={inicio_tasa:'" + ano + "'}";
                 var request = new RestRequest("rest/v6/customRecargos_Seneam/" + definicion, Method.GET);
                 IRestResponse response = client.Execute(request);
@@ -1439,7 +1454,7 @@ namespace CostToInvoiceButton
                 var client = new RestClient("https://iccs.bigmachines.com/");
                 string User = Encoding.UTF8.GetString(Convert.FromBase64String("aW1wbGVtZW50YWRvcg=="));
                 string Pass = Encoding.UTF8.GetString(Convert.FromBase64String("U2luZXJneSoyMDE4"));
-                client.Authenticator = new HttpBasicAuthenticator("servicios", "Sinergy2019.");
+                client.Authenticator = new HttpBasicAuthenticator("servicios", pswCPQ);
                 string definicion = "?q={str_tipo:'SENEAM',str_categoria:'" + Utilidad + "'} ";
                 var request = new RestRequest("rest/v6/customCategorias/" + definicion, Method.GET);
                 IRestResponse response = client.Execute(request);
@@ -3216,7 +3231,26 @@ namespace CostToInvoiceButton
                 MessageBox.Show("getINPC:" + ex.Message + " Det: " + ex.StackTrace);
             }
         }
+        public string getPassword(string application)
+        {
+            string password = "";
+            ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
+            APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
+            clientInfoHeader.AppID = "Query Example";
+            String queryString = "SELECT Password FROM CO.Password WHERE Aplicacion='" + application + "'";
+            clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 1, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
+            foreach (CSVTable table in queryCSV.CSVTables)
+            {
+                String[] rowData = table.Rows;
+                foreach (String data in rowData)
+                {
+                    password = String.IsNullOrEmpty(data) ? "" : data;
+                }
+            }
+            return password;
+        }
     }
+
     [AddIn("Invoice to Cost", Version = "1.0.0.0")]
     public class WorkspaceRibbonButtonFactory : IWorkspaceRibbonButtonFactory
     {

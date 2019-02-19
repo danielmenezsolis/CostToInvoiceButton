@@ -23,6 +23,7 @@ namespace CostToInvoiceButton
 {
     public partial class DoubleScreen : Form
     {
+        public string pswCPQ { get; set; }
         private ClaseParaPrecios.RootObject rootObjectPricesFCCFBO { get; set; }
         private IRecordContext recordContext { get; set; }
         private IGlobalContext global { get; set; }
@@ -507,11 +508,11 @@ namespace CostToInvoiceButton
                     }
                     else if (lblSrType.Text == "FCC")
                     {
-                        if (IsFloatValue(txtCost.Text)) // && GetPrices() == 0)
+                        if (!blnPriceSet) // && GetPrices() == 0)
                         {
                             // cboCurrency.Text = "USD";
                             DateTime date = DateTime.Parse(txtATA.Text);
-                            txtPrice.Text = Math.Round((Convert.ToDouble(txtCost.Text) + (Convert.ToDouble(txtCost.Text) * GetUtilidadPercentage(txtUtilidad.Text) / 100)) / getExchangeRate(date), 2, MidpointRounding.AwayFromZero).ToString();
+                            txtPrice.Text = Math.Round((Convert.ToDouble(txtCost.Text) + (Convert.ToDouble(txtCost.Text) * GetUtilidadPercentage(txtUtilidad.Text) / 100)) / getExchangeRateSemanal(date), 2, MidpointRounding.AwayFromZero).ToString();
                         }
                         /*
                         if (txtItemNumber.Text == "ASECSAS0073")
@@ -786,7 +787,7 @@ namespace CostToInvoiceButton
                 //MessageBox.Show("Costo mas centavos : " + galonrate);
                 double IVA = (galonrate * .16);
                 //MessageBox.Show("IVA : " + IVA);
-                galonrate = galonrate + IVA;
+                // galonrate = galonrate + IVA;
                 //MessageBox.Show("Costo mas IVA : " + galonrate);
                 if (txtItemNumber.Text == "AGASIAS0270" || txtItemNumber.Text == "JFUEIAS0269")
                 {
@@ -823,11 +824,11 @@ namespace CostToInvoiceButton
                 elements.Find<SecurityBindingElement>().IncludeTimestamp = false;
                 clientORN.Endpoint.Binding = new CustomBinding(elements);
                 global.PrepareConnectSession(clientORN.ChannelFactory);
+                pswCPQ = getPassword("CPQ");
                 if (clientORN != null)
                 {
                     result = true;
                 }
-
                 return result;
             }
             catch (Exception ex)
@@ -836,6 +837,24 @@ namespace CostToInvoiceButton
                 return false;
 
             }
+        }
+        public string getPassword(string application)
+        {
+            string password = "";
+            ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
+            APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
+            clientInfoHeader.AppID = "Query Example";
+            String queryString = "SELECT Password FROM CO.Password WHERE Aplicacion='" + application + "'";
+            clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 1, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
+            foreach (CSVTable table in queryCSV.CSVTables)
+            {
+                String[] rowData = table.Rows;
+                foreach (String data in rowData)
+                {
+                    password = String.IsNullOrEmpty(data) ? "" : data;
+                }
+            }
+            return password;
         }
         private string GetFBOValue(int Itinerary)
         {
@@ -1556,7 +1575,7 @@ namespace CostToInvoiceButton
                     var client = new RestClient("https://iccs.bigmachines.com/");
                     //string User = Encoding.UTF8.GetString(Convert.FromBase64String("aW1wbGVtZW50YWRvcg=="));
                     //string Pass = Encoding.UTF8.GetString(Convert.FromBase64String("U2luZXJIwMTgu"));
-                    client.Authenticator = new HttpBasicAuthenticator("servicios", "Sinergy2019.");
+                    client.Authenticator = new HttpBasicAuthenticator("servicios", pswCPQ);
                     // string definicion = "?totalResults=false&q={str_item_number:'" + dataGridServicios.Rows[e.RowIndex].Cells[1].FormattedValue.ToString().Trim() + "',str_icao_iata_code:'" + airtport + "'}";
                     if (lblSrType.Text == "FBO")
                     {
@@ -1800,7 +1819,7 @@ namespace CostToInvoiceButton
                 var client = new RestClient("https://iccs.bigmachines.com/");
                 //string User = Encoding.UTF8.GetString(Convert.FromBase64String("aW1wbGVtZW50YWRvcg=="));
                 //string Pass = Encoding.UTF8.GetString(Convert.FromBase64String("U2luZXJneTIwMTgu"));
-                client.Authenticator = new HttpBasicAuthenticator("servicios", "Sinergy2019.");
+                client.Authenticator = new HttpBasicAuthenticator("servicios", pswCPQ);
                 string definicion = "";
                 // string definicion = "?totalResults=false&q={str_item_number:'" + dataGridServicios.Rows[e.RowIndex].Cells[1].FormattedValue.ToString().Trim() + "',str_icao_iata_code:'" + airtport + "'}";
                 // string definicion = "?totalResults=true&q={str_item_number:'" + txtItemNumber.Text + "',str_icao_iata_code:'" + txtAirport.Text + "'}";
@@ -2063,7 +2082,7 @@ namespace CostToInvoiceButton
                 var client = new RestClient("https://iccs.bigmachines.com/");
                 string User = Encoding.UTF8.GetString(Convert.FromBase64String("aW1wbGVtZW50YWRvcg=="));
                 string Pass = Encoding.UTF8.GetString(Convert.FromBase64String("U2luZXJneSoyMDE4"));
-                client.Authenticator = new HttpBasicAuthenticator("servicios", "Sinergy2019.");
+                client.Authenticator = new HttpBasicAuthenticator("servicios", pswCPQ);
                 string definicion = "?q={str_tipo:'SENEAM',str_categoria:'" + Utilidad + "'} ";
                 var request = new RestRequest("rest/v6/customCategorias/" + definicion, Method.GET);
                 IRestResponse response = client.Execute(request);
@@ -2096,7 +2115,7 @@ namespace CostToInvoiceButton
                 var client = new RestClient("https://iccs.bigmachines.com/");
                 string User = Encoding.UTF8.GetString(Convert.FromBase64String("aW1wbGVtZW50YWRvcg=="));
                 string Pass = Encoding.UTF8.GetString(Convert.FromBase64String("U2luZXJneSoyMDE4"));
-                client.Authenticator = new HttpBasicAuthenticator("servicios", "Sinergy2019.");
+                client.Authenticator = new HttpBasicAuthenticator("servicios", pswCPQ);
                 string definicion = "?q={str_tipo:'UTILIDAD',str_categoria:'" + Utilidad + "'} ";
                 var request = new RestRequest("rest/v6/customCategorias/" + definicion, Method.GET);
                 IRestResponse response = client.Execute(request);
@@ -2127,7 +2146,7 @@ namespace CostToInvoiceButton
                 var client = new RestClient("https://iccs.bigmachines.com/");
                 string User = Encoding.UTF8.GetString(Convert.FromBase64String("aW1wbGVtZW50YWRvcg=="));
                 string Pass = Encoding.UTF8.GetString(Convert.FromBase64String("U2luZXJneSoyMDE4"));
-                client.Authenticator = new HttpBasicAuthenticator("servicios", "Sinergy2019.");
+                client.Authenticator = new HttpBasicAuthenticator("servicios", pswCPQ);
                 //string definicion = "?totalResults=false&q={str_item_number:'" + dataGridServicios.Rows[e.RowIndex].Cells[1].FormattedValue.ToString().Trim() + "',str_icao_iata_code:'" + airtport + "'}";
                 string definicion = "?q={str_tipo:'FUEL',str_categoria:'" + Combustible + "'} ";
                 var request = new RestRequest("rest/v6/customCategorias/" + definicion, Method.GET);
@@ -2159,7 +2178,7 @@ namespace CostToInvoiceButton
                 var client = new RestClient("https://iccs.bigmachines.com/");
                 string User = Encoding.UTF8.GetString(Convert.FromBase64String("aW1wbGVtZW50YWRvcg=="));
                 string Pass = Encoding.UTF8.GetString(Convert.FromBase64String("U2luZXJneSoyMDE4"));
-                client.Authenticator = new HttpBasicAuthenticator("servicios", "Sinergy2019.");
+                client.Authenticator = new HttpBasicAuthenticator("servicios", pswCPQ);
                 string definicion = "?q={str_tipo:'FUEL_I',str_categoria:'" + Combustible + "'} ";
                 var request = new RestRequest("rest/v6/customCategorias/" + definicion, Method.GET);
                 IRestResponse response = client.Execute(request);
@@ -3022,7 +3041,7 @@ namespace CostToInvoiceButton
                 var client = new RestClient("https://iccs.bigmachines.com/");
                 string User = Encoding.UTF8.GetString(Convert.FromBase64String("aW1wbGVtZW50YWRvcg=="));
                 string Pass = Encoding.UTF8.GetString(Convert.FromBase64String("U2luZXJneSoyMDE4"));
-                client.Authenticator = new HttpBasicAuthenticator("servicios", "Sinergy2019.");
+                client.Authenticator = new HttpBasicAuthenticator("servicios", pswCPQ);
 
                 //string definicion = "?totalResults=false&q={str_item_number:'" + dataGridServicios.Rows[e.RowIndex].Cells[1].FormattedValue.ToString().Trim() + "',str_icao_iata_code:'" + airtport + "'}";
                 string definicion = "?q={str_tipo:'HANGAR_SPACE',str_categoria:'" + Utilidad + "'} ";
@@ -3110,7 +3129,7 @@ namespace CostToInvoiceButton
                 var client = new RestClient("https://iccs.bigmachines.com/");
                 //string User = Encoding.UTF8.GetString(Convert.FromBase64String("aW1wbGVtZW50YWRvcg=="));
                 //string Pass = Encoding.UTF8.GetString(Convert.FromBase64String("U2luZXJIwMTgu"));
-                client.Authenticator = new HttpBasicAuthenticator("servicios", "Sinergy2019.");
+                client.Authenticator = new HttpBasicAuthenticator("servicios", pswCPQ);
 
                 global.LogMessage("GETFinanzasFBO:" + definicion + "SRType:" + lblSrType.Text);
                 var request = new RestRequest("rest/v6/customFinanzas_FBO/" + definicion, Method.GET);

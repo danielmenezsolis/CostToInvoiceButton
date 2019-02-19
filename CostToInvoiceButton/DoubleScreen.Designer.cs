@@ -461,7 +461,7 @@
             dataGridViewCellStyle6.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
             this.dataGridInvoice.DefaultCellStyle = dataGridViewCellStyle6;
             this.dataGridInvoice.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.dataGridInvoice.EditMode = System.Windows.Forms.DataGridViewEditMode.EditOnF2;
+            this.dataGridInvoice.EditMode = System.Windows.Forms.DataGridViewEditMode.EditProgrammatically;
             this.dataGridInvoice.Location = new System.Drawing.Point(0, 541);
             this.dataGridInvoice.MultiSelect = false;
             this.dataGridInvoice.Name = "dataGridInvoice";

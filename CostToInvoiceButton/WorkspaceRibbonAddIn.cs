@@ -2762,14 +2762,8 @@ namespace CostToInvoiceButton
                         if (!String.IsNullOrEmpty(item.ParentPax))
                         {
                             priceP = getPaxPrice(item.ParentPax, out cur, false);
-
                             curcambio = cur;
-
-
                             PriceCh = getPaxPrice(item.ID, out cur, true);
-
-
-
                             price = PriceCh + priceP;
                             UpdatePaxPrice(item.ID, PriceCh, curcambio);
                             UpdatePaxPrice(item.ParentPax, price, curcambio);

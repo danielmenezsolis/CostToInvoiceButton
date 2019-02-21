@@ -1082,7 +1082,6 @@ namespace CostToInvoiceButton
 
             }
         }
-
         private void GetSuppliers()
         {
             cboSuppliers.DataSource = null;
@@ -1109,7 +1108,6 @@ namespace CostToInvoiceButton
             cboSuppliers.ValueMember = "Key";
             cboSuppliers.Enabled = true;
         }
-
         private void getAllSuppliers()
         {
             //cboSuppliers.DataSource = null;
@@ -1821,13 +1819,11 @@ namespace CostToInvoiceButton
                 //string Pass = Encoding.UTF8.GetString(Convert.FromBase64String("U2luZXJneTIwMTgu"));
                 client.Authenticator = new HttpBasicAuthenticator("servicios", pswCPQ);
                 string definicion = "";
-                // string definicion = "?totalResults=false&q={str_item_number:'" + dataGridServicios.Rows[e.RowIndex].Cells[1].FormattedValue.ToString().Trim() + "',str_icao_iata_code:'" + airtport + "'}";
-                // string definicion = "?totalResults=true&q={str_item_number:'" + txtItemNumber.Text + "',str_icao_iata_code:'" + txtAirport.Text + "'}";
                 if (lblSrType.Text == "PERMISOS")
                 {
                     definicion = "?totalResults=true&q={str_item_number:'" + txtItemNumber.Text + "'}";
                 }
-                if (lblSrType.Text == "FBO")
+                else if (lblSrType.Text == "FBO")
                 {
                     int cargo = 0;
                     string grupo = txtPaxGroup.Text;
@@ -1854,45 +1850,17 @@ namespace CostToInvoiceButton
                         definicion = "?totalResults=true&q={str_item_number:'" + txtItemNumber.Text + "',str_icao_iata_code:'" + txtAirport.Text + "',bol_int_fbo:1,$or:[{str_schedule_type:{$exists:false}},{str_schedule_type:'" + txtMainHour.Text + "'}],$or:[{str_aircraft_type:{$exists:false}},{str_aircraft_type:'" + txtICAOD.Text + "'}],$or:[{str_client_category:{$exists:false}},{str_client_category:'" + txtCustomerClass.Text.Replace("&", "%") + "'}]}";
                     }
                 }
-                if (lblSrType.Text == "FUEL")
+                else if (lblSrType.Text == "FUEL")
                 {
                     definicion = "?totalResults=true&q={str_item_number:'" + txtItemNumber.Text + "'" +
                                ",str_ft_arrival:'" + arr_type.ToString() + "'" +
                                ",str_ft_depart:'" + dep_type.ToString() + "'" +
                                ",str_schedule_type:'" + txtMainHour.Text + "'" +
-                               //",bol_int_flight_cargo:'" + cargo.ToString() + "'" +
                                ",$and:[{$or:[{str_icao_iata_code:'" + txtAirport.Text + "'},{str_icao_iata_code:{$exists:false}}]}," +
-                               //"{$or:[{str_aircraft_group:'" + grupo.ToString() + "'},{str_aircraft_group:{$exists:false}}]}," +
                                "{$or:[{str_client_category:{$like:'" + txtCustomerClass.Text.Replace("&", "%") + "'}},{str_client_category:{$exists:false}}]}," +
                                "{$or:[{str_aircraft_type:'" + txtICAOD.Text + "'},{str_aircraft_type:{$exists:false}}]}]}";
-
-                    /*
-                    if (txtItemNumber.Text == "IAFMUAS0271")
-                    {
-                        if (txtClientName.Text.Contains("NETJETS"))
-                        {
-                            definicion = "?totalResults=true&q={str_item_number:'" + txtItemNumber.Text + "',str_icao_iata_code:'" + txtAirport.Text + "',str_client_category:'NTJET'}";
-                        }
-                        definicion = "?totalResults=true&q={str_item_number:'" + txtItemNumber.Text + "',str_icao_iata_code:'" + txtAirport.Text + "'}";
-                    }
-                    if (txtItemNumber.Text == "ANFERAS0013")
-                    {
-                        definicion = "?totalResults=true&q={$or:[{str_icao_iata_code:{$exists:false}},{str_icao_iata_code:'" + txtAirport.Text + "'}],str_item_number:'ANFERAS0013',str_aircraft_type:'" + txtICAOD.Text + "'}&orderby=str_icao_iata_code:asc";
-                    }
-                    if (txtItemNumber.Text == "AFMURAS0016")
-                    {
-                        if (txtClientName.Text.Contains("NETJETS"))
-                        {
-                            definicion = "?totalResults=true&q={str_item_number:'" + txtItemNumber.Text + "',str_client_category:'NetJets'}";
-                        }
-                        definicion = "?totalResults=true&q={str_item_number:'" + txtItemNumber.Text + "'}";
-                    }
-                    if (txtItemNumber.Text == "ANIASAS0015")
-                    {
-                        definicion = "?totalResults=true&q={str_item_number:'" + txtItemNumber.Text + "',str_aircraft_type:'" + txtICAOD.Text + "'}";
-                    }*/
                 }
-                if (lblSrType.Text == "FCC")
+                else if (lblSrType.Text == "FCC")
                 {
                     int cargo = 0;
                     string grupo = txtPaxGroup.Text;
@@ -1923,32 +1891,6 @@ namespace CostToInvoiceButton
                                    ",$and:[{$or:[{str_icao_iata_code:'" + txtAirport.Text + "'},{str_icao_iata_code:{$exists:false}}]}," +
                                    "{$or:[{str_aircraft_type:'" + txtICAOD.Text + "'},{str_aircraft_type:{$exists:false}}]}]}";
                     }
-                    // MANEJO DE ITEMS ADICIONALES ANTERIORES
-                    /*
-                    else if (txtItemNumber.Text == "ASECSAS0073")
-                    {
-                        definicion += "str_item_number:'" + txtItemNumber.Text + "',str_icao_iata_code:'" + txtAirport.Text + "',str_client_category:'ASI_SECURITY'} ";
-                    }
-                    else if (txtItemNumber.Text == "IPFERPS0052")
-                    {
-                        //definicion = "?totalResults=true&q={str_item_number:'" + txtItemNumber.Text + "',str_icao_iata_code:'" + txtAirport.Text + "',str_aircraft_type:'" + txtICAOD.Text + "'}";
-                        definicion += "str_item_number:'" + txtItemNumber.Text + "',str_icao_iata_code:'" + txtAirport.Text + "',$or:[{str_ft_arrival:'" + arr_type.ToString() + "'},{str_ft_arrival:{$exists: false}}],$or:[{str_client_category:{$exists:false}},{str_client_category:'" + txtCustomerClass.Text.Replace("&", "%") + "'}]}";
-                    }
-                    else if (txtItemNumber.Text == "OHANIAS0129" || txtItemNumber.Text == "OPLAIAS0128" || txtItemNumber.Text == "OFPLIAS0130")
-                    {
-                        definicion += "str_item_number:'" + txtItemNumber.Text + "',str_icao_iata_code:'" + txtAirport.Text + "'}";
-                    }
-                    */
-                    /*
-                    else if (txtItemNumber.Text == "ATPRIAP304")
-                    {
-                        definicion = "?totalResults=true&q={bol_int_fbo:0,str_item_number:'" + txtItemNumber.Text + "'}";
-                    }
-                    else if (txtCategorias.Text.Contains("PERMISOS"))
-                    {
-                        definicion += "str_item_number:'" + txtItemNumber.Text + "', str_client_category:'" + txtCustomerClass.Text.Replace("&", "%") + "'}";
-                    }
-                    */
                     else
                     {
 

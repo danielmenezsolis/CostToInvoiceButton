@@ -407,28 +407,6 @@ namespace CostToInvoiceButton
                                     }
                                 }
                             }
-                            /*
-                            if (!GetItineraryCountries(Convert.ToInt32(item.Itinerary)))
-                            {
-                                component.Airport = item.Airport.Replace("-", "_");
-                                //component.ItemNumber = getFBOItemNumber(Convert.ToInt32(item.Itinerary));
-                                component.ItemNumber = "IPFERPS0052";
-                                if (!String.IsNullOrEmpty(component.ItemNumber))
-                                {
-                                    component = GetComponentData(component);
-                                    if (!String.IsNullOrEmpty(component.ItemDescription))
-                                    {
-                                        component.Incident = IncidentID;
-                                        component.Itinerary = Convert.ToInt32(item.Itinerary);
-                                        component.Categories = GetCategories(component.ItemNumber, component.Airport);
-                                        component.MCreated = "1";
-                                        component.Componente = "0";
-                                        component.ParentPaxId = IncidentID;
-                                        InsertComponent(component);
-                                    }
-                                }
-                            }
-                            */
                             // OVERPARKING
                             /*
                             if (GetMinutesLeg(Convert.ToInt32(item.Itinerary)) >= 2 && GetMinutesLeg(Convert.ToInt32(item.Itinerary)) < 8)
@@ -2902,7 +2880,6 @@ namespace CostToInvoiceButton
                 return 0;
             }
         }
-
         public string getTotalCurrency(string PaxId, bool parent)
         {
             string TotCur = "";
@@ -2941,7 +2918,6 @@ namespace CostToInvoiceButton
             }
             return i + "|" + TotCur;
         }
-
         private double getExchangeRateSemanal(DateTime date)
         {
             try
@@ -3041,7 +3017,6 @@ namespace CostToInvoiceButton
                 return 1;
             }
         }
-
         private double getMonthINPC(string fechaF)
         {
             double inpc = 0;

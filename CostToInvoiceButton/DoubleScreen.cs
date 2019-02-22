@@ -25,6 +25,7 @@ namespace CostToInvoiceButton
     {
         public string pswCPQ { get; set; }
         private ClaseParaPrecios.RootObject rootObjectPricesFCCFBO { get; set; }
+        private ClaseParaCostos.RootObject rootObjectCostsFCCFBO { get; set; }
         private IRecordContext recordContext { get; set; }
         private IGlobalContext global { get; set; }
         public List<WHours> WHoursList { get; set; }
@@ -1666,6 +1667,7 @@ namespace CostToInvoiceButton
                     ClaseParaCostos.RootObject rootObjectCosts = JsonConvert.DeserializeObject<ClaseParaCostos.RootObject>(response.Content);
                     if (rootObjectCosts != null && rootObjectCosts.items.Count > 0)
                     {
+                        rootObjectCostsFCCFBO = rootObjectCosts;
                         if (lblSrType.Text == "FUEL")
                         {
                             foreach (ClaseParaCostos.Item item in rootObjectCosts.items)
@@ -1982,6 +1984,24 @@ namespace CostToInvoiceButton
             {
                 global.LogMessage("GetPrices: " + ex.Message + "Detalle: " + ex.StackTrace);
                 return 0;
+            }
+        }
+        private void cboSuppliers_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (rootObjectCostsFCCFBO != null)
+            {
+                double cost = 0;
+                foreach (var item in rootObjectCostsFCCFBO.items)
+                {
+                    global.LogMessage(cboSuppliers.Text + " : " + item.str_vendor_name);
+                    if (item.str_vendor_name.Trim() == cboSuppliers.Text.Trim())
+                    {
+                        MessageBox.Show(item.str_vendor_name + " : " + item.flo_cost);
+                        cost = item.flo_cost;
+                    }
+                }
+
+                txtCost.Text = Math.Round(cost, 2).ToString();
             }
         }
         private double GetSeneamPercentage(string Utilidad)
@@ -3528,10 +3548,6 @@ namespace CostToInvoiceButton
             {
                 MessageBox.Show("Error en creación de child: " + ex.Message + "Det" + ex.StackTrace);
             }
-        }
-        private void cboSuppliers_SelectedIndexChanged(object sender, EventArgs e)
-        {
-
         }
     }
     public class ItiPrices

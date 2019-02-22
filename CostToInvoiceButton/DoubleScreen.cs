@@ -42,6 +42,7 @@ namespace CostToInvoiceButton
         double catcollectionfee = 0;
         double airportfee = 0;
         double deductionfee = 0;
+        string uomPayable = "SER";
         public DoubleScreen(IGlobalContext globalContext, IRecordContext record)
         {
             try
@@ -143,7 +144,7 @@ namespace CostToInvoiceButton
                             {
                                 precio = precio / tipoCambio;
                             }
-                            precio = Math.Round(precio, 0, MidpointRounding.AwayFromZero);
+                            precio = Math.Round(precio, 2, MidpointRounding.AwayFromZero);
                             txtPrice.Text = precio.ToString();
                         }
                     }
@@ -1509,7 +1510,7 @@ namespace CostToInvoiceButton
         }
         private void SetTotal()
         {
-            txtAmount.Text = Math.Round(Convert.ToDouble(txtPrice.Text) * Convert.ToInt32(txtQty.Text), 4).ToString();
+            txtAmount.Text = Math.Round(Convert.ToDouble(txtPrice.Text) * Convert.ToInt32(txtQty.Text), 2).ToString();
         }
         private double GetCosts(out string Currency)
         {
@@ -1543,7 +1544,6 @@ namespace CostToInvoiceButton
                         }
                     }
                 }
-                string OUM = "";
                 string Curr = "";
                 string supplier = "NO SUPPLIER";
                 double cost = 0;
@@ -1586,33 +1586,6 @@ namespace CostToInvoiceButton
                         {
                             definicion = "?totalResults=true&q={str_item_number:'" + txtItemNumber.Text + "',str_icao_iata_code:'" + txtAirport.Text + "',bol_int_fbo: 1,str_schedule_type:'" + txtMainHour.Text + "'}&orderby=str_icao_iata_code:asc";
                         }
-                        // FUEL
-                        /*
-                        if (txtItemNumber.Text == "ANFERAS0013" || txtItemNumber.Text == "ANIASAS0015" || txtItemNumber.Text == "AGASIAS0270" || txtItemNumber.Text == "JFUEIAS0269" || txtItemNumber.Text == "AGASIAS0011" || txtItemNumber.Text == "JFUEIAS0010" || txtItemNumber.Text == "AFMURAS0016")
-                        {
-                            definicion = "?totalResults=true&q={str_item_number:'" + txtItemNumber.Text + "',str_icao_iata_code:'" + txtAirport.Text + "',str_schedule_type:'NORMAL'}";
-
-                            if (txtItemNumber.Text == "IAFMUAS0271" || txtItemNumber.Text == "AFMURAS0016")
-                            {
-                                if (txtClientName.Text.Contains("NETJETS"))
-                                {
-                                    definicion = "?totalResults=true&q={str_item_number:'" + txtItemNumber.Text + "',str_icao_iata_code:'" + txtAirport.Text + "',str_client_category:'NTJET'}";
-                                }
-                                definicion = "?totalResults=true&q={str_item_number:'" + txtItemNumber.Text + "',str_icao_iata_code:'" + txtAirport.Text + "'}";
-                            }
-                            if (txtItemNumber.Text == "AGASIAS0270")
-                            {
-                                definicion = "?totalResults=true&q={str_item_number:'AGASIAS0011',str_icao_iata_code:'" + txtAirport.Text + "',str_schedule_type:'NORMAL'}";
-                            }
-                            if (txtItemNumber.Text == "JFUEIAS0269")
-                            {
-                                definicion = "?totalResults=true&q={str_item_number:'JFUEIAS0010',str_icao_iata_code:'" + txtAirport.Text + "',str_schedule_type:'NORMAL'}";
-                            }
-                            if (txtItemNumber.Text == "ANFERAS0013")
-                            {
-                                definicion = "?totalResults=true&q={$or:[{str_icao_iata_code:{$exists:false}},{str_icao_iata_code:'" + txtAirport.Text + "'}],str_item_number:'ANFERAS0013',str_aircraft_type:'" + txtICAOD.Text + "'}";
-                            }
-                        }*/
                     }
                     if (lblSrType.Text == "FCC")
                     {
@@ -1706,7 +1679,7 @@ namespace CostToInvoiceButton
                                 {
                                     cost = item.flo_cost;
                                     Curr = item.str_currency_code;
-                                    OUM = item.str_uom_code;
+                                    uomPayable = item.str_uom_code;
                                     supplier = item.str_vendor_name;
                                     global.LogMessage("itemCost Valido: " + item.flo_cost.ToString());
                                 }
@@ -1719,13 +1692,12 @@ namespace CostToInvoiceButton
                                 DateTime inicio = DateTime.Parse(item.str_start_date + " " + "00:00");
                                 DateTime fin = DateTime.Parse(item.str_end_date + " " + "23:59");
                                 DateTime fecha = DateTime.Parse(txtATA.Text);
-
                                 // MessageBox.Show("Inicio: " + inicio.ToString() + "\n" + "Fin: " + fin.ToString() + "\n" + "ATA: " + fecha.ToString());
                                 if (fecha.CompareTo(inicio) >= 0 && fecha.CompareTo(fin) <= 0)
                                 {
                                     cost = item.flo_cost;
                                     Curr = item.str_currency_code;
-                                    OUM = item.str_uom_code;
+                                    uomPayable = item.str_uom_code;
                                     supplier = item.str_vendor_name;
                                     // MessageBox.Show("Cost FBO/FCC dentro de fechas " + cost.ToString());
                                 }
@@ -1739,12 +1711,11 @@ namespace CostToInvoiceButton
                                 DateTime inicio = DateTime.Parse(item.str_start_date + " " + "00:00");
                                 DateTime fin = DateTime.Parse(item.str_end_date + " " + "23:59");
                                 DateTime fecha = DateTime.Parse(GetSRCreationDate(Convert.ToInt32(lblIdIncident.Text)));
-
                                 if (fecha.CompareTo(inicio) >= 0 && fecha.CompareTo(fin) <= 0)
                                 {
                                     cost = item.flo_cost;
                                     Curr = item.str_currency_code;
-                                    OUM = item.str_uom_code;
+                                    uomPayable = item.str_uom_code;
                                     supplier = item.str_vendor_name;
                                 }
                             }
@@ -1753,11 +1724,11 @@ namespace CostToInvoiceButton
                         {
                             cost = rootObjectCosts.items[0].flo_cost;
                             Curr = rootObjectCosts.items[0].str_currency_code;
-                            OUM = rootObjectCosts.items[0].str_uom_code;
+                            uomPayable = rootObjectCosts.items[0].str_uom_code;
                             cboSuppliers.Text = supplier;
                             // MessageBox.Show("Cost OTROS: " + cost.ToString());
                         }
-                        txtUOM.Text = OUM;
+                        txtUOM.Text = uomPayable;
                     }
                     else
                     {
@@ -1783,7 +1754,6 @@ namespace CostToInvoiceButton
             global.LogMessage("EntraGetPrices");
             string arr_type = "DOMESTIC";
             string dep_type = "DOMESTIC";
-
             if (lblSrType.Text == "FBO" || lblSrType.Text == "FCC")
             {
                 ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
@@ -1810,7 +1780,6 @@ namespace CostToInvoiceButton
                 }
             }
             string Curr = "";
-            string OUM = "";
             double price = 0;
             try
             {
@@ -1926,7 +1895,7 @@ namespace CostToInvoiceButton
                                 blnPriceSet = true;
                                 price = item.flo_amount;
                                 Curr = item.str_currency_code;
-                                OUM = item.str_oum_code;
+                                uomPayable = item.str_oum_code;
                             }
                         }
                     }
@@ -1943,9 +1912,8 @@ namespace CostToInvoiceButton
                                 //MessageBox.Show("Precio: " + item.flo_amount);
                                 price = item.flo_amount;
                                 Curr = item.str_currency_code;
-                                OUM = item.str_oum_code;
+                                uomPayable = item.str_oum_code;
                                 string cClass = "";
-
                                 cClass = string.IsNullOrEmpty(item.str_client_category) ? "" : item.str_client_category.Trim();
                                 global.LogMessage("Clase: " + cClass);
                                 if (txtCustomerClass.Text == cClass.Trim())
@@ -1967,7 +1935,7 @@ namespace CostToInvoiceButton
                                 blnPriceSet = true;
                                 price = item.flo_amount;
                                 Curr = item.str_currency_code;
-                                OUM = item.str_oum_code;
+                                uomPayable = item.str_oum_code;
                                 lblCurrencyPrice.Text = Curr;
                             }
                         }
@@ -1977,7 +1945,7 @@ namespace CostToInvoiceButton
                         blnPriceSet = true;
                         price = rootObjectPrices.items[0].flo_amount;
                         Curr = rootObjectPrices.items[0].str_currency_code;
-                        OUM = rootObjectPrices.items[0].str_oum_code;
+                        uomPayable = rootObjectPrices.items[0].str_oum_code;
                     }
                 }
                 else
@@ -1988,14 +1956,14 @@ namespace CostToInvoiceButton
                 if (lblSrType.Text == "FBO" && price == 0)
                 {
                     blnPriceSet = false;
-                    price = Math.Round(((double.Parse(txtQty.Text) * double.Parse(txtCost.Text)) * 1.30), 4);
+                    price = Math.Round(((double.Parse(txtQty.Text) * double.Parse(txtCost.Text)) * 1.30), 2);
                 }
                 if (lblSrType.Text == "FCC" && price == 0 && txtPackage.Text != "Yes")
                 {
                     // cboCurrency.Text = "USD";
                     blnPriceSet = false;
                     DateTime date = DateTime.Parse(txtATA.Text);
-                    price = ((Convert.ToDouble(txtCost.Text) + (Convert.ToDouble(txtCost.Text) * GetUtilidadPercentage(txtUtilidad.Text) / 100)) / getExchangeRateSemanal(date));
+                    price = Math.Round(((Convert.ToDouble(txtCost.Text) + (Convert.ToDouble(txtCost.Text) * GetUtilidadPercentage(txtUtilidad.Text) / 100)) / getExchangeRateSemanal(date)), 2);
                 }
                 /*
                 if (isComponent())
@@ -2783,13 +2751,13 @@ namespace CostToInvoiceButton
 
             if (moneda == "MXN")
             {
-                txtCost.Text = Math.Round((Convert.ToDouble(txtCost.Text) * rate), 4).ToString();
-                txtPrice.Text = Math.Round((Convert.ToDouble(txtPrice.Text) * rate), 4).ToString();
+                txtCost.Text = Math.Round((Convert.ToDouble(txtCost.Text) * rate), 2).ToString();
+                txtPrice.Text = Math.Round((Convert.ToDouble(txtPrice.Text) * rate), 2).ToString();
             }
             else if (moneda == "USD")
             {
-                txtCost.Text = Math.Round((Convert.ToDouble(txtCost.Text) / rate), 4).ToString();
-                txtPrice.Text = Math.Round((Convert.ToDouble(txtPrice.Text) / rate), 4).ToString();
+                txtCost.Text = Math.Round((Convert.ToDouble(txtCost.Text) / rate), 2).ToString();
+                txtPrice.Text = Math.Round((Convert.ToDouble(txtPrice.Text) / rate), 2).ToString();
             }
 
         }
@@ -3137,7 +3105,7 @@ namespace CostToInvoiceButton
                             pricefinal = double.Parse(txtCost.Text);
 
                             pricefinal = pricefinal / rate;
-                            pricefinal = Math.Round(pricefinal, 4);
+                            pricefinal = Math.Round(pricefinal, 2);
                         }
                         else
                         {
@@ -3147,13 +3115,13 @@ namespace CostToInvoiceButton
                                 double utilidad = GetUtilidadPercentage(txtUtilidad.Text) / 100;
 
                                 precio = precio + (precio * utilidad);
-                                pricefinal = Math.Round(precio, 4);
+                                pricefinal = Math.Round(precio, 2);
 
                                 if (lblCurrencyPrice.Text == "USD")
                                 {
                                     precio = Convert.ToDouble(pricefinal);
                                     precio = precio / rate;
-                                    pricefinal = Math.Round(precio, 4);
+                                    pricefinal = Math.Round(precio, 2);
                                 }
                             }
                         }
@@ -3162,7 +3130,7 @@ namespace CostToInvoiceButton
                     {
                         if (IsFloatValue(txtCost.Text) && txtItemNumber.Text != "ASFIEAP357")
                         {
-                            pricefinal = Math.Round((Convert.ToDouble(txtCost.Text) * 1.30), 4);
+                            pricefinal = Math.Round((Convert.ToDouble(txtCost.Text) * 1.30), 2);
                         }
                     }
                     if (lblSrType.Text == "FUEL")
@@ -3193,7 +3161,7 @@ namespace CostToInvoiceButton
                             if (IsNumber(txtCost.Text))
                             {
                                 double minutehour = GetMinutesLeg();
-                                pricefinal = Math.Round((Convert.ToDouble(txtCost.Text) * minutehour), 4);
+                                pricefinal = Math.Round((Convert.ToDouble(txtCost.Text) * minutehour), 2);
                             }
                         }
                     }
@@ -3312,7 +3280,6 @@ namespace CostToInvoiceButton
                             "\"Costo\":\"" + dgvRenglon.Cells["Cost"].Value.ToString() + "\"," +
                             "\"CostCurrency\":\"" + dgvRenglon.Cells["Currency"].Value.ToString() + "\"," +
                             "\"TotalCost\":\"" + dgvRenglon.Cells["TotalCost"].Value.ToString() + "\"";
-
                             if (!String.IsNullOrEmpty(dgvRenglon.Cells["Fee"].Value.ToString()))
                             {
                                 body += ",\"Fee\":\"" + dgvRenglon.Cells["Fee"].Value.ToString() + "\"";
@@ -3337,7 +3304,6 @@ namespace CostToInvoiceButton
                             {
                                 MessageBox.Show(response.Content);
                             }
-
                             if (dgvRenglon.Cells["Package"].Value.ToString() == "No")
                             {
                                 if (!hasPayables(dgvRenglon.Cells["IdService"].Value.ToString()))
@@ -3492,21 +3458,46 @@ namespace CostToInvoiceButton
         {
             try
             {
-
                 Costo = string.IsNullOrEmpty(Costo) ? "0" : Costo;
                 Qty = string.IsNullOrEmpty(Qty) ? "1" : Qty;
+                int uom_menu = 1;
+                global.LogMessage("uomInt = " + uom_menu.ToString());
+                switch (uomPayable)
+                {
+                    case "SER":
+                        uom_menu = 1;
+                        break;
+                    case "TW":
+                        uom_menu = 2;
+                        break;
+                    case "HR":
+                        uom_menu = 3;
+                        break;
+                    case "HHR":
+                        uom_menu = 4;
+                        break;
+                    case "MIN":
+                        uom_menu = 5;
+                        break;
+                    case "UND":
+                        uom_menu = 118;
+                        break;
+                }
                 double Ticket = Math.Round(Convert.ToDouble(Costo) * Convert.ToDouble(Qty), 2);
                 var client = new RestClient("https://iccsmx.custhelp.com/");
                 var request = new RestRequest("/services/rest/connect/v1.4/CO.Payables/", Method.POST)
                 {
                     RequestFormat = DataFormat.Json
                 };
-
                 string body = "{";
                 body += "\"Supplier\":\"" + Supp + "\",";
+                body += "\"UOM_Menu\":";
+                body += "{";
+                body += "\"id\":" + uom_menu.ToString() + "";
+                body += "},";
                 body += "\"Quantity\":\"" + Qty + "\",";
                 body += "\"UnitCost\":\"" + Costo + "\",";
-                body += "\"TicketAmount\":\"" + Ticket + "\",";
+                body += "\"TicketAmount\":\"" + Ticket.ToString() + "\",";
                 body += "\"ItemDescription\":\"" + ItemDesc + "\",";
                 body += "\"ItemNumber\":\"" + ItemNum + "\",";
                 body += "\"Currency\":";
@@ -3519,7 +3510,6 @@ namespace CostToInvoiceButton
                 body += "}";
                 body += "}";
                 global.LogMessage("CPayableIO" + body);
-
                 request.AddParameter("application/json", body, ParameterType.RequestBody);
                 request.AddHeader("Authorization", "Basic ZW9saXZhczpTaW5lcmd5KjIwMTg=");
                 request.AddHeader("X-HTTP-Method-Override", "POST");
@@ -3528,7 +3518,6 @@ namespace CostToInvoiceButton
                 var content = response.Content;
                 if (response.StatusCode == HttpStatusCode.Created)
                 {
-
                 }
                 else
                 {
@@ -3539,7 +3528,6 @@ namespace CostToInvoiceButton
             {
                 MessageBox.Show("Error en creación de child: " + ex.Message + "Det" + ex.StackTrace);
             }
-
         }
         private void cboSuppliers_SelectedIndexChanged(object sender, EventArgs e)
         {

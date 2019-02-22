@@ -68,6 +68,8 @@ namespace CostToInvoiceButton
                 {
                     //Etiquetas/Cajas
                     ClearTxtBoxes();
+                    rootObjectPricesFCCFBO = null;
+                    rootObjectCostsFCCFBO = null;
                     cboSuppliers.Enabled = true;
                     txtPrice.Enabled = true;
                     txtQty.Enabled = true;
@@ -3437,7 +3439,6 @@ namespace CostToInvoiceButton
         private void DoubleScreen_Load(object sender, EventArgs e)
         {
             getAllSuppliers();
-            rootObjectPricesFCCFBO = new ClaseParaPrecios.RootObject();
         }
         private void txtCost_TextChanged(object sender, EventArgs e)
         {

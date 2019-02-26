@@ -1305,7 +1305,7 @@ namespace CostToInvoiceButton
                         }
                         Services service = new Services();
                         ComponentChild component = new ComponentChild();
-                        component.Airport = "MTS_ITEM";
+                        component.Airport = "ICCS_MASTER_IO";
                         component.ItemNumber = iNumber;
                         component.Incident = IncidentID;
                         component.ParentPaxId = IncidentID;
@@ -1402,7 +1402,7 @@ namespace CostToInvoiceButton
                         }
                         Services service = new Services();
                         ComponentChild component = new ComponentChild();
-                        component.Airport = "MTS_ITEM";
+                        component.Airport = "ICCS_MASTER_IO";
                         component.ItemNumber = iNumber;
                         component.Incident = IncidentID;
                         component.ParentPaxId = IncidentID;
@@ -1808,9 +1808,9 @@ namespace CostToInvoiceButton
                                           "<typ1:upperCaseCompare>true</typ1:upperCaseCompare>" +
                                           "<typ1:attribute>OrganizationCode</typ1:attribute>" +
                                            "<typ1:operator>=</typ1:operator>";
-                if (component.Airport == "MTS_ITEM")
+                if (component.Airport == "ICCS_MASTER_IO")
                 {
-                    envelope += "<typ1:value>MTS_ITEM</typ1:value>";
+                    envelope += "<typ1:value>ICCS_MASTER_IO</typ1:value>";
                 }
                 else
                 {
@@ -2572,9 +2572,9 @@ namespace CostToInvoiceButton
                                            "<typ1:upperCaseCompare>true</typ1:upperCaseCompare>" +
                                            "<typ1:attribute>OrganizationCode</typ1:attribute>" +
                                            "<typ1:operator>=</typ1:operator>";
-                if (Airport == "MTS_ITEM")
+                if (Airport == "ICCS_MASTER_IO")
                 {
-                    envelope += "<typ1:value>MTS_ITEM</typ1:value>";
+                    envelope += "<typ1:value>ICCS_MASTER_IO</typ1:value>";
                 }
                 else
                 {

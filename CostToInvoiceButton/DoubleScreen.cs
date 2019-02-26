@@ -98,7 +98,14 @@ namespace CostToInvoiceButton
                         txtQty.Text = dataGridServicios.Rows[e.RowIndex].Cells["Quantity"].Value.ToString();
                     }
                     string airtport = dataGridServicios.Rows[e.RowIndex].Cells["Airport"].Value.ToString();
-                    txtAirport.Text = "IO_AEREO_" + airtport.Replace("-", "_").Trim();
+                    if (lblSrType.Text == "SENEAM" || lblSrType.Text == "PERMISOS")
+                    {
+                        txtAirport.Text = "ICCS_MASTER_IO";
+                    }
+                    else
+                    {
+                        txtAirport.Text = "IO_AEREO_" + airtport.Replace("-", "_").Trim();
+                    }
                     string supp = dataGridServicios.Rows[e.RowIndex].Cells["Supplier"].Value.ToString();
 
                     GetSuppliers();
@@ -1660,9 +1667,15 @@ namespace CostToInvoiceButton
                         }
                     }
                     if (lblSrType.Text == "PERMISOS")
-                    {
-                        definicion = "?totalResults=true&q={str_item_number:'" + txtItemNumber.Text + "'}";
-                    }
+                {
+                   
+                    definicion = "?totalResults=true&q={str_item_number:'" + txtItemNumber.Text + "'" +
+                                                   ",bol_int_fbo:'0'" +
+                                                   ",str_ft_arrival:'" + arr_type.ToString() + "'" +
+                                                   ",str_ft_depart:'" + dep_type.ToString() + "'" +
+                                                   //",str_schedule_type:'" + txtMainHour.Text + "'" +
+                                                   ",$and:[{$or:[{str_client_category:{$like:'" + txtCustomerClass.Text.Replace("&", "%") + "'}},{str_client_category:{$exists:false}}]}]}";
+                }
                     global.LogMessage("GETCostDef: " + definicion + " SRType: " + lblSrType.Text);
                     var request = new RestRequest("rest/v6/customCostos/" + definicion, Method.GET);
                     IRestResponse response = client.Execute(request);
@@ -1794,7 +1807,18 @@ namespace CostToInvoiceButton
                 string definicion = "";
                 if (lblSrType.Text == "PERMISOS")
                 {
-                    definicion = "?totalResults=true&q={str_item_number:'" + txtItemNumber.Text + "'}";
+                    int cargo = 0;
+                    if (isCargo())
+                    {
+                        cargo = 1;
+                    }
+                    definicion = "?totalResults=true&q={str_item_number:'" + txtItemNumber.Text + "'" +
+                                                   ",bol_int_fbo:'0'"+
+                                                   ",str_ft_arrival:'" + arr_type.ToString() + "'" +
+                                                   ",str_ft_depart:'" + dep_type.ToString() + "'" +
+                                                   //",str_schedule_type:'" + txtMainHour.Text + "'" +
+                                                   ",bol_int_flight_cargo:'" + cargo.ToString() + "'" +
+                                                   ",$and:[{$or:[{str_client_category:{$like:'" + txtCustomerClass.Text.Replace("&", "%") + "'}},{str_client_category:{$exists:false}}]}]}";
                 }
                 else if (lblSrType.Text == "FBO")
                 {
@@ -1941,6 +1965,13 @@ namespace CostToInvoiceButton
                                 Curr = item.str_currency_code;
                                 uomPayable = item.str_oum_code;
                                 lblCurrencyPrice.Text = Curr;
+                                string cClass = "";
+                                cClass = string.IsNullOrEmpty(item.str_client_category) ? "" : item.str_client_category.Trim();
+                                global.LogMessage("Clase: " + cClass);
+                                if (txtCustomerClass.Text == cClass.Trim())
+                                {
+                                    break;
+                                }
                             }
                         }
                     }
@@ -2891,6 +2922,10 @@ namespace CostToInvoiceButton
                 APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
                 clientInfoHeader.AppID = "Query Example";
                 String queryString = "SELECT Customfields.c.flight_type.Name FROM Incident WHERE Id = " + lblIdIncident.Text;
+                if (lblSrType.Text == "PERMISO")
+                {
+                    queryString = "SELECT Customfields.c.permit_type.Name FROM Incident WHERE Id = " + lblIdIncident.Text;
+                }
                 clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 1, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
                 foreach (CSVTable table in queryCSV.CSVTables)
                 {

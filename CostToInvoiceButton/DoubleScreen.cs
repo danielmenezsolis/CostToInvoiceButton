@@ -406,7 +406,16 @@ namespace CostToInvoiceButton
                             txtPrice.Text = (Convert.ToDouble(txtCost.Text) * per).ToString();
                         }
                     }
-
+                    if (txtItemNumber.Text == "OVEAIA0131" || txtItemNumber.Text == "OVEAIAS0131")
+                    {
+                        double b;
+                        if (double.TryParse(txtCost.Text, out b))
+                        {
+                            double hr = Math.Ceiling(GetMinutesLeg() / 60);
+                            txtQty.Text = hr.ToString();
+                            //txtCost.Text = (Convert.ToDouble(txtCost.Text) * hr).ToString();
+                        }
+                    }
                     if (txtItemNumber.Text == "MHSPSAS0091")
                     {
                         double b;
@@ -417,7 +426,7 @@ namespace CostToInvoiceButton
                             double utilidad = gethSGroup(txtICAOD.Text);
                             utilidad = 1 + (utilidad / 100);
                             utilidad = (Convert.ToDouble(txtCost.Text) * m2) * utilidad;
-                            txtPrice.Text = Math.Round(utilidad, 4).ToString();
+                            txtPrice.Text = Math.Round(utilidad, 2).ToString();
                         }
                     }
 
@@ -515,7 +524,7 @@ namespace CostToInvoiceButton
                 {
                     if (lblSrType.Text == "FBO")
                     {
-                        txtPrice.Text = Math.Round(((double.Parse(txtQty.Text) * double.Parse(txtCost.Text)) * 1.30), 4).ToString();
+                        txtPrice.Text = Math.Round(((double.Parse(txtQty.Text) * double.Parse(txtCost.Text)) * 1.30), 2).ToString();
                     }
                     else if (lblSrType.Text == "FCC")
                     {

@@ -362,9 +362,11 @@ namespace CostToInvoiceButton
                                         antelacion = (ATA - openDate).TotalMinutes;
                                     }
                                     global.LogMessage("Antelacion: " + antelacion.ToString());
-                                    extension = ((ATD - openDate).TotalMinutes) + 15;
+                                    openDate = DateTime.Parse(ATD.Date.ToShortDateString() + " " + open);//.ToUniversalTime();
+                                    closeDate = DateTime.Parse(ATD.Date.ToShortDateString() + " " + close);//.ToUniversalTime();
+                                    extension = ((closeDate - ATD).TotalMinutes) + 15;
                                     global.LogMessage("Extension: " + extension.ToString());
-                                    if (ATA.DayOfYear.ToString() != ATD.DayOfYear.ToString())
+                                    /*if (ATA.DayOfYear.ToString() != ATD.DayOfYear.ToString())
                                     {
                                         global.LogMessage("ATA.Date != ATD.Date");
                                         openDate = DateTime.Parse(ATD.Date.ToShortDateString() + " " + open);
@@ -378,7 +380,7 @@ namespace CostToInvoiceButton
                                         {
                                             extension = 0;
                                         }
-                                    }
+                                    }*/
                                     global.LogMessage("Después de validar día.\nExtensión: " + extension.ToString());
                                     if (extension > 0)
                                     {
@@ -406,6 +408,16 @@ namespace CostToInvoiceButton
                                         }
                                     }
                                 }
+                            }
+                            // OVERPARKING Message
+                            if (GetMinutesLeg(Convert.ToInt32(item.Itinerary)) >= 2 && GetMinutesLeg(Convert.ToInt32(item.Itinerary)) < 8)
+                            {
+                                MessageBox.Show("OVERPARKING detected.");
+
+                            }
+                            else if (GetMinutesLeg(Convert.ToInt32(item.Itinerary)) > 8)
+                            {
+                                MessageBox.Show("OVERNIGHT detected.");
                             }
                             // OVERPARKING
                             /*

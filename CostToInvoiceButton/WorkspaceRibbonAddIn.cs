@@ -43,6 +43,24 @@ namespace CostToInvoiceButton
         public string SENCat { get; set; }
         public string ClientName { get; set; }
         public string cClass { get; set; }
+        public int fboFccItinerary { get; set; }
+
+        // Variables por tipo de SR
+        //FBO - FCC
+        string Royalty = "";
+        string txtFBO = "";
+        string txtATA = "";
+        string txtATD = "";
+        int arrivalId = 0;
+        string txtMainHour = "";
+        string txtArrivalAiport = "";
+        string txtLimit = "";
+        string txtAirportFee = "";
+        string txtCateringCollection = "";
+        string txtCollectionDeduction = "";
+        string txtToAirtport = "";
+        string txtFromAirport = "";
+        public List<WHours> WHoursList { get; set; }
 
         public WorkspaceRibbonAddIn(bool inDesignMode, IRecordContext RecordContext, IGlobalContext globalContext)
         {
@@ -75,7 +93,6 @@ namespace CostToInvoiceButton
                     // recordContext.ExecuteEditorCommand(EditorCommand.Save);
                     ClientName = "";
                     string Utilidad = "";
-                    string Royalty = "";
                     string Combustible = "";
                     string CombustibleI = "";
                     string SENEAM = "";
@@ -86,6 +103,7 @@ namespace CostToInvoiceButton
                     string CateringDeliveryDate = "";
                     string AircraftCategory = "";
                     string AircraftPCategory = "";
+                   
                     cClass = "";
                     pswCPQ = getPassword("CPQ");
                     Incident = (IIncident)recordContext.GetWorkspaceRecord(WorkspaceRecordType.Incident);
@@ -149,6 +167,14 @@ namespace CostToInvoiceButton
                     {
                         ArrivalAirportIncident = GetArrivalAirportIncident(IncidentID);
                         DepartureAirportIncident = GetDepartureAirportIncident(IncidentID);
+                    }
+                    if (SRType == "FBO" || SRType == "FCC")
+                    {
+                        fboFccItinerary = Convert.ToInt32(getItineraryId());
+                        txtFBO = GetFBOValue((string.IsNullOrEmpty(fboFccItinerary.ToString())) ? 0 : fboFccItinerary);
+                        arrivalId = getArrivalAirport(Convert.ToInt32(fboFccItinerary));
+                        GetItineraryHours((string.IsNullOrEmpty(fboFccItinerary.ToString())) ? 0 : fboFccItinerary);
+                        txtMainHour = GetMainHourFBOFCC(txtATA, txtATD);
                     }
                     if (SRType == "FUEL")
                     {
@@ -339,18 +365,21 @@ namespace CostToInvoiceButton
                                     InsertComponent(component1);
                                 }
                             }
+                            /*
                             double minover = 0;
                             double antelacion = 0;
                             double extension = 0;
-                            if (AirportOpen24(Convert.ToInt32(item.Itinerary)) != false)
+                            
+                            if (!AirportOpen24(Convert.ToInt32(item.Itinerary)))
                             {
-                                int arrival = getArrivalAirport(Convert.ToInt32(item.Itinerary));
-                                if (arrival != 0)
+                                arrivalId = getArrivalAirport(Convert.ToInt32(item.Itinerary));
+                                global.LogMessage("Arrival: " + arrivalId.ToString());
+                                if (arrivalId != 0)
                                 {
                                     DateTime openDate;
                                     DateTime closeDate;
-                                    string open = getOpenArrivalAirport(arrival);
-                                    string close = getCloseArrivalAirport(arrival);
+                                    string open = getOpenArrivalAirport(arrivalId);
+                                    string close = getCloseArrivalAirport(arrivalId);
                                     DateTime ATA = getATAItinerary(Convert.ToInt32(item.Itinerary));//.ToUniversalTime();
                                     DateTime ATD = getATDItinerary(Convert.ToInt32(item.Itinerary));//.ToUniversalTime();
                                     global.LogMessage("ATA: " + ATA.ToString() + "\nATD: " + ATD.ToString());
@@ -406,6 +435,17 @@ namespace CostToInvoiceButton
                                         }
                                     }
                                 }
+                            }
+                            */
+                            // OVERPARKING Message
+                            if (GetMinutesLeg(Convert.ToInt32(item.Itinerary)) >= 2 && GetMinutesLeg(Convert.ToInt32(item.Itinerary)) < 8)
+                            {
+                                MessageBox.Show("OVERPARKING detected.");
+
+                            }
+                            else if (GetMinutesLeg(Convert.ToInt32(item.Itinerary)) > 8)
+                            {
+                                MessageBox.Show("OVERNIGHT detected.");
                             }
                             // OVERPARKING
                             /*
@@ -476,7 +516,6 @@ namespace CostToInvoiceButton
                     DgvServicios.DataSource = servicios;
 
                     // OCULTAR COLUMNAS
-
                     DgvServicios.Columns["Supplier"].Visible = false;
                     DgvServicios.Columns["ID"].Visible = false;
                     DgvServicios.Columns["InvoiceInternal"].Visible = false;
@@ -528,6 +567,19 @@ namespace CostToInvoiceButton
                     ((TextBox)doubleScreen.Controls["txtCreationIncidentDate"]).Text = incidentCreation.ToString();
                     ((ComboBox)doubleScreen.Controls["cboCurrency"]).Text = SRType == "FUEL" ? "MXN" : GetCurrency();
 
+                    //Textbox FBO/FCC
+                    ((TextBox)doubleScreen.Controls["txtFBO"]).Text = txtFBO;
+                    ((TextBox)doubleScreen.Controls["txtATA"]).Text = txtATA;
+                    ((TextBox)doubleScreen.Controls["txtATD"]).Text = txtATD;
+                    ((TextBox)doubleScreen.Controls["txtMainHour"]).Text = txtMainHour;
+                    ((TextBox)doubleScreen.Controls["txtArrivalAiport"]).Text = txtArrivalAiport;
+                    ((TextBox)doubleScreen.Controls["txtLimit"]).Text = txtLimit;
+                    ((TextBox)doubleScreen.Controls["txtAirportFee"]).Text = txtAirportFee;
+                    ((TextBox)doubleScreen.Controls["txtCateringCollection"]).Text = txtCateringCollection;
+                    ((TextBox)doubleScreen.Controls["txtCollectionDeduction"]).Text = txtCollectionDeduction;
+                    ((TextBox)doubleScreen.Controls["txtToAirtport"]).Text = txtToAirtport;
+                    ((TextBox)doubleScreen.Controls["txtFromAirport"]).Text = txtFromAirport;
+
                     doubleScreen.ShowDialog();
                 }
             }
@@ -566,6 +618,316 @@ namespace CostToInvoiceButton
             {
                 MessageBox.Show("Error en INIT: " + ex.Message);
                 return false;
+            }
+        }
+        public string getItineraryId()
+        {
+            try
+            {
+                string itinerary = "";
+                ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
+                APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
+                clientInfoHeader.AppID = "Query Example";
+                String queryString = "SELECT ID FROM CO.Itinerary WHERE Incident1 = " + IncidentID;
+                clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 1, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
+                foreach (CSVTable table in queryCSV.CSVTables)
+                {
+                    String[] rowData = table.Rows;
+                    foreach (String data in rowData)
+                    {
+                        itinerary = data;
+                    }
+                }
+                return itinerary;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.StackTrace);
+                return "0";
+
+            }
+        }
+        private void GetItineraryHours(int Itinerary)
+        {
+            try
+            {
+                ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
+                APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
+                clientInfoHeader.AppID = "Query Example";
+                String queryString = "SELECT ATA,ATATime,ATD,ATDTime,ArrivalAirport,ToAirport.Country.LookupName,ToAirport.Country.LookupName,FromAirport.Country.LookupName FROM CO.Itinerary WHERE Incident1 =" + IncidentID.ToString() + " AND ID =" + Itinerary.ToString() + "";
+                clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 1, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
+                foreach (CSVTable table in queryCSV.CSVTables)
+                {
+                    String[] rowData = table.Rows;
+                    foreach (String data in rowData)
+                    {
+                        Char delimiter = '|';
+                        String[] substrings = data.Split(delimiter);
+                        txtATA = DateTime.Parse(substrings[0] + " " + substrings[1]).ToString();
+                        txtATD = DateTime.Parse(substrings[2] + " " + substrings[3]).ToString();
+                        getArrivalHours (arrivalId, DateTime.Parse(txtATA).ToString("yyyy-MM-dd"), DateTime.Parse(txtATD).ToString("yyyy-MM-dd"));
+                        txtArrivalAiport = substrings[4];
+                        txtLimit = getGrupoLogLimit(arrivalId);
+                        txtAirportFee = getAirportCollectionFee(arrivalId);
+                        txtCateringCollection = getAirportCateringCollectionFee(arrivalId);
+                        txtCollectionDeduction = getAirportCollectionDeductionFee(arrivalId);
+                        txtToAirtport = substrings[6];
+                        txtFromAirport = substrings[7];
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("GetItineraryHours" + ex.Message + "DEtalle: " + ex.StackTrace);
+            }
+        }
+        private void getArrivalHours(int Arrival, string AtaDate, string ATDDate)
+        {
+            try
+            {
+                ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
+                APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
+                clientInfoHeader.AppID = "Query Example";
+                String queryString = "SELECT OpensZULUTime,ClosesZULUTime,Type, ID FROM CO.Airport_WorkingHours WHERE Airports =" + Arrival;
+                clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 1000, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
+                WHoursList = new List<WHours>();
+                foreach (CSVTable table in queryCSV.CSVTables)
+                {
+                    String[] rowData = table.Rows;
+                    foreach (String data in rowData)
+                    {
+                        WHours hours = new WHours();
+                        Char delimiter = '|';
+                        String[] substrings = data.Split(delimiter);
+                        hours.ATAOpens = DateTime.Parse(AtaDate + " " + substrings[0]);
+                        hours.ATACloses = DateTime.Parse(AtaDate + " " + substrings[1]);
+                        hours.ATDOpens = DateTime.Parse(ATDDate + " " + substrings[0]);
+                        hours.ATDCloses = DateTime.Parse(ATDDate + " " + substrings[1]);
+                        //MessageBox.Show(hours.Closes.ToString());
+
+                        if (DateTime.Compare(hours.ATAOpens, hours.ATACloses) > 0)
+                        {
+                            hours.ATACloses = hours.ATACloses.AddDays(1);
+                            hours.ATDCloses = hours.ATDCloses.AddDays(1);
+                            //MessageBox.Show(hours.Closes.ToString());
+                        }
+                        hours.id = Convert.ToInt32(substrings[3].Trim());
+                        switch (substrings[2].Trim())
+                        {
+                            case "1":
+                                hours.Type = "EXTRAORDINARIO";
+                                break;
+                            case "2":
+                                hours.Type = "CRITICO";
+                                break;
+                            case "25":
+                                hours.Type = "NORMAL";
+                                break;
+                        }
+                        global.LogMessage("Type: " + hours.Type.ToString() + "   ATA Opens: " + hours.ATAOpens.ToString() + "   ATA Closes: " + hours.ATACloses.ToString() +
+                            "\nATD Opens: " + hours.ATDOpens.ToString() + "   ATD Closes: " + hours.ATDCloses.ToString());
+                        WHoursList.Add(hours);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("getArrivalHours" + ex.Message + "DEtalle: " + ex.StackTrace);
+
+            }
+        }
+        private string getGrupoLogLimit(int Airport)
+        {
+            try
+            {
+                string limit = "";
+                ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
+                APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
+                clientInfoHeader.AppID = "Query Example";
+                String queryString = "SELECT flightloglimit FROM CO.Airports WHERE ID =" + Airport + " ";
+                clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 1, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
+                foreach (CSVTable table in queryCSV.CSVTables)
+                {
+                    String[] rowData = table.Rows;
+                    foreach (String data in rowData)
+                    {
+                        limit = data;
+                    }
+                }
+                return limit;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message + "Det:" + ex.StackTrace);
+                return null;
+            }
+        }
+        private string getAirportCollectionFee(int Airport)
+        {
+            try
+            {
+                double Fee = 1;
+                ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
+                APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
+                clientInfoHeader.AppID = "Query Example";
+                DateTime ata = DateTime.Parse(txtATA);
+                String queryString = "SELECT CollectionFee FROM CO.AirportFee WHERE Airports = " + Airport + " AND ClientCategory.Name = '" + Royalty + "' AND DueDate > '" + ata.ToString("yyyy-MM-dd") + "'";
+                clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 1, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
+                foreach (CSVTable table in queryCSV.CSVTables)
+                {
+                    String[] rowData = table.Rows;
+                    foreach (String data in rowData)
+                    {
+                        Fee = String.IsNullOrEmpty(data) ? 1 : Convert.ToDouble(data);
+                        Fee = Fee / 100;
+                    }
+                }
+                return Fee.ToString();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("getAirportCollectionFee: " + ex.Message + "Det:" + ex.StackTrace);
+                return null;
+            }
+        }
+        private string getAirportCateringCollectionFee(int Airport)
+        {
+            try
+            {
+                double CateringFee = 0;
+                ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
+                APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
+                clientInfoHeader.AppID = "Query Example";
+                DateTime ata = DateTime.Parse(txtATA);
+                String queryString = "SELECT CateringCollectionFee  FROM CO.AirportFee WHERE Airports = " + Airport + " AND ClientCategory.Name = '" + Royalty + "' AND DueDate > '" + ata.ToString("yyyy-MM-dd") + "'";
+                clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 1, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
+                foreach (CSVTable table in queryCSV.CSVTables)
+                {
+                    String[] rowData = table.Rows;
+                    foreach (String data in rowData)
+                    {
+                        CateringFee = String.IsNullOrEmpty(data) ? 0 : Convert.ToDouble(data);
+                        CateringFee = CateringFee / 100;
+                    }
+                }
+                return CateringFee.ToString();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("getAirportCateringCollectionFee: " + ex.Message + "Det:" + ex.StackTrace);
+                return null;
+            }
+        }
+        private int GetArrivalFuelAirport()
+        {
+            try
+            {
+                int airport = 0;
+                ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
+                APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
+                clientInfoHeader.AppID = "Query Example";
+                String queryString = "SELECT CustomFields.CO.Airports FROM Incident WHERE Id =  " + IncidentID.ToString();
+                clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 1, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
+                foreach (CSVTable table in queryCSV.CSVTables)
+                {
+                    String[] rowData = table.Rows;
+                    foreach (String data in rowData)
+                    {
+                        airport = String.IsNullOrEmpty(data) ? 0 : int.Parse(data);
+                    }
+                }
+                return airport;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("GetArrivalFuelAirport: " + ex.Message + "Det:" + ex.StackTrace);
+                return 0;
+            }
+
+        }
+        private string getAirportCollectionDeductionFee(int Airport)
+        {
+            try
+            {
+                double DeductionFee = 0;
+                ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
+                APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
+                clientInfoHeader.AppID = "Query Example";
+                DateTime ata = DateTime.Parse(txtATA);
+                String queryString = "SELECT CollectionDeduction FROM CO.AirportFee WHERE Airports = " + Airport + " AND ClientCategory.Name = '" + Royalty + "' AND DueDate > '" + ata.ToString("yyyy-MM-dd") + "'";
+                clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 1, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
+                foreach (CSVTable table in queryCSV.CSVTables)
+                {
+                    String[] rowData = table.Rows;
+                    foreach (String data in rowData)
+                    {
+                        DeductionFee = String.IsNullOrEmpty(data) ? 0 : Convert.ToDouble(data);
+                        DeductionFee = DeductionFee / 100;
+                    }
+                }
+                return DeductionFee.ToString();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("getAirportCollectionDeductionFee: " + ex.Message + "Det:" + ex.StackTrace);
+                return null;
+            }
+        }
+        private string GetMainHourFBOFCC(string ata, string atd)
+        {
+            try
+            {
+                DateTime ATA = DateTime.Parse(ata);
+                DateTime ATD = DateTime.Parse(atd);
+                global.LogMessage("GetMainHourFBOFCC:     ATA" + ATA.ToString() + "     ATD" + ATD.ToString());
+                string hour = "EXTRAORDINARIO";
+                string hourata = "EXTRAORDINARIO";
+                string houratd = "EXTRAORDINARIO";
+
+                if (WHoursList.Count > 0)
+                {
+                    foreach (WHours w in WHoursList)
+                    {
+                        if (IsBetween(ATA, w.ATAOpens, w.ATACloses) && w.Type == "CRITICO")
+                        {
+                            hourata = "CRITICO";
+                        }
+                        if (IsBetween(ATA, w.ATAOpens, w.ATACloses) && w.Type == "NORMAL")
+                        {
+                            hourata = "NORMAL";
+                        }
+                        if (IsBetween(ATD, w.ATDOpens, w.ATDCloses) && w.Type == "CRITICO")
+                        {
+                            houratd = "CRITICO";
+                        }
+                        if (IsBetween(ATD, w.ATDOpens, w.ATDCloses) && w.Type == "NORMAL")
+                        {
+                            houratd = "NORMAL";
+                        }
+                        if (hourata == houratd)
+                        {
+                            hour = hourata;
+                        }
+                        else if (hourata == "EXTRAORDINARIO" || houratd == "EXTRAORDINARIO")
+                        {
+                            hour = "EXTRAORDINARIO";
+                        }
+                        else if (hourata == "CRITICO" || houratd == "CRITICO")
+                        {
+                            hour = "CRITICO";
+                        }
+                        else
+                        {
+                            hour = "NORMAL";
+                        }
+                    }
+                }
+                return hour;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message + "Det:" + ex.StackTrace);
+                return "";
             }
         }
         public string GetReferenceNumber()
@@ -2188,6 +2550,7 @@ namespace CostToInvoiceButton
                 APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
                 clientInfoHeader.AppID = "Query Example";
                 String queryString = "SELECT CustomFields.CO.Airports.LookupName  FROM Incident WHERE Id =" + incident + "";
+                global.LogMessage("GetArrivalAirportIncident = " + queryString);
                 clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 1, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
                 foreach (CSVTable table in queryCSV.CSVTables)
                 {
@@ -3215,6 +3578,32 @@ namespace CostToInvoiceButton
                 }
             }
             return password;
+        }
+        private string GetFBOValue(int Itinerary)
+        {
+            try
+            {
+                string FBO = "";
+                ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
+                APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
+                clientInfoHeader.AppID = "Query Example";
+                String queryString = "SELECT ArrivalAirport.FBO.Name FROM CO.Itinerary WHERE Incident1 =" + IncidentID.ToString() + " AND ID =" + Itinerary + "";
+                clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 1, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
+                foreach (CSVTable table in queryCSV.CSVTables)
+                {
+                    String[] rowData = table.Rows;
+                    foreach (String data in rowData)
+                    {
+                        FBO = data;
+                    }
+                }
+                return FBO;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("GetFBOValue" + ex.Message + "DEtalle: " + ex.StackTrace);
+                return "";
+            }
         }
     }
 

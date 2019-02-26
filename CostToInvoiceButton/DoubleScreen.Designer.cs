@@ -1009,6 +1009,7 @@
             this.lblCurrencyCost.Size = new System.Drawing.Size(31, 13);
             this.lblCurrencyCost.TabIndex = 87;
             this.lblCurrencyCost.Text = "MXN";
+            this.lblCurrencyCost.Visible = false;
             // 
             // txtCateringDDate
             // 

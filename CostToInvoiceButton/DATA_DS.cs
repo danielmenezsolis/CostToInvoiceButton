@@ -93,6 +93,8 @@ namespace CostToInvoiceButton
         public string DESCRIPTION { get; set; }
         [XmlElement(ElementName = "PRIMARY_UOM_CODE")]
         public string PRIMARY_UOM_CODE { get; set; }
+        [XmlElement(ElementName = "VENDOR_NUMBER")]
+        public string VENDOR_NUMBER { get; set; }
     }
 
     [XmlRoot(ElementName = "G_N_ITEMSUP")]

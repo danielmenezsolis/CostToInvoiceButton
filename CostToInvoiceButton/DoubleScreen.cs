@@ -1115,7 +1115,7 @@ namespace CostToInvoiceButton
                     if (item.ITEM_NUMBER == txtItemNumber.Text.Trim())
                     {
                         Sup sup = new Sup();
-                        sup.Id = item.VENDOR_ID;
+                        sup.Id = item.VENDOR_NUMBER;
                         sup.Name = item.PARTY_NAME;
                         sups.Add(sup);
                     }
@@ -1676,15 +1676,15 @@ namespace CostToInvoiceButton
                         }
                     }
                     if (lblSrType.Text == "PERMISOS")
-                {
-                   
-                    definicion = "?totalResults=true&q={str_item_number:'" + txtItemNumber.Text + "'" +
-                                                   ",bol_int_fbo:'0'" +
-                                                   ",str_ft_arrival:'" + arr_type.ToString() + "'" +
-                                                   ",str_ft_depart:'" + dep_type.ToString() + "'" +
-                                                   //",str_schedule_type:'" + txtMainHour.Text + "'" +
-                                                   ",$and:[{$or:[{str_client_category:{$like:'" + txtCustomerClass.Text.Replace("&", "%") + "'}},{str_client_category:{$exists:false}}]}]}";
-                }
+                    {
+
+                        definicion = "?totalResults=true&q={str_item_number:'" + txtItemNumber.Text + "'" +
+                                                       ",bol_int_fbo:'0'" +
+                                                       ",str_ft_arrival:'" + arr_type.ToString() + "'" +
+                                                       ",str_ft_depart:'" + dep_type.ToString() + "'" +
+                                                       //",str_schedule_type:'" + txtMainHour.Text + "'" +
+                                                       ",$and:[{$or:[{str_client_category:{$like:'" + txtCustomerClass.Text.Replace("&", "%") + "'}},{str_client_category:{$exists:false}}]}]}";
+                    }
                     global.LogMessage("GETCostDef: " + definicion + " SRType: " + lblSrType.Text);
                     var request = new RestRequest("rest/v6/customCostos/" + definicion, Method.GET);
                     IRestResponse response = client.Execute(request);
@@ -1822,7 +1822,7 @@ namespace CostToInvoiceButton
                         cargo = 1;
                     }
                     definicion = "?totalResults=true&q={str_item_number:'" + txtItemNumber.Text + "'" +
-                                                   ",bol_int_fbo:'0'"+
+                                                   ",bol_int_fbo:'0'" +
                                                    ",str_ft_arrival:'" + arr_type.ToString() + "'" +
                                                    ",str_ft_depart:'" + dep_type.ToString() + "'" +
                                                    //",str_schedule_type:'" + txtMainHour.Text + "'" +
@@ -2035,10 +2035,9 @@ namespace CostToInvoiceButton
                 double cost = 0;
                 foreach (var item in rootObjectCostsFCCFBO.items)
                 {
-                    global.LogMessage(cboSuppliers.Text + " : " + item.str_vendor_name);
-                    if (item.str_vendor_name.Trim() == cboSuppliers.Text.Trim())
+
+                    if (item.int_vendor_id.ToString().Trim() == cboSuppliers.SelectedValue.ToString())
                     {
-                        MessageBox.Show(item.str_vendor_name + " : " + item.flo_cost);
                         cost = item.flo_cost;
                     }
                 }
@@ -2046,6 +2045,7 @@ namespace CostToInvoiceButton
                 txtCost.Text = Math.Round(cost, 2).ToString();
             }
         }
+
         private double GetSeneamPercentage(string Utilidad)
         {
             try

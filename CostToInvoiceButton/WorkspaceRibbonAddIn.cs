@@ -396,15 +396,15 @@ namespace CostToInvoiceButton
                                     {
                                         if (antelacion > 0 && extension == 0)
                                         {
-                                            MessageBox.Show("OVERTIME ARRIVAL detected: " + antelacion + " minutes.");
+                                            MessageBox.Show("OVERTIME ARRIVAL detected");//: " + antelacion + " minutes.");
                                         }
                                         else if (extension > 0 && antelacion == 0)
                                         {
-                                            MessageBox.Show("OVERTIME DEPARTURE detected: " + extension + " minutes.");
+                                            MessageBox.Show("OVERTIME DEPARTURE detected");//: " + extension + " minutes.");
                                         }
                                         else
                                         {
-                                            MessageBox.Show("OVERTIME ARRIVAL & DEPARTURE detected: " + minover + " minutes.");
+                                            MessageBox.Show("OVERTIME ARRIVAL & DEPARTURE detected");//: " + minover + " minutes.");
                                         }
                                     }
                                 }

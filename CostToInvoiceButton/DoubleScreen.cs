@@ -317,7 +317,7 @@ namespace CostToInvoiceButton
                         if ((txtAirport.Text.Contains("MHLM") || txtAirport.Text.Contains("MGGT")) && GetCountItinerary() > 1 && txtClientName.Text.Contains("GULF AND CAR") && isBHInside())
                         {
                             double p = GetPrices();
-                            txtPrice.Text = Math.Round(p - (p * 0.025), 4).ToString();
+                            txtPrice.Text = Math.Round(p - (p * 0.025), 2).ToString();
                         }
                         /*
                         else
@@ -416,6 +416,10 @@ namespace CostToInvoiceButton
                             //txtCost.Text = (Convert.ToDouble(txtCost.Text) * hr).ToString();
                         }
                     }
+                    if (txtItemNumber.Text == "IPFERPS0052")
+                    {
+                        txtQty.Text = getPaxInBound(txtIdService.Text);
+                    }
                     if (txtItemNumber.Text == "MHSPSAS0091")
                     {
                         double b;
@@ -429,7 +433,6 @@ namespace CostToInvoiceButton
                             txtPrice.Text = Math.Round(utilidad, 2).ToString();
                         }
                     }
-
                     if (txtItemNumber.Text == "DEPEGAR0358")
                     {
                         double price = 0;
@@ -472,6 +475,32 @@ namespace CostToInvoiceButton
             catch (Exception ex)
             {
                 MessageBox.Show("ServiceDobleClic: " + ex.Message + "Det:" + ex.StackTrace);
+            }
+        }
+        private string getPaxInBound(string Service)
+        {
+            try
+            {
+                string PaxInBound = "";
+                ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
+                APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
+                clientInfoHeader.AppID = "Query Example";
+                String queryString = "SELECT PaxInBound FROM CO.Services WHERE ID = " + Service;
+                clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 1, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
+                foreach (CSVTable table in queryCSV.CSVTables)
+                {
+                    String[] rowData = table.Rows;
+                    foreach (String data in rowData)
+                    {
+                        PaxInBound = data;
+                    }
+                }
+                return String.IsNullOrEmpty(PaxInBound) ? "1" : PaxInBound;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("getPaxInBound" + ex.Message + "Det:" + ex.StackTrace);
+                return "1";
             }
         }
         private void quitToolStripMenuItem_Click(object sender, EventArgs e)
@@ -1777,6 +1806,7 @@ namespace CostToInvoiceButton
         }
         private double GetPrices()
         {
+            string cClass = "";
             global.LogMessage("EntraGetPrices");
             string arr_type = "DOMESTIC";
             string dep_type = "DOMESTIC";
@@ -1875,7 +1905,6 @@ namespace CostToInvoiceButton
                         cargo = 1;
                         grupo = txtCargoGroup.Text;
                     }
-
                     definicion = "?totalResults=true&q={bol_int_fbo:0,";
                     if (isFBOPrice())
                     {
@@ -1899,7 +1928,6 @@ namespace CostToInvoiceButton
                     }
                     else
                     {
-
                         definicion += "str_item_number:'" + txtItemNumber.Text + "'" +
                                 ",str_ft_arrival:'" + arr_type.ToString() + "'" +
                                 ",str_ft_depart:'" + dep_type.ToString() + "'" +
@@ -1950,10 +1978,9 @@ namespace CostToInvoiceButton
                                 price = item.flo_amount;
                                 Curr = item.str_currency_code;
                                 uomPayable = item.str_oum_code;
-                                string cClass = "";
-                                cClass = string.IsNullOrEmpty(item.str_client_category) ? "" : item.str_client_category.Trim();
+                                cClass = item.str_client_category.ToString();
                                 global.LogMessage("Clase: " + cClass);
-                                if (txtCustomerClass.Text == cClass.Trim())
+                                if (txtCustomerClass.Text == cClass)
                                 {
                                     break;
                                 }
@@ -1974,10 +2001,9 @@ namespace CostToInvoiceButton
                                 Curr = item.str_currency_code;
                                 uomPayable = item.str_oum_code;
                                 lblCurrencyPrice.Text = Curr;
-                                string cClass = "";
-                                cClass = string.IsNullOrEmpty(item.str_client_category) ? "" : item.str_client_category.Trim();
+                                cClass = item.str_client_category.ToString();
                                 global.LogMessage("Clase: " + cClass);
-                                if (txtCustomerClass.Text == cClass.Trim())
+                                if (txtCustomerClass.Text == cClass)
                                 {
                                     break;
                                 }
@@ -2035,17 +2061,14 @@ namespace CostToInvoiceButton
                 double cost = 0;
                 foreach (var item in rootObjectCostsFCCFBO.items)
                 {
-
                     if (item.int_vendor_id.ToString().Trim() == cboSuppliers.SelectedValue.ToString())
                     {
                         cost = item.flo_cost;
                     }
                 }
-
                 txtCost.Text = Math.Round(cost, 2).ToString();
             }
         }
-
         private double GetSeneamPercentage(string Utilidad)
         {
             try
@@ -2076,8 +2099,6 @@ namespace CostToInvoiceButton
                 return 0;
 
             }
-
-
         }
         private double GetUtilidadPercentage(string Utilidad)
         {

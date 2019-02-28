@@ -83,7 +83,9 @@ namespace CostToInvoiceButton
                     lblTotalCostFuel.Hide();
                     txtGalones.Hide();
                     txtTotalCostFuel.Hide();
+
                     dataGridSuppliers.DataSource = null;
+                    dataGridSuppliers.Update();
                     txtInvoiceReady.Text = dataGridServicios.Rows[e.RowIndex].Cells["InvoiceReady"].Value.ToString() == "Yes" ? "1" : "0";
                     txtIdService.Text = dataGridServicios.Rows[e.RowIndex].Cells["ID"].Value.ToString();
                     txtItinerary.Text = dataGridServicios.Rows[e.RowIndex].Cells["Itinerary"].Value.ToString();
@@ -572,12 +574,12 @@ namespace CostToInvoiceButton
         {
             if (e.RowIndex != -1)
             {
-               
                 string action = dataGridInvoice.Rows[e.RowIndex].Cells[e.ColumnIndex].Value.ToString();
                 if (action == "Edit")
                 {
 
                 }
+
                 if (action == "Delete")
                 {
                     DialogResult dialogResult = MessageBox.Show("Want to erase row?", "Double Screen", MessageBoxButtons.YesNo);
@@ -1506,7 +1508,7 @@ namespace CostToInvoiceButton
                 txtPrice.Text = "";
                 txtQty.Text = "1";
                 cboSuppliers.DataSource = null;
-                //cboSuppliers.Enabled = false;
+                cboSuppliers.Enabled = false;
                 txtPrice.Enabled = false;
                 txtQty.Enabled = false;
                 txtCost.Enabled = false;
@@ -3264,8 +3266,6 @@ namespace CostToInvoiceButton
         {
             try
             {
-
-
                 if (!string.IsNullOrEmpty(txtItem.Text) && !string.IsNullOrEmpty(txtItemNumber.Text))
                 {
                     if (ValidateData())

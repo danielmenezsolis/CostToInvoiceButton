@@ -60,6 +60,23 @@
             this.txtItemNumber = new System.Windows.Forms.TextBox();
             this.BtnAdd = new System.Windows.Forms.Button();
             this.dataGridInvoice = new System.Windows.Forms.DataGridView();
+            this.InvoiceReady = new System.Windows.Forms.DataGridViewCheckBoxColumn();
+            this.Item = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Vendor = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Quantity = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Currency = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Cost = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.TotalCost = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.PriceCurrency = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Price = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Amount = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.IdService = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Itinerary = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Package = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.ItemNumber = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Fee = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.EditColumn = new System.Windows.Forms.DataGridViewButtonColumn();
+            this.DeleteColumn = new System.Windows.Forms.DataGridViewButtonColumn();
             this.label10 = new System.Windows.Forms.Label();
             this.label11 = new System.Windows.Forms.Label();
             this.label12 = new System.Windows.Forms.Label();
@@ -127,23 +144,6 @@
             this.label20 = new System.Windows.Forms.Label();
             this.lblSrNum = new System.Windows.Forms.Label();
             this.txtFee = new System.Windows.Forms.TextBox();
-            this.InvoiceReady = new System.Windows.Forms.DataGridViewCheckBoxColumn();
-            this.Item = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Vendor = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Quantity = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Currency = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Cost = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.TotalCost = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.PriceCurrency = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Price = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Amount = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.IdService = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Itinerary = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Package = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.ItemNumber = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Fee = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.EditColumn = new System.Windows.Forms.DataGridViewButtonColumn();
-            this.DeleteColumn = new System.Windows.Forms.DataGridViewButtonColumn();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridSuppliers)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridServicios)).BeginInit();
@@ -480,6 +480,127 @@
             this.dataGridInvoice.TabStop = false;
             this.dataGridInvoice.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridInvoice_CellContentClick);
             // 
+            // InvoiceReady
+            // 
+            this.InvoiceReady.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
+            this.InvoiceReady.FalseValue = "";
+            this.InvoiceReady.HeaderText = "Invoice Ready?";
+            this.InvoiceReady.Name = "InvoiceReady";
+            this.InvoiceReady.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this.InvoiceReady.TrueValue = "";
+            this.InvoiceReady.Width = 79;
+            // 
+            // Item
+            // 
+            this.Item.HeaderText = "Item";
+            this.Item.Name = "Item";
+            this.Item.ReadOnly = true;
+            this.Item.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            // 
+            // Vendor
+            // 
+            this.Vendor.HeaderText = "Supplier";
+            this.Vendor.Name = "Vendor";
+            this.Vendor.ReadOnly = true;
+            this.Vendor.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            // 
+            // Quantity
+            // 
+            this.Quantity.HeaderText = "Quantity";
+            this.Quantity.Name = "Quantity";
+            this.Quantity.ReadOnly = true;
+            this.Quantity.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            // 
+            // Currency
+            // 
+            this.Currency.HeaderText = "Cost Currency";
+            this.Currency.Name = "Currency";
+            this.Currency.ReadOnly = true;
+            this.Currency.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            // 
+            // Cost
+            // 
+            this.Cost.HeaderText = "Cost p/unit";
+            this.Cost.Name = "Cost";
+            this.Cost.ReadOnly = true;
+            this.Cost.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            // 
+            // TotalCost
+            // 
+            this.TotalCost.HeaderText = "Total Cost";
+            this.TotalCost.Name = "TotalCost";
+            this.TotalCost.ReadOnly = true;
+            // 
+            // PriceCurrency
+            // 
+            this.PriceCurrency.HeaderText = "Price Currency";
+            this.PriceCurrency.Name = "PriceCurrency";
+            this.PriceCurrency.ReadOnly = true;
+            // 
+            // Price
+            // 
+            this.Price.HeaderText = "Price p/unit";
+            this.Price.Name = "Price";
+            this.Price.ReadOnly = true;
+            this.Price.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            // 
+            // Amount
+            // 
+            this.Amount.HeaderText = "Total Price";
+            this.Amount.Name = "Amount";
+            this.Amount.ReadOnly = true;
+            this.Amount.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            // 
+            // IdService
+            // 
+            this.IdService.HeaderText = "Service ID";
+            this.IdService.Name = "IdService";
+            this.IdService.ReadOnly = true;
+            this.IdService.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this.IdService.Visible = false;
+            // 
+            // Itinerary
+            // 
+            this.Itinerary.HeaderText = "Itinerary";
+            this.Itinerary.Name = "Itinerary";
+            this.Itinerary.ReadOnly = true;
+            this.Itinerary.Visible = false;
+            // 
+            // Package
+            // 
+            this.Package.HeaderText = "Package";
+            this.Package.Name = "Package";
+            this.Package.ReadOnly = true;
+            this.Package.Visible = false;
+            // 
+            // ItemNumber
+            // 
+            this.ItemNumber.HeaderText = "Item Number";
+            this.ItemNumber.Name = "ItemNumber";
+            this.ItemNumber.ReadOnly = true;
+            this.ItemNumber.Visible = false;
+            // 
+            // Fee
+            // 
+            this.Fee.HeaderText = "Fee";
+            this.Fee.Name = "Fee";
+            this.Fee.ReadOnly = true;
+            // 
+            // EditColumn
+            // 
+            this.EditColumn.HeaderText = "Edit";
+            this.EditColumn.Name = "EditColumn";
+            this.EditColumn.Text = "Edit";
+            this.EditColumn.UseColumnTextForButtonValue = true;
+            this.EditColumn.Visible = false;
+            // 
+            // DeleteColumn
+            // 
+            this.DeleteColumn.HeaderText = "Delete";
+            this.DeleteColumn.Name = "DeleteColumn";
+            this.DeleteColumn.Text = "Delete";
+            this.DeleteColumn.UseColumnTextForButtonValue = true;
+            // 
             // label10
             // 
             this.label10.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
@@ -600,6 +721,7 @@
             // 
             // cboSuppliers
             // 
+            this.cboSuppliers.Enabled = false;
             this.cboSuppliers.FormattingEnabled = true;
             this.cboSuppliers.Location = new System.Drawing.Point(98, 458);
             this.cboSuppliers.Name = "cboSuppliers";
@@ -1094,127 +1216,6 @@
             this.txtFee.TabIndex = 108;
             this.txtFee.TabStop = false;
             this.txtFee.Visible = false;
-            // 
-            // InvoiceReady
-            // 
-            this.InvoiceReady.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
-            this.InvoiceReady.FalseValue = "";
-            this.InvoiceReady.HeaderText = "Invoice Ready?";
-            this.InvoiceReady.Name = "InvoiceReady";
-            this.InvoiceReady.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this.InvoiceReady.TrueValue = "";
-            this.InvoiceReady.Width = 79;
-            // 
-            // Item
-            // 
-            this.Item.HeaderText = "Item";
-            this.Item.Name = "Item";
-            this.Item.ReadOnly = true;
-            this.Item.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            // 
-            // Vendor
-            // 
-            this.Vendor.HeaderText = "Supplier";
-            this.Vendor.Name = "Vendor";
-            this.Vendor.ReadOnly = true;
-            this.Vendor.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            // 
-            // Quantity
-            // 
-            this.Quantity.HeaderText = "Quantity";
-            this.Quantity.Name = "Quantity";
-            this.Quantity.ReadOnly = true;
-            this.Quantity.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            // 
-            // Currency
-            // 
-            this.Currency.HeaderText = "Cost Currency";
-            this.Currency.Name = "Currency";
-            this.Currency.ReadOnly = true;
-            this.Currency.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            // 
-            // Cost
-            // 
-            this.Cost.HeaderText = "Cost p/unit";
-            this.Cost.Name = "Cost";
-            this.Cost.ReadOnly = true;
-            this.Cost.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            // 
-            // TotalCost
-            // 
-            this.TotalCost.HeaderText = "Total Cost";
-            this.TotalCost.Name = "TotalCost";
-            this.TotalCost.ReadOnly = true;
-            // 
-            // PriceCurrency
-            // 
-            this.PriceCurrency.HeaderText = "Price Currency";
-            this.PriceCurrency.Name = "PriceCurrency";
-            this.PriceCurrency.ReadOnly = true;
-            // 
-            // Price
-            // 
-            this.Price.HeaderText = "Price p/unit";
-            this.Price.Name = "Price";
-            this.Price.ReadOnly = true;
-            this.Price.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            // 
-            // Amount
-            // 
-            this.Amount.HeaderText = "Total Price";
-            this.Amount.Name = "Amount";
-            this.Amount.ReadOnly = true;
-            this.Amount.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            // 
-            // IdService
-            // 
-            this.IdService.HeaderText = "Service ID";
-            this.IdService.Name = "IdService";
-            this.IdService.ReadOnly = true;
-            this.IdService.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this.IdService.Visible = false;
-            // 
-            // Itinerary
-            // 
-            this.Itinerary.HeaderText = "Itinerary";
-            this.Itinerary.Name = "Itinerary";
-            this.Itinerary.ReadOnly = true;
-            this.Itinerary.Visible = false;
-            // 
-            // Package
-            // 
-            this.Package.HeaderText = "Package";
-            this.Package.Name = "Package";
-            this.Package.ReadOnly = true;
-            this.Package.Visible = false;
-            // 
-            // ItemNumber
-            // 
-            this.ItemNumber.HeaderText = "Item Number";
-            this.ItemNumber.Name = "ItemNumber";
-            this.ItemNumber.ReadOnly = true;
-            this.ItemNumber.Visible = false;
-            // 
-            // Fee
-            // 
-            this.Fee.HeaderText = "Fee";
-            this.Fee.Name = "Fee";
-            this.Fee.ReadOnly = true;
-            // 
-            // EditColumn
-            // 
-            this.EditColumn.HeaderText = "Edit";
-            this.EditColumn.Name = "EditColumn";
-            this.EditColumn.Text = "Edit";
-            this.EditColumn.UseColumnTextForButtonValue = true;
-            this.EditColumn.Visible = false;
-            // 
-            // DeleteColumn
-            // 
-            this.DeleteColumn.HeaderText = "Delete";
-            this.DeleteColumn.Name = "DeleteColumn";
-            this.DeleteColumn.Text = "Delete";
-            this.DeleteColumn.UseColumnTextForButtonValue = true;
             // 
             // DoubleScreen
             // 

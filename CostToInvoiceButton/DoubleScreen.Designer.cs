@@ -512,7 +512,6 @@
             // 
             this.Currency.HeaderText = "Cost Currency";
             this.Currency.Name = "Currency";
-            this.Currency.ReadOnly = true;
             this.Currency.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
             // 
             // Cost
@@ -708,7 +707,6 @@
             // 
             // cboSuppliers
             // 
-            this.cboSuppliers.Enabled = false;
             this.cboSuppliers.FormattingEnabled = true;
             this.cboSuppliers.Location = new System.Drawing.Point(98, 458);
             this.cboSuppliers.Name = "cboSuppliers";
@@ -1313,6 +1311,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.dataGridInvoice)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
+
         }
 
         #endregion

@@ -517,6 +517,7 @@ namespace CostToInvoiceButton
                         DgvServicios.Columns["Fee"].Visible = false;
                         DgvInvoice.Columns["Fee"].Visible = false;
                     }
+                    DgvInvoice.ReadOnly = false;
 
                     DgvServicios.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.DisplayedCells;
                     ((System.Windows.Forms.Label)doubleScreen.Controls["lblSrType"]).Text = SRType.ToUpper();

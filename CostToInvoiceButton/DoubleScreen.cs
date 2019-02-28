@@ -572,6 +572,7 @@ namespace CostToInvoiceButton
         {
             if (e.RowIndex != -1)
             {
+               
                 string action = dataGridInvoice.Rows[e.RowIndex].Cells[e.ColumnIndex].Value.ToString();
                 if (action == "Edit")
                 {
@@ -836,9 +837,9 @@ namespace CostToInvoiceButton
                 EndpointAddress endPointAddr = new EndpointAddress(global.GetInterfaceServiceUrl(ConnectServiceType.Soap));
                 BasicHttpBinding binding = new BasicHttpBinding(BasicHttpSecurityMode.TransportWithMessageCredential);
                 binding.Security.Message.ClientCredentialType = BasicHttpMessageCredentialType.UserName;
-                binding.ReceiveTimeout = new TimeSpan(1, 0, 0);
+                binding.ReceiveTimeout = new TimeSpan(0, 10, 0);
                 binding.MaxReceivedMessageSize = 1048576; //1MB
-                binding.SendTimeout = new TimeSpan(1, 0, 0);
+                binding.SendTimeout = new TimeSpan(0, 10, 0);
                 clientORN = new RightNowSyncPortClient(binding, endPointAddr);
                 BindingElementCollection elements = clientORN.Endpoint.Binding.CreateBindingElements();
                 elements.Find<SecurityBindingElement>().IncludeTimestamp = false;
@@ -1105,7 +1106,7 @@ namespace CostToInvoiceButton
         private void GetSuppliers()
         {
             cboSuppliers.DataSource = null;
-            cboSuppliers.Enabled = false;
+
             List<Sup> sups = new List<Sup>();
 
             if (ListaSupplier.Exists(x => (x.ORGANIZATION_CODE.Trim() == txtAirport.Text)))
@@ -1131,6 +1132,7 @@ namespace CostToInvoiceButton
             cboSuppliers.DisplayMember = "Value";
             cboSuppliers.ValueMember = "Key";
             cboSuppliers.Enabled = true;
+
         }
         private void getAllSuppliers()
         {
@@ -1504,7 +1506,7 @@ namespace CostToInvoiceButton
                 txtPrice.Text = "";
                 txtQty.Text = "1";
                 cboSuppliers.DataSource = null;
-                cboSuppliers.Enabled = false;
+                //cboSuppliers.Enabled = false;
                 txtPrice.Enabled = false;
                 txtQty.Enabled = false;
                 txtCost.Enabled = false;
@@ -2034,19 +2036,25 @@ namespace CostToInvoiceButton
         }
         private void cboSuppliers_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (rootObjectCostsFCCFBO != null)
+            try
             {
-                double cost = 0;
-                foreach (var item in rootObjectCostsFCCFBO.items)
+                if (rootObjectCostsFCCFBO != null)
                 {
-
-                    if (item.int_vendor_id.ToString().Trim() == cboSuppliers.SelectedValue.ToString())
+                    double cost = 0;
+                    foreach (var item in rootObjectCostsFCCFBO.items)
                     {
-                        cost = item.flo_cost;
+                        if (item.int_vendor_id.ToString().Trim() == cboSuppliers.SelectedValue.ToString())
+                        {
+                            cost = item.flo_cost;
+                        }
                     }
-                }
 
-                txtCost.Text = Math.Round(cost, 2).ToString();
+                    txtCost.Text = Math.Round(cost, 2).ToString();
+                }
+            }
+            catch (Exception ex)
+            {
+                global.LogMessage("cboSuppliers_SelectedIndexChanged: " + ex.Message + "Det: " + ex.StackTrace);
             }
         }
 

@@ -836,9 +836,9 @@ namespace CostToInvoiceButton
                 EndpointAddress endPointAddr = new EndpointAddress(global.GetInterfaceServiceUrl(ConnectServiceType.Soap));
                 BasicHttpBinding binding = new BasicHttpBinding(BasicHttpSecurityMode.TransportWithMessageCredential);
                 binding.Security.Message.ClientCredentialType = BasicHttpMessageCredentialType.UserName;
-                binding.ReceiveTimeout = new TimeSpan(0, 10, 0);
+                binding.ReceiveTimeout = new TimeSpan(1, 0, 0);
                 binding.MaxReceivedMessageSize = 1048576; //1MB
-                binding.SendTimeout = new TimeSpan(0, 10, 0);
+                binding.SendTimeout = new TimeSpan(1, 0, 0);
                 clientORN = new RightNowSyncPortClient(binding, endPointAddr);
                 BindingElementCollection elements = clientORN.Endpoint.Binding.CreateBindingElements();
                 elements.Find<SecurityBindingElement>().IncludeTimestamp = false;

@@ -1313,7 +1313,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.dataGridInvoice)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
-
         }
 
         #endregion

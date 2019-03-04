@@ -2092,6 +2092,8 @@ namespace CostToInvoiceButton
         {
             try
             {
+                var watch = Stopwatch.StartNew();
+
                 var client = new RestClient("https://iccsmx.custhelp.com/");
                 var request = new RestRequest("/services/rest/connect/v1.4/CO.Services/", Method.POST)
                 {
@@ -2220,7 +2222,9 @@ namespace CostToInvoiceButton
                 {
                     MessageBox.Show(content);
                 }
-
+                watch.Stop();
+                var elapsed = watch.Elapsed;
+                global.LogMessage("InsertComponent: " + elapsed.TotalSeconds + " Secs");
             }
             catch (Exception ex)
             {

@@ -233,7 +233,19 @@ namespace CostToInvoiceButton
                         global.LogMessage("Sin precio asignado. Buscando precio.");
                         if (String.IsNullOrEmpty(txtPrice.Text))
                         {
-                            txtPrice.Text = GetPrices().ToString();
+                            global.LogMessage("Antes GetPrices");
+                            double priceFinal = 0;
+                            //try
+                            //{
+                                priceFinal = getPrices();
+                            //}
+                            //catch (Exception ex)
+                            //{
+                            //    MessageBox.Show(ex.Message + "GetPricesMethodNotFound" + ex.StackTrace);
+                            //    return;
+                            //}
+                            global.LogMessage("Despues GetPrices\nValor: " + priceFinal);
+                            txtPrice.Text = priceFinal.ToString();
                         }
                     }
                     else
@@ -299,7 +311,7 @@ namespace CostToInvoiceButton
                             txtGalones.ReadOnly = true;
                             txtTotalCostFuel.ReadOnly = true;
 
-                            txtPrice.Text = Math.Round(GetPrices(), 2).ToString();
+                            txtPrice.Text = Math.Round(getPrices(), 2).ToString();
                         }
                     }
 
@@ -318,7 +330,7 @@ namespace CostToInvoiceButton
                         */
                         if ((txtAirport.Text.Contains("MHLM") || txtAirport.Text.Contains("MGGT")) && GetCountItinerary() > 1 && txtClientName.Text.Contains("GULF AND CAR") && isBHInside())
                         {
-                            double p = GetPrices();
+                            double p = getPrices();
                             txtPrice.Text = Math.Round(p - (p * 0.025), 4).ToString();
                         }
                         /*
@@ -1588,6 +1600,7 @@ namespace CostToInvoiceButton
                 }
                 else if (GetTicketSumCatA() > 0)
                 {
+                    global.LogMessage("Sumatoria de Payables");
                     cost = GetTicketSumCatA();
                 }
                 else if (lblSrType.Text == "GYCUSTODIA" && txtItemNumber.Text == "MHSPSAS0091")
@@ -1596,6 +1609,7 @@ namespace CostToInvoiceButton
                 }
                 else
                 {
+                    global.LogMessage("Busqueda en listas de costos");
                     string definicion = "";
                     var client = new RestClient("https://iccs.bigmachines.com/");
                     //string User = Encoding.UTF8.GetString(Convert.FromBase64String("aW1wbGVtZW50YWRvcg=="));
@@ -1783,7 +1797,7 @@ namespace CostToInvoiceButton
                 return 0;
             }
         }
-        private double GetPrices()
+        private double getPrices()
         {
             global.LogMessage("EntraGetPrices");
             string arr_type = "DOMESTIC";
@@ -1815,6 +1829,7 @@ namespace CostToInvoiceButton
             }
             string Curr = "";
             double price = 0;
+            
             try
             {
                 var client = new RestClient("https://iccs.bigmachines.com/");
@@ -1876,6 +1891,7 @@ namespace CostToInvoiceButton
                 }
                 else if (lblSrType.Text == "FCC")
                 {
+                    global.LogMessage("Tipo de SR FCC");
                     int cargo = 0;
                     string grupo = txtPaxGroup.Text;
                     if (isCargo())
@@ -1924,6 +1940,8 @@ namespace CostToInvoiceButton
                 var request = new RestRequest("rest/v6/customPrecios/" + definicion, Method.GET);
                 IRestResponse response = client.Execute(request);
                 ClaseParaPrecios.RootObject rootObjectPrices = JsonConvert.DeserializeObject<ClaseParaPrecios.RootObject>(response.Content);
+                global.LogMessage("Response: " + response);
+                global.LogMessage("Response: " + response.Content);
                 if (rootObjectPrices != null && rootObjectPrices.items.Count > 0)
                 {
                     rootObjectPricesFCCFBO = rootObjectPrices;
@@ -2059,7 +2077,6 @@ namespace CostToInvoiceButton
                 global.LogMessage("cboSuppliers_SelectedIndexChanged: " + ex.Message + "Det: " + ex.StackTrace);
             }
         }
-
         private double GetSeneamPercentage(string Utilidad)
         {
             try

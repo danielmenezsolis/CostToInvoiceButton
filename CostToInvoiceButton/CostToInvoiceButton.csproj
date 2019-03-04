@@ -42,10 +42,6 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>bin\Debug\ClaseParaCostos.dll</HintPath>
     </Reference>
-    <Reference Include="ClaseParaPrecios, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>bin\Debug\ClaseParaPrecios.dll</HintPath>
-    </Reference>
     <Reference Include="MoreLinq, Version=3.0.0.0, Culture=neutral, PublicKeyToken=384d532d7e88985d, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\morelinq.3.0.0\lib\net451\MoreLinq.dll</HintPath>
@@ -88,6 +84,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ClaseFinanzas.cs" />
+    <Compile Include="ClaseParaPrecios.cs" />
     <Compile Include="ClaseRecargos.cs" />
     <Compile Include="Connected Services\SOAPICCS\Reference.cs">
       <AutoGen>True</AutoGen>

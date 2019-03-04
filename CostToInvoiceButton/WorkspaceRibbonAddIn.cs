@@ -9,6 +9,7 @@ using System;
 using System.AddIn;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -43,6 +44,12 @@ namespace CostToInvoiceButton
         public string SENCat { get; set; }
         public string ClientName { get; set; }
         public string cClass { get; set; }
+        public bool overnight { get; set; }
+        public bool overparking { get; set; }
+        public bool overtimearridepart { get; set; }
+        public bool overtimedeparture { get; set; }
+        public bool overtimearrival { get; set; }
+
 
         public WorkspaceRibbonAddIn(bool inDesignMode, IRecordContext RecordContext, IGlobalContext globalContext)
         {
@@ -51,14 +58,14 @@ namespace CostToInvoiceButton
                 global = globalContext;
                 recordContext = RecordContext;
                 this.inDesignMode = inDesignMode;
-                RecordContext.Saving += new CancelEventHandler(RecordContext_Saving);
+                //RecordContext.Saving += new CancelEventHandler(RecordContext_Saving);
             }
         }
         private void RecordContext_Saving(object sender, CancelEventArgs e)
         {
             try
             {
-                Init();
+                //Init();
             }
             catch (Exception ex)
             {
@@ -72,7 +79,8 @@ namespace CostToInvoiceButton
             {
                 if (Init())
                 {
-                    // recordContext.ExecuteEditorCommand(EditorCommand.Save);
+
+                    var watch = Stopwatch.StartNew();
                     ClientName = "";
                     string Utilidad = "";
                     string Royalty = "";
@@ -95,38 +103,33 @@ namespace CostToInvoiceButton
                     {
                         foreach (ICfVal inccampos in IncCustomFieldList)
                         {
-                            if (inccampos.CfId == 37)
+                            switch (inccampos.CfId)
                             {
-                                CateringDeliveryDate = inccampos.ValDttm.ToString();
-                            }
-                            if (inccampos.CfId == 58)
-                            {
-                                ClientName = inccampos.ValStr;
-                            }
-                            if (inccampos.CfId == 61)
-                            {
-                                Royalty = inccampos.ValStr;
-                            }
-                            if (inccampos.CfId == 62)
-                            {
-                                Utilidad = inccampos.ValStr;
-                            }
-                            if (inccampos.CfId == 63)
-                            {
-                                Combustible = inccampos.ValStr;
-                            }
-                            if (inccampos.CfId == 81)
-                            {
-                                SeneamCat = inccampos.ValStr;
-                                SENCat = inccampos.ValStr;
-                            }
-                            if (inccampos.CfId == 82)
-                            {
-                                CombustibleI = inccampos.ValStr;
-                            }
-                            if (inccampos.CfId == 85)
-                            {
-                                SENEAM = inccampos.ValStr;
+                                case 37:
+                                    CateringDeliveryDate = inccampos.ValDttm.ToString();
+                                    break;
+                                case 58:
+                                    ClientName = inccampos.ValStr;
+                                    break;
+                                case 61:
+                                    Royalty = inccampos.ValStr;
+                                    break;
+                                case 62:
+                                    Utilidad = inccampos.ValStr;
+                                    break;
+                                case 63:
+                                    Combustible = inccampos.ValStr;
+                                    break;
+                                case 81:
+                                    SeneamCat = inccampos.ValStr;
+                                    SENCat = inccampos.ValStr;
+                                    break;
+                                case 82:
+                                    CombustibleI = inccampos.ValStr;
+                                    break;
+                                case 85:
+                                    SENEAM = inccampos.ValStr;
+                                    break;
                             }
                         }
                     }
@@ -339,6 +342,8 @@ namespace CostToInvoiceButton
                                     InsertComponent(component1);
                                 }
                             }
+
+                            var watchovertime = Stopwatch.StartNew();
                             double minover = 0;
                             double antelacion = 0;
                             double extension = 0;
@@ -396,14 +401,17 @@ namespace CostToInvoiceButton
                                     {
                                         if (antelacion > 0 && extension == 0)
                                         {
+                                            overtimearrival = true;
                                             MessageBox.Show("OVERTIME ARRIVAL detected");//: " + antelacion + " minutes.");
                                         }
                                         else if (extension > 0 && antelacion == 0)
                                         {
+                                            overtimedeparture = true;
                                             MessageBox.Show("OVERTIME DEPARTURE detected");//: " + extension + " minutes.");
                                         }
                                         else
                                         {
+                                            overtimearridepart = true;
                                             MessageBox.Show("OVERTIME ARRIVAL & DEPARTURE detected");//: " + minover + " minutes.");
                                         }
                                     }
@@ -412,13 +420,18 @@ namespace CostToInvoiceButton
                             // OVERPARKING Message
                             if (GetMinutesLeg(Convert.ToInt32(item.Itinerary)) >= 2 && GetMinutesLeg(Convert.ToInt32(item.Itinerary)) < 8)
                             {
+                                overparking = true;
                                 MessageBox.Show("OVERPARKING detected.");
 
                             }
                             else if (GetMinutesLeg(Convert.ToInt32(item.Itinerary)) > 8)
                             {
+                                overnight = true;
                                 MessageBox.Show("OVERNIGHT detected.");
                             }
+                            watchovertime.Stop();
+                            var elapsedMsovertime = watch.Elapsed;
+                            global.LogMessage("Calculo Overtimes: " + elapsedMsovertime.Seconds.ToString() + " Secs");
                             // OVERPARKING
                             /*
                             if (GetMinutesLeg(Convert.ToInt32(item.Itinerary)) >= 2 && GetMinutesLeg(Convert.ToInt32(item.Itinerary)) < 8)
@@ -482,6 +495,8 @@ namespace CostToInvoiceButton
 
                     }
 
+                    var watchcargapantalla = Stopwatch.StartNew();
+
                     doubleScreen = new DoubleScreen(global, recordContext);
                     DgvInvoice = ((DataGridView)doubleScreen.Controls["dataGridInvoice"]);
                     DgvServicios = ((DataGridView)doubleScreen.Controls["dataGridServicios"]);
@@ -540,9 +555,17 @@ namespace CostToInvoiceButton
                     ((TextBox)doubleScreen.Controls["txtSemeam"]).Text = SeneamCat;
                     ((TextBox)doubleScreen.Controls["txtCreationIncidentDate"]).Text = incidentCreation.ToString();
                     ((ComboBox)doubleScreen.Controls["cboCurrency"]).Text = SRType == "FUEL" ? "MXN" : GetCurrency();
+                    watchcargapantalla.Stop();
+                    var elapsedMswatchcargapantalla = watchcargapantalla.Elapsed;
+                    global.LogMessage("CargaPantallaDoble: " + elapsedMswatchcargapantalla.Seconds.ToString() + " Secs");
+
+                    watch.Stop();
+                    var elapsedMs = watch.Elapsed;
+                    global.LogMessage("Click: " + elapsedMs.TotalSeconds.ToString() + " Secs");
 
                     doubleScreen.ShowDialog();
                 }
+
             }
             catch (Exception ex)
             {
@@ -825,6 +848,7 @@ namespace CostToInvoiceButton
         {
             try
             {
+                var watch = Stopwatch.StartNew();
                 bool open = true;
                 ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
                 APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
@@ -840,7 +864,10 @@ namespace CostToInvoiceButton
                         open = data == "1" ? true : false;
                     }
                 }
+                watch.Stop();
+                var elapsedMs = watch.Elapsed;
 
+                global.LogMessage("AirportOpen24: " + elapsedMs.Seconds.ToString() + " Secs");
                 return open;
             }
             catch (Exception ex)
@@ -855,6 +882,7 @@ namespace CostToInvoiceButton
         {
             try
             {
+                var watch = Stopwatch.StartNew();
                 int arriv = 0;
                 ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
                 APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
@@ -870,6 +898,9 @@ namespace CostToInvoiceButton
                         arriv = String.IsNullOrEmpty(data) ? 0 : Convert.ToInt32(data);
                     }
                 }
+                watch.Stop();
+                var elapsedMs = watch.Elapsed;
+                global.LogMessage("getArrivalAirport: " + elapsedMs.Seconds.ToString() + " Secs");
                 return arriv;
             }
             catch (Exception ex)
@@ -882,6 +913,8 @@ namespace CostToInvoiceButton
         {
             try
             {
+                var watch = Stopwatch.StartNew();
+
                 string opens = "";
                 ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
                 APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
@@ -897,6 +930,9 @@ namespace CostToInvoiceButton
                         opens = data;
                     }
                 }
+                watch.Stop();
+                var elapsedMs = watch.Elapsed;
+                global.LogMessage("getOpenArrivalAirport: " + elapsedMs.Seconds.ToString() + " Secs");
                 return opens;
             }
             catch (Exception ex)
@@ -909,6 +945,7 @@ namespace CostToInvoiceButton
         {
             try
             {
+                var watch = Stopwatch.StartNew();
                 string closes = "";
                 ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
                 APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
@@ -924,6 +961,9 @@ namespace CostToInvoiceButton
                         closes = data;
                     }
                 }
+                watch.Stop();
+                var elapsedMs = watch.Elapsed;
+                global.LogMessage("getCloseArrivalAirport: " + elapsedMs.Seconds.ToString() + " Secs");
                 return closes;
             }
             catch (Exception ex)
@@ -936,6 +976,7 @@ namespace CostToInvoiceButton
         {
             try
             {
+                var watch = Stopwatch.StartNew();
                 string ATA = "";
                 ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
                 APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
@@ -953,6 +994,9 @@ namespace CostToInvoiceButton
                         ATA = substrings[0] + " " + substrings[1];
                     }
                 }
+                watch.Stop();
+                var elapsedMs = watch.Elapsed;
+                global.LogMessage("getATAItinerary: " + elapsedMs.Seconds.ToString() + " Secs");
                 return DateTime.Parse(ATA);
             }
             catch (Exception ex)
@@ -965,6 +1009,7 @@ namespace CostToInvoiceButton
         {
             try
             {
+                var watch = Stopwatch.StartNew();
                 string ATD = "";
                 ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
                 APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
@@ -982,7 +1027,9 @@ namespace CostToInvoiceButton
                         ATD = substrings[0] + " " + substrings[1];
                     }
                 }
-
+                watch.Stop();
+                var elapsedMs = watch.Elapsed;
+                global.LogMessage("getATDItinerary: " + elapsedMs.Seconds.ToString() + " Secs");
                 return DateTime.Parse(ATD);
             }
             catch (Exception ex)
@@ -995,6 +1042,8 @@ namespace CostToInvoiceButton
         {
             try
             {
+                var watch = Stopwatch.StartNew();
+
                 ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
                 APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
                 clientInfoHeader.AppID = "Query Example";
@@ -1024,6 +1073,9 @@ namespace CostToInvoiceButton
                         }
                     }
                 }
+                watch.Stop();
+                var elapsedMs = watch.Elapsed;
+                global.LogMessage("CreateAirNavFee: " + elapsedMs.Seconds.ToString() + " Secs");
             }
             catch (Exception ex)
             {
@@ -1034,6 +1086,9 @@ namespace CostToInvoiceButton
         {
             try
             {
+                var watch = Stopwatch.StartNew();
+
+
                 ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
                 APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
                 clientInfoHeader.AppID = "Query Example";
@@ -1063,6 +1118,9 @@ namespace CostToInvoiceButton
                         }
                     }
                 }
+                watch.Stop();
+                var elapsedMs = watch.Elapsed;
+                global.LogMessage("CreateAirNavICCS: " + elapsedMs.Seconds.ToString() + " Secs");
             }
             catch (Exception ex)
             {
@@ -1073,6 +1131,8 @@ namespace CostToInvoiceButton
         {
             try
             {
+                var watch = Stopwatch.StartNew();
+
                 ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
                 APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
                 clientInfoHeader.AppID = "Query Example";
@@ -1104,6 +1164,10 @@ namespace CostToInvoiceButton
                         }
                     }
                 }
+                watch.Stop();
+                var elapsedMs = watch.Elapsed;
+                global.LogMessage("CreateDeposit: " + elapsedMs.Seconds.ToString() + " Secs");
+
             }
             catch (Exception ex)
             {
@@ -1211,6 +1275,8 @@ namespace CostToInvoiceButton
         {
             try
             {
+                var watch = Stopwatch.StartNew();
+
                 string tipo = "";
                 ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
                 APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
@@ -1356,6 +1422,9 @@ namespace CostToInvoiceButton
                         }
                     }
                 }
+                watch.Stop();
+                var elapsedMs = watch.Elapsed;
+                global.LogMessage("CreateOvers: " + elapsedMs.Seconds.ToString() + " Secs");
             }
             catch (Exception ex)
             {
@@ -1395,6 +1464,8 @@ namespace CostToInvoiceButton
         {
             try
             {
+                var watch = Stopwatch.StartNew();
+
                 double feeper = GetSeneamPercentage(SENCat);
                 ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
                 APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
@@ -1431,6 +1502,9 @@ namespace CostToInvoiceButton
                         }
                     }
                 }
+                watch.Stop();
+                var elapsedMs = watch.Elapsed;
+                global.LogMessage("CreateSENEAMFee: " + elapsedMs.Seconds.ToString() + " Secs");
             }
             catch (Exception ex)
             {
@@ -1471,6 +1545,9 @@ namespace CostToInvoiceButton
         {
             try
             {
+
+                var watch = Stopwatch.StartNew();
+
                 List<Services> services = new List<Services>();
                 ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
                 APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
@@ -1511,6 +1588,10 @@ namespace CostToInvoiceButton
                         service.Tax = substrings[18];
                         service.InvoiceReady = substrings[19] == "1" ? "Yes" : "No";
                         service.Quantity = substrings[20];
+                        if (service.ItemNumber == "IPFERPS0052")
+                        {
+                            service.Quantity = GetPaxIbound(service.ID);
+                        }
                         service.CostCurrency = substrings[21];
                         service.TotalCost = substrings[22];
                         service.PriceCurrency = substrings[23];
@@ -1519,6 +1600,9 @@ namespace CostToInvoiceButton
                         services.Add(service);
                     }
                 }
+                watch.Stop();
+                var elapsedMs = watch.Elapsed;
+                global.LogMessage("GetListServices: " + elapsedMs.Seconds.ToString() + " Secs");
                 return services;
             }
             catch (Exception ex)
@@ -1527,10 +1611,39 @@ namespace CostToInvoiceButton
                 return null;
             }
         }
+
+        public string GetPaxIbound(string serviceid)
+        {
+            try
+            {
+                string paxin = "";
+                ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
+                APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
+                clientInfoHeader.AppID = "Query Example";
+                String queryString = "SELECT PaxInbound FROM CO.Services WHERE ID =  " + serviceid;
+                clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 10000, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
+                foreach (CSVTable table in queryCSV.CSVTables)
+                {
+                    String[] rowData = table.Rows;
+                    foreach (String data in rowData)
+                    {
+                        paxin = data;
+                    }
+                }
+                return paxin;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("GetPaxIbound: " + ex.Message + "Detail: " + ex.StackTrace);
+                return "";
+            }
+        }
+
         public void GetDeleteFuelItems()
         {
             try
             {
+                var watch = Stopwatch.StartNew();
 
                 ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
                 APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
@@ -1548,6 +1661,9 @@ namespace CostToInvoiceButton
                         }
                     }
                 }
+                watch.Stop();
+                var elapsedMs = watch.Elapsed;
+                global.LogMessage("GetDeleteFuelItems: " + elapsedMs.Seconds.ToString() + " Secs");
             }
             catch (Exception ex)
             {
@@ -1558,7 +1674,7 @@ namespace CostToInvoiceButton
         {
             try
             {
-
+                var watch = Stopwatch.StartNew();
                 ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
                 APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
                 clientInfoHeader.AppID = "Query Example";
@@ -1575,6 +1691,9 @@ namespace CostToInvoiceButton
                         }
                     }
                 }
+                watch.Stop();
+                var elapsedMs = watch.Elapsed;
+                global.LogMessage("GetDeleteMCreated: " + elapsedMs.Seconds.ToString() + " Secs");
             }
             catch (Exception ex)
             {
@@ -1585,6 +1704,7 @@ namespace CostToInvoiceButton
         {
             try
             {
+                var watch = Stopwatch.StartNew();
 
                 ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
                 APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
@@ -1602,6 +1722,9 @@ namespace CostToInvoiceButton
                         }
                     }
                 }
+                watch.Stop();
+                var elapsedMs = watch.Elapsed;
+                global.LogMessage("GetDeleteGF_PF: " + elapsedMs.Seconds.ToString() + " Secs");
             }
             catch (Exception ex)
             {
@@ -2109,6 +2232,8 @@ namespace CostToInvoiceButton
         {
             try
             {
+                var watch = Stopwatch.StartNew();
+
                 string SRTYPE = "";
                 if (IncidentID != 0)
                 {
@@ -2150,6 +2275,9 @@ namespace CostToInvoiceButton
                         SRTYPE = "PERMISOS";
                         break;
                 }
+                watch.Stop();
+                var elapsedMs = watch.Elapsed;
+                global.LogMessage("GetSRType: " + elapsedMs.Seconds.ToString() + " Secs");
                 return SRTYPE;
             }
             catch (Exception ex)
@@ -2196,6 +2324,8 @@ namespace CostToInvoiceButton
         {
             try
             {
+                var watch = Stopwatch.StartNew();
+
                 string Arrival = "";
                 ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
                 APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
@@ -2210,6 +2340,9 @@ namespace CostToInvoiceButton
                         Arrival = data.Replace("-", "_");
                     }
                 }
+                watch.Stop();
+                var elapsedMs = watch.Elapsed;
+                global.LogMessage("GetArrivalAirportIncident: " + elapsedMs.Seconds.ToString() + " Secs");
                 return Arrival;
             }
             catch (Exception ex)
@@ -2222,6 +2355,8 @@ namespace CostToInvoiceButton
         {
             try
             {
+                var watch = Stopwatch.StartNew();
+
                 string Departure = "";
                 ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
                 APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
@@ -2236,6 +2371,9 @@ namespace CostToInvoiceButton
                         Departure = data.Replace("-", "_");
                     }
                 }
+                watch.Stop();
+                var elapsedMs = watch.Elapsed;
+                global.LogMessage("GetDepartureAirportIncident: " + elapsedMs.Seconds.ToString() + " Secs");
                 return Departure;
             }
             catch (Exception ex)
@@ -2248,6 +2386,8 @@ namespace CostToInvoiceButton
         {
             try
             {
+                var watch = Stopwatch.StartNew();
+
                 string clase = "";
                 ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
                 APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
@@ -2262,6 +2402,9 @@ namespace CostToInvoiceButton
                         clase = data;
                     }
                 }
+                watch.Stop();
+                var elapsedMs = watch.Elapsed;
+                global.LogMessage("getCustomerClass: " + elapsedMs.Seconds.ToString() + " Secs");
                 return clase;
             }
             catch (Exception ex)
@@ -2274,6 +2417,7 @@ namespace CostToInvoiceButton
         {
             try
             {
+                var watch = Stopwatch.StartNew();
                 string Icao = "";
                 ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
                 APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
@@ -2288,6 +2432,10 @@ namespace CostToInvoiceButton
                         Icao = data;
                     }
                 }
+                watch.Stop();
+                var elapsedMs = watch.Elapsed;
+                global.LogMessage("getICAODesi: " + elapsedMs.Seconds.ToString() + " Secs");
+
                 return Icao;
             }
             catch (Exception ex)
@@ -2300,6 +2448,8 @@ namespace CostToInvoiceButton
         {
             try
             {
+                var watch = Stopwatch.StartNew();
+
                 string Type = "";
                 ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
                 APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
@@ -2314,6 +2464,9 @@ namespace CostToInvoiceButton
                         Type = data;
                     }
                 }
+                watch.Stop();
+                var elapsedMs = watch.Elapsed;
+                global.LogMessage("GetFuelType: " + elapsedMs.Seconds.ToString() + " Secs");
                 return Type;
             }
             catch (Exception ex)
@@ -2357,6 +2510,9 @@ namespace CostToInvoiceButton
         }
         public void GetFuelData(string ClientType, string FuelType, int Itinerar, string Air)
         {
+            var watch = Stopwatch.StartNew();
+
+
             string[] LookCountry = new string[2];
 
             if (SRType == "FUEL")
@@ -2426,6 +2582,9 @@ namespace CostToInvoiceButton
                         }
                     }
                 }
+                watch.Stop();
+                var elapsedMs = watch.Elapsed;
+                global.LogMessage("GetFuelData: " + elapsedMs.Seconds.ToString() + " Secs");
             }
             catch (Exception ex)
             {
@@ -2436,6 +2595,7 @@ namespace CostToInvoiceButton
         {
             try
             {
+                var watch = Stopwatch.StartNew();
                 string[] LookCountry = new string[2];
                 string ItemN = "AFMURAS0016";
                 if (SRType == "FUEL")
@@ -2494,6 +2654,9 @@ namespace CostToInvoiceButton
                         }
                     }
                 }
+                watch.Stop();
+                var elapsedMs = watch.Elapsed;
+                global.LogMessage("CreateFuelMinimun: " + elapsedMs.Seconds.ToString() + " Secs");
             }
             catch (Exception ex)
             {
@@ -2670,6 +2833,8 @@ namespace CostToInvoiceButton
         {
             try
             {
+                var watch = Stopwatch.StartNew();
+
                 string cGroup = "";
                 ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
                 APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
@@ -2684,6 +2849,9 @@ namespace CostToInvoiceButton
                         cGroup = data;
                     }
                 }
+                watch.Stop();
+                var elapsedMs = watch.Elapsed;
+                global.LogMessage("GetCargoGroup: " + elapsedMs.Seconds.ToString() + " Secs");
                 return cGroup;
             }
             catch (Exception ex)
@@ -2696,6 +2864,8 @@ namespace CostToInvoiceButton
         {
             try
             {
+                var watch = Stopwatch.StartNew();
+
                 string pGroup = "";
                 ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
                 APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
@@ -2710,7 +2880,11 @@ namespace CostToInvoiceButton
                         pGroup = data;
                     }
                 }
+                watch.Stop();
+                var elapsedMs = watch.Elapsed;
+                global.LogMessage("GetPaxGroup: " + elapsedMs.Seconds.ToString() + " Secs");
                 return pGroup;
+
             }
             catch (Exception ex)
             {
@@ -2722,6 +2896,8 @@ namespace CostToInvoiceButton
         {
             try
             {
+                var watch = Stopwatch.StartNew();
+
                 List<Services> services = new List<Services>();
                 ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
                 APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
@@ -2762,11 +2938,14 @@ namespace CostToInvoiceButton
                         else
                         {
                             price = getPaxPrice(item.ID, out cur, true);
-
                             UpdatePaxPrice(item.ID, price, curcambio);
                         }
                     }
+
                 }
+                watch.Stop();
+                var elapsedMs = watch.Elapsed;
+                global.LogMessage("UpdatePackageCost: " + elapsedMs.Seconds.ToString() + " Secs");
             }
             catch (Exception ex)
             {

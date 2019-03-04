@@ -17,7 +17,7 @@ using System.ServiceModel;
 using System.ServiceModel.Channels;
 using RightNow.AddIns.AddInViews;
 using CostToInvoiceButton.SOAPICCS;
-
+using System.Diagnostics;
 
 namespace CostToInvoiceButton
 {
@@ -55,7 +55,7 @@ namespace CostToInvoiceButton
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.InnerException.ToString());
+                global.LogMessage("Error al cargar Pantalla Doble: " + ex.Message + "Det: " + ex.StackTrace);
             }
         }
         private void dataGridServicios_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
@@ -83,7 +83,6 @@ namespace CostToInvoiceButton
                     lblTotalCostFuel.Hide();
                     txtGalones.Hide();
                     txtTotalCostFuel.Hide();
-
                     dataGridSuppliers.DataSource = null;
                     dataGridSuppliers.Update();
                     txtInvoiceReady.Text = dataGridServicios.Rows[e.RowIndex].Cells["InvoiceReady"].Value.ToString() == "Yes" ? "1" : "0";
@@ -237,7 +236,7 @@ namespace CostToInvoiceButton
                             double priceFinal = 0;
                             //try
                             //{
-                                priceFinal = getPrices();
+                            priceFinal = getPrices();
                             //}
                             //catch (Exception ex)
                             //{
@@ -406,7 +405,8 @@ namespace CostToInvoiceButton
                         double b;
                         if (double.TryParse(txtCost.Text, out b))
                         {
-                            double hr = GetMinutesLeg();
+
+                            double hr = Math.Round(GetMinutesLeg() / 60, 0, MidpointRounding.AwayFromZero);
                             MessageBox.Show("Horas en AIRCRAFT SECURITY: " + hr.ToString());
                             double hXper = 24;
                             if (txtCustomerClass.Text == "ASI_SECURITY")
@@ -1150,8 +1150,8 @@ namespace CostToInvoiceButton
         }
         private void getAllSuppliers()
         {
-            //cboSuppliers.DataSource = null;
-            //cboSuppliers.Enabled = false;
+            var watch = Stopwatch.StartNew();
+            string organization = GetOrganization().Replace("-", "_");
             try
             {
 
@@ -1167,10 +1167,20 @@ namespace CostToInvoiceButton
     "				<pub:attributeTemplate></pub:attributeTemplate>" +
     "				<pub:reportAbsolutePath>Custom/Integracion/XX_ITEM_SUPPLIER_ORG_REP.xdo</pub:reportAbsolutePath>" +
     "				<pub:sizeOfDataChunkDownload>-1</pub:sizeOfDataChunkDownload>" +
+    "               <pub:parameterNameValues>" +
+                    "<pub:item>" +
+                        "<pub:name>pAereo</pub:name>" +
+                        "<pub:values>" +
+                            "<pub:item>IO_AEREO_" + organization + "</pub:item>" +
+                        "</pub:values>" +
+                    "</pub:item>" +
+                "</pub:parameterNameValues>" +
+
     "			</pub:reportRequest>" +
     "		</pub:runReport>" +
     "	</soap:Body>" +
     "</soap:Envelope>";
+                global.LogMessage("GetAllSupps: " + envelope);
                 byte[] byteArray = Encoding.UTF8.GetBytes(envelope);
                 // Construct the base 64 encoded string used as credentials for the service call
                 byte[] toEncodeAsBytes = ASCIIEncoding.ASCII.GetBytes("itotal" + ":" + "Oracle123");
@@ -1234,12 +1244,36 @@ namespace CostToInvoiceButton
                     }
                 }
 
+                watch.Stop();
+                var elapsedMs = watch.Elapsed;
+                global.LogMessage("GetSuppliers: " + elapsedMs.TotalSeconds.ToString() + " Secs");
             }
             catch (Exception ex)
             {
                 MessageBox.Show("GetSupliers" + ex.Message + "DEtalle: " + ex.StackTrace);
             }
         }
+
+        private string GetOrganization()
+        {
+            try
+            {
+                string org = "";
+
+                foreach (DataGridViewRow dgvRenglon in dataGridServicios.Rows)
+                {
+                    org = dgvRenglon.Cells["Airport"].Value.ToString();
+                }
+                return org;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("GetOrganization: " + ex.Message + "Det: " + ex.StackTrace);
+                return "";
+            }
+
+        }
+
         private double getExchangeRate(DateTime date)
         {
             try
@@ -1647,10 +1681,12 @@ namespace CostToInvoiceButton
                         {
                             definicion += "str_item_number:'" + txtItemNumber.Text + "',str_icao_iata_code:'" + txtAirport.Text + "',bol_int_flight_cargo:" + cargo.ToString() + ",str_schedule_type:'" + txtMainHour.Text + "',str_aircraft_type:'" + txtICAOD.Text + "',str_ft_arrival: '" + arr_type.ToString() + "', str_ft_depart: '" + dep_type.ToString() + "',$or:[{str_client_category:{$exists:false}},{str_client_category:'" + txtCustomerClass.Text.Replace("&", "%") + "'}]}";
                         }
-                        else if (txtItemNumber.Text == "ASECSAS0073")
+
+                        /*else if (txtItemNumber.Text == "ASECSAS0073")
                         {
                             definicion += "str_item_number:'" + txtItemNumber.Text + "',str_icao_iata_code:'" + txtAirport.Text + "',str_client_category:'ASI_SECURITY'} ";
-                        }
+                        }*/
+
                         else if (txtItemNumber.Text == "IPFERPS0052")
                         {
                             //definicion = "?totalResults=true&q={str_item_number:'" + txtItemNumber.Text + "',str_icao_iata_code:'" + txtAirport.Text + "',str_aircraft_type:'" + txtICAOD.Text + "'}";
@@ -1829,7 +1865,7 @@ namespace CostToInvoiceButton
             }
             string Curr = "";
             double price = 0;
-            
+
             try
             {
                 var client = new RestClient("https://iccs.bigmachines.com/");
@@ -1977,6 +2013,7 @@ namespace CostToInvoiceButton
                                 Curr = item.str_currency_code;
                                 uomPayable = item.str_oum_code;
                                 string cClass = "";
+                                lblCurrencyPrice.Text = Curr;
                                 cClass = string.IsNullOrEmpty(item.str_client_category) ? "" : item.str_client_category.Trim();
                                 global.LogMessage("Clase: " + cClass);
                                 if (txtCustomerClass.Text == cClass.Trim())

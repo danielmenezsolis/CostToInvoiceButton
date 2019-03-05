@@ -343,10 +343,11 @@ namespace CostToInvoiceButton
                                 }
                             }
 
-                            var watchovertime = Stopwatch.StartNew();
                             double minover = 0;
                             double antelacion = 0;
                             double extension = 0;
+                            var watchovertime = Stopwatch.StartNew();
+
                             if (AirportOpen24(Convert.ToInt32(item.Itinerary)) != false)
                             {
                                 int arrival = getArrivalAirport(Convert.ToInt32(item.Itinerary));
@@ -386,6 +387,9 @@ namespace CostToInvoiceButton
                                             extension = 0;
                                         }
                                     }*/
+
+
+
                                     global.LogMessage("Después de validar día.\nExtensión: " + extension.ToString());
                                     if (extension > 0)
                                     {
@@ -402,36 +406,43 @@ namespace CostToInvoiceButton
                                         if (antelacion > 0 && extension == 0)
                                         {
                                             overtimearrival = true;
-                                            MessageBox.Show("OVERTIME ARRIVAL detected");//: " + antelacion + " minutes.");
+                                            // MessageBox.Show("OVERTIME ARRIVAL detected");//: " + antelacion + " minutes.");
                                         }
                                         else if (extension > 0 && antelacion == 0)
                                         {
                                             overtimedeparture = true;
-                                            MessageBox.Show("OVERTIME DEPARTURE detected");//: " + extension + " minutes.");
+                                            //MessageBox.Show("OVERTIME DEPARTURE detected");//: " + extension + " minutes.");
                                         }
                                         else
                                         {
                                             overtimearridepart = true;
-                                            MessageBox.Show("OVERTIME ARRIVAL & DEPARTURE detected");//: " + minover + " minutes.");
+                                            //MessageBox.Show("OVERTIME ARRIVAL & DEPARTURE detected");//: " + minover + " minutes.");
                                         }
                                     }
+
+
+
                                 }
                             }
+                            watchovertime.Stop();
+                            var elapsedMsovertime = watchovertime.Elapsed;
+                            global.LogMessage("Calculo Overtimes: " + elapsedMsovertime.Seconds.ToString() + " Secs");
                             // OVERPARKING Message
-                            if (GetMinutesLeg(Convert.ToInt32(item.Itinerary)) >= 2 && GetMinutesLeg(Convert.ToInt32(item.Itinerary)) < 8)
+                            double minutesleg = GetMinutesLeg(Convert.ToInt32(item.Itinerary));
+
+                            if (minutesleg >= 2 && minutesleg < 8)
                             {
                                 overparking = true;
-                                MessageBox.Show("OVERPARKING detected.");
+                                //MessageBox.Show("OVERPARKING detected.");
 
                             }
-                            else if (GetMinutesLeg(Convert.ToInt32(item.Itinerary)) > 8)
+                            else if (minutesleg > 8)
                             {
                                 overnight = true;
-                                MessageBox.Show("OVERNIGHT detected.");
+                                //MessageBox.Show("OVERNIGHT detected.");
                             }
-                            watchovertime.Stop();
-                            var elapsedMsovertime = watch.Elapsed;
-                            global.LogMessage("Calculo Overtimes: " + elapsedMsovertime.Seconds.ToString() + " Secs");
+
+
                             // OVERPARKING
                             /*
                             if (GetMinutesLeg(Convert.ToInt32(item.Itinerary)) >= 2 && GetMinutesLeg(Convert.ToInt32(item.Itinerary)) < 8)
@@ -535,10 +546,12 @@ namespace CostToInvoiceButton
                     DgvInvoice.ReadOnly = false;
 
                     DgvServicios.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.DisplayedCells;
+                    string cur = GetCurrency();
+                    string refnum = GetReferenceNumber();
                     ((System.Windows.Forms.Label)doubleScreen.Controls["lblSrType"]).Text = SRType.ToUpper();
                     ((System.Windows.Forms.Label)doubleScreen.Controls["lblIdIncident"]).Text = IncidentID.ToString();
-                    ((System.Windows.Forms.Label)doubleScreen.Controls["lblCurrencyPrice"]).Text = GetCurrency();
-                    ((System.Windows.Forms.Label)doubleScreen.Controls["lblSrNum"]).Text = GetReferenceNumber();
+                    ((System.Windows.Forms.Label)doubleScreen.Controls["lblCurrencyPrice"]).Text = cur;
+                    ((System.Windows.Forms.Label)doubleScreen.Controls["lblSrNum"]).Text = refnum;
                     ((TextBox)doubleScreen.Controls["txtUtilidad"]).Text = Utilidad;
                     ((TextBox)doubleScreen.Controls["txtClientName"]).Text = ClientName;
                     ((TextBox)doubleScreen.Controls["txtRoyalty"]).Text = Royalty;
@@ -554,7 +567,7 @@ namespace CostToInvoiceButton
                     ((TextBox)doubleScreen.Controls["txtDepartureIncident"]).Text = DepartureAirportIncident;
                     ((TextBox)doubleScreen.Controls["txtSemeam"]).Text = SeneamCat;
                     ((TextBox)doubleScreen.Controls["txtCreationIncidentDate"]).Text = incidentCreation.ToString();
-                    ((ComboBox)doubleScreen.Controls["cboCurrency"]).Text = SRType == "FUEL" ? "MXN" : GetCurrency();
+                    ((ComboBox)doubleScreen.Controls["cboCurrency"]).Text = SRType == "FUEL" ? "MXN" : cur;
                     watchcargapantalla.Stop();
                     var elapsedMswatchcargapantalla = watchcargapantalla.Elapsed;
                     global.LogMessage("CargaPantallaDoble: " + elapsedMswatchcargapantalla.Seconds.ToString() + " Secs");
@@ -580,6 +593,7 @@ namespace CostToInvoiceButton
         {
             try
             {
+
                 bool result = false;
                 EndpointAddress endPointAddr = new EndpointAddress(global.GetInterfaceServiceUrl(ConnectServiceType.Soap));
                 BasicHttpBinding binding = new BasicHttpBinding(BasicHttpSecurityMode.TransportWithMessageCredential);
@@ -608,6 +622,7 @@ namespace CostToInvoiceButton
         {
             try
             {
+                var watch = Stopwatch.StartNew();
                 string Reference = "";
                 ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
                 APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
@@ -622,6 +637,9 @@ namespace CostToInvoiceButton
                         Reference = data;
                     }
                 }
+                watch.Stop();
+                var elapsedMs = watch.Elapsed;
+                global.LogMessage("GetReferenceNumber: " + elapsedMs.TotalSeconds.ToString() + " Secs");
                 return Reference;
             }
             catch (Exception ex)
@@ -635,6 +653,7 @@ namespace CostToInvoiceButton
         {
             try
             {
+                var watch = Stopwatch.StartNew();
                 double minutes = 0;
                 ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
                 APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
@@ -658,6 +677,9 @@ namespace CostToInvoiceButton
                     }
                 }
                 TimeSpan t = TimeSpan.FromMinutes(minutes);
+                watch.Stop();
+                var elapsedMs = watch.Elapsed;
+                global.LogMessage("GetMinutesLeg: " + elapsedMs.TotalSeconds.ToString() + " Secs");
                 return Math.Ceiling(t.TotalHours);
             }
             catch (Exception ex)
@@ -668,6 +690,7 @@ namespace CostToInvoiceButton
         }
         public string GetCurrency()
         {
+            var watch = Stopwatch.StartNew();
             string cur = "";
             ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
             APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
@@ -682,12 +705,16 @@ namespace CostToInvoiceButton
                     cur = data;
                 }
             }
+            watch.Stop();
+            var elapsedMs = watch.Elapsed;
+            global.LogMessage("GetCurrency: " + elapsedMs.TotalSeconds.ToString() + " Secs");
             return cur;
         }
         public string GetFirstAirport()
         {
             try
             {
+                var watch = Stopwatch.StartNew();
                 string air = "";
                 ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
                 APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
@@ -702,6 +729,9 @@ namespace CostToInvoiceButton
                         air = data.Replace("-", "_");
                     }
                 }
+                watch.Stop();
+                var elapsedMs = watch.Elapsed;
+                global.LogMessage("GetFirstAirport: " + elapsedMs.TotalSeconds.ToString() + " Secs");
                 return air;
             }
             catch (Exception ex)
@@ -714,6 +744,8 @@ namespace CostToInvoiceButton
         {
             try
             {
+
+                var watch = Stopwatch.StartNew();
                 string air = "";
                 ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
                 APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
@@ -728,7 +760,9 @@ namespace CostToInvoiceButton
                         air = data.Replace("-", "_");
                     }
                 }
-                MessageBox.Show("Airport: " + air);
+                watch.Stop();
+                var elapsedMs = watch.Elapsed;
+                global.LogMessage("getAirportById: " + elapsedMs.TotalSeconds.ToString() + " Secs");
                 return air;
             }
             catch (Exception ex)
@@ -2347,6 +2381,7 @@ namespace CostToInvoiceButton
                 watch.Stop();
                 var elapsedMs = watch.Elapsed;
                 global.LogMessage("GetArrivalAirportIncident: " + elapsedMs.Seconds.ToString() + " Secs");
+
                 return Arrival;
             }
             catch (Exception ex)

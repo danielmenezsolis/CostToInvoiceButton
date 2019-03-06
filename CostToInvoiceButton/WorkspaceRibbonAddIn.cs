@@ -387,9 +387,6 @@ namespace CostToInvoiceButton
                                             extension = 0;
                                         }
                                     }*/
-
-
-
                                     global.LogMessage("Después de validar día.\nExtensión: " + extension.ToString());
                                     if (extension > 0)
                                     {
@@ -572,9 +569,9 @@ namespace CostToInvoiceButton
                     var elapsedMswatchcargapantalla = watchcargapantalla.Elapsed;
                     global.LogMessage("CargaPantallaDoble: " + elapsedMswatchcargapantalla.Seconds.ToString() + " Secs");
 
-                    watch.Stop();
-                    var elapsedMs = watch.Elapsed;
-                    global.LogMessage("Click: " + elapsedMs.TotalSeconds.ToString() + " Secs");
+                        watch.Stop();
+                        var elapsedMs = watch.Elapsed;
+                        global.LogMessage("Click: " + elapsedMs.TotalSeconds.ToString() + " Secs");
 
                     doubleScreen.ShowDialog();
                 }
@@ -594,6 +591,7 @@ namespace CostToInvoiceButton
             try
             {
 
+                var watch = Stopwatch.StartNew();
                 bool result = false;
                 EndpointAddress endPointAddr = new EndpointAddress(global.GetInterfaceServiceUrl(ConnectServiceType.Soap));
                 BasicHttpBinding binding = new BasicHttpBinding(BasicHttpSecurityMode.TransportWithMessageCredential);
@@ -610,6 +608,9 @@ namespace CostToInvoiceButton
                 {
                     result = true;
                 }
+                watch.Stop();
+                var elapsedMs = watch.Elapsed;
+                global.LogMessage("Init: " + elapsedMs.TotalSeconds.ToString() + " Secs");
                 return result;
             }
             catch (Exception ex)

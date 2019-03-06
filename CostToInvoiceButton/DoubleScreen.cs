@@ -44,6 +44,16 @@ namespace CostToInvoiceButton
         double airportfee = 0;
         double deductionfee = 0;
         string uomPayable = "SER";
+
+        //FCC/FBOData
+        public string ItineraryId { get; set; }
+        public string arr_type { get; set; }
+        public string dep_type { get; set; }
+        public string AiportOrg { get; set; }
+        public string IsFBO { get; set; }
+        public string IsCargo { get; set; }
+
+
         public DoubleScreen(IGlobalContext globalContext, IRecordContext record)
         {
             try
@@ -62,6 +72,7 @@ namespace CostToInvoiceButton
         {
             try
             {
+                var watch = Stopwatch.StartNew();
                 Cursor.Current = Cursors.WaitCursor;
                 // txtUOM.Text = "";
                 if (e.RowIndex != -1)
@@ -85,6 +96,7 @@ namespace CostToInvoiceButton
                     txtTotalCostFuel.Hide();
                     dataGridSuppliers.DataSource = null;
                     dataGridSuppliers.Update();
+                    cboCurrency.Text = dataGridServicios.Rows[e.RowIndex].Cells["CostCurrency"].Value.ToString();
                     txtInvoiceReady.Text = dataGridServicios.Rows[e.RowIndex].Cells["InvoiceReady"].Value.ToString() == "Yes" ? "1" : "0";
                     txtIdService.Text = dataGridServicios.Rows[e.RowIndex].Cells["ID"].Value.ToString();
                     txtItinerary.Text = dataGridServicios.Rows[e.RowIndex].Cells["Itinerary"].Value.ToString();
@@ -181,7 +193,7 @@ namespace CostToInvoiceButton
                         {
                             lblExchangeRate.Show();
                             txtExchangeRate.Show();
-                            txtExchangeRate.Text = getExchangeRateSemanal(DateTime.Parse(txtATA.Text)).ToString();
+                            //txtExchangeRate.Text = getExchangeRateSemanal(DateTime.Parse(txtATA.Text)).ToString();
                         }
                     }
                     if (lblSrType.Text == "FUEL")
@@ -253,11 +265,12 @@ namespace CostToInvoiceButton
                         blnPriceSet = true;
                     }
 
-                    global.LogMessage("Price: " + blnPriceSet.ToString() + "Cost: " + blnCostSet.ToString() + "PriceCost" + PriceCostValueSet);
+                    //global.LogMessage("Price: " + blnPriceSet.ToString() + "Cost: " + blnCostSet.ToString() + "PriceCost" + PriceCostValueSet);
 
                     if (blnCostSet && blnPriceSet)
                     {
                         PriceCostValueSet = true;
+
                         return;
                     }
 
@@ -481,6 +494,9 @@ namespace CostToInvoiceButton
 
 
                     Cursor.Current = Cursors.Default;
+                    watch.Stop();
+                    var elapsedMs = watch.Elapsed;
+                    global.LogMessage("ServiceDobleClic: " + elapsedMs.TotalSeconds.ToString() + " Secs");
                 }
             }
             catch (Exception ex)
@@ -1151,7 +1167,7 @@ namespace CostToInvoiceButton
         private void getAllSuppliers()
         {
             var watch = Stopwatch.StartNew();
-            string organization = GetOrganization().Replace("-", "_");
+            AiportOrg = GetOrganization().Replace("-", "_");
             try
             {
 
@@ -1171,7 +1187,7 @@ namespace CostToInvoiceButton
                     "<pub:item>" +
                         "<pub:name>pAereo</pub:name>" +
                         "<pub:values>" +
-                            "<pub:item>IO_AEREO_" + organization + "</pub:item>" +
+                            "<pub:item>IO_AEREO_" + AiportOrg + "</pub:item>" +
                         "</pub:values>" +
                     "</pub:item>" +
                 "</pub:parameterNameValues>" +
@@ -1835,9 +1851,9 @@ namespace CostToInvoiceButton
         }
         private double getPrices()
         {
-            global.LogMessage("EntraGetPrices");
-            string arr_type = "DOMESTIC";
-            string dep_type = "DOMESTIC";
+
+            arr_type = "DOMESTIC";
+            dep_type = "DOMESTIC";
             if (lblSrType.Text == "FBO" || lblSrType.Text == "FCC")
             {
                 ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
@@ -2083,6 +2099,8 @@ namespace CostToInvoiceButton
                     blnPriceSet = false;
                     price = Convert.ToDouble(txtPrice.Text);
                 }
+
+
                 return price;
             }
             catch (Exception ex)
@@ -3546,10 +3564,68 @@ namespace CostToInvoiceButton
                 return null;
             }
         }
+
+        private void GetPrimaryData()
+        {
+
+            foreach (DataGridViewRow dgvRenglon in dataGridServicios.Rows)
+            {
+                AiportOrg = "IO_AEREO_" + dgvRenglon.Cells["Airport"].Value.ToString().Replace("-", "_");
+                ItineraryId = dgvRenglon.Cells["Itinerary"].Value.ToString();
+            }
+            arr_type = "DOMESTIC";
+            dep_type = "DOMESTIC";
+            ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
+            APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
+            clientInfoHeader.AppID = "Query Example";
+            String queryString = "SELECT ToAirport.Country.LookupName,FromAirport.Country.LookupName FROM CO.Itinerary WHERE ID = " + ItineraryId;
+            clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 1, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
+            foreach (CSVTable table in queryCSV.CSVTables)
+            {
+                String[] rowData = table.Rows;
+                foreach (String data in rowData)
+                {
+                    Char delimiter = '|';
+                    string[] substrings = data.Split(delimiter);
+                    if (substrings[1] != "MX")
+                    {
+                        arr_type = "INTERNATIONAL";
+                    }
+                    if (substrings[0] != "MX")
+                    {
+                        dep_type = "INTERNATIONAL";
+                    }
+                }
+            }
+
+            GetItineraryHours(Convert.ToInt32(ItineraryId));
+            txtMainHour.Text = GetMainHourFBOFCC(txtATA.Text, txtATD.Text);
+            IsFBO = GetFBOValue(Convert.ToInt32(ItineraryId)) == "Yes" ? "1" : "0";
+            IsCargo = isCargo() ? "1" : "0";
+            txtExchangeRate.Text = getExchangeRateSemanal(DateTime.Parse(txtATA.Text)).ToString();
+            string definicion = "?totalResults=true&q={bol_int_fbo:" + IsFBO;
+            definicion += ",str_ft_arrival:'" + arr_type + "'";
+            definicion += ",str_ft_depart:'" + dep_type + "'";
+            definicion += ",str_schedule_type:'" + txtMainHour.Text + "'";
+            definicion += ",bol_int_flight_cargo:" + IsCargo;
+            definicion += ",$or:[{str_client_category:{$exists:false}},{str_client_category:'" + txtCustomerClass.Text.Replace("&", "%") + "'}]";
+            definicion += ",$and:[{$or:[{str_icao_iata_code:'" + AiportOrg + "'},{str_icao_iata_code:{$exists:false}}]},";
+            definicion += "{$or:[{str_aircraft_type:'" + txtICAOD.Text + "'},{str_aircraft_type:{$exists:false}}]}]}";
+
+            global.LogMessage("DefinicionInicialPrecios: " + definicion);
+        }
+
         private void DoubleScreen_Load(object sender, EventArgs e)
         {
+            if (lblSrType.Text == "FCC" || lblSrType.Text == "FBO")
+            {
+                GetPrimaryData();
+            }
             getAllSuppliers();
         }
+
+
+
         private void txtCost_TextChanged(object sender, EventArgs e)
         {
 

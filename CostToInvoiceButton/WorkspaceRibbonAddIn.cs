@@ -49,53 +49,44 @@ namespace CostToInvoiceButton
         public bool overtimearridepart { get; set; }
         public bool overtimedeparture { get; set; }
         public bool overtimearrival { get; set; }
-
+        public string Utilidad { get; set; }
+        public string Royalty { get; set; }
+        public string Combustible { get; set; }
+        public string CombustibleI { get; set; }
+        public string SENEAM { get; set; }
+        public string SeneamCat { get; set; }
+        public string ICAO { get; set; }
+        public string ClientType { get; set; }
+        public string FuelType { get; set; }
+        public string CateringDeliveryDate { get; set; }
+        public string AircraftCategory { get; set; }
+        public string AircraftPCategory { get; set; }
 
         public WorkspaceRibbonAddIn(bool inDesignMode, IRecordContext RecordContext, IGlobalContext globalContext)
         {
             if (inDesignMode == false)
             {
+                var watch = Stopwatch.StartNew();
                 global = globalContext;
                 recordContext = RecordContext;
-                this.inDesignMode = inDesignMode;
-                //RecordContext.Saving += new CancelEventHandler(RecordContext_Saving);
+                watch.Stop();
+                var elapsedMs = watch.Elapsed;
+                global.LogMessage("SuperInicio: " + elapsedMs.TotalMilliseconds + " MiliSecs");
+
             }
         }
-        private void RecordContext_Saving(object sender, CancelEventArgs e)
-        {
-            try
-            {
-                //Init();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("RecordContext_Saving" + ex.Message + " Det :" + ex.StackTrace);
-                throw ex;
-            }
-        }
+
         public new void Click()
         {
             try
             {
                 if (Init())
                 {
-
                     var watch = Stopwatch.StartNew();
+                    var watchdatos = Stopwatch.StartNew();
                     ClientName = "";
-                    string Utilidad = "";
-                    string Royalty = "";
-                    string Combustible = "";
-                    string CombustibleI = "";
-                    string SENEAM = "";
-                    string SeneamCat = "";
-                    string ICAO = "";
-                    string ClientType = "";
-                    string FuelType = "";
-                    string CateringDeliveryDate = "";
-                    string AircraftCategory = "";
-                    string AircraftPCategory = "";
                     cClass = "";
-                    pswCPQ = getPassword("CPQ");
+                    
                     Incident = (IIncident)recordContext.GetWorkspaceRecord(WorkspaceRecordType.Incident);
                     IList<ICfVal> IncCustomFieldList = Incident.CustomField;
                     DateTime? incidentCreation = Incident.Created;
@@ -133,7 +124,10 @@ namespace CostToInvoiceButton
                             }
                         }
                     }
+
+
                     IncidentID = Incident.ID;
+                    pswCPQ = getPassword("CPQ");
                     ICAO = getICAODesi(IncidentID);
                     cClass = getCustomerClass(IncidentID);
                     if (cClass == "")
@@ -146,8 +140,12 @@ namespace CostToInvoiceButton
                     AircraftPCategory = GetPaxGroup(ICAO);
                     ClientType = GetClientType();
                     FuelType = GetFuelType(IncidentID);
-                    // GetDeleteMCreated();
-                    // CreateChildComponents();
+
+
+                    watchdatos.Stop();
+                    var watchdatostime = watchdatos.Elapsed;
+                    global.LogMessage("Datos: " + watchdatostime.TotalSeconds + " TSecs");
+
                     if (SRType != "FBO" || SRType != "FCC")
                     {
                         ArrivalAirportIncident = GetArrivalAirportIncident(IncidentID);
@@ -359,19 +357,19 @@ namespace CostToInvoiceButton
                                     string close = getCloseArrivalAirport(arrival);
                                     DateTime ATA = getATAItinerary(Convert.ToInt32(item.Itinerary));//.ToUniversalTime();
                                     DateTime ATD = getATDItinerary(Convert.ToInt32(item.Itinerary));//.ToUniversalTime();
-                                    global.LogMessage("ATA: " + ATA.ToString() + "\nATD: " + ATD.ToString());
+                                    //global.LogMessage("ATA: " + ATA.ToString() + "\nATD: " + ATD.ToString());
                                     openDate = DateTime.Parse(ATA.Date.ToShortDateString() + " " + open);//.ToUniversalTime();
                                     closeDate = DateTime.Parse(ATA.Date.ToShortDateString() + " " + close);//.ToUniversalTime();
-                                    global.LogMessage("openDate: " + openDate.ToString() + "\ncloseDate: " + closeDate.ToString());
+                                    //global.LogMessage("openDate: " + openDate.ToString() + "\ncloseDate: " + closeDate.ToString());
                                     if (IsBetween(ATA, openDate, closeDate))
                                     {
                                         antelacion = (ATA - openDate).TotalMinutes;
                                     }
-                                    global.LogMessage("Antelacion: " + antelacion.ToString());
+                                    //global.LogMessage("Antelacion: " + antelacion.ToString());
                                     openDate = DateTime.Parse(ATD.Date.ToShortDateString() + " " + open);//.ToUniversalTime();
                                     closeDate = DateTime.Parse(ATD.Date.ToShortDateString() + " " + close);//.ToUniversalTime();
                                     extension = ((closeDate - ATD).TotalMinutes) + 15;
-                                    global.LogMessage("Extension: " + extension.ToString());
+                                    //global.LogMessage("Extension: " + extension.ToString());
                                     /*if (ATA.DayOfYear.ToString() != ATD.DayOfYear.ToString())
                                     {
                                         global.LogMessage("ATA.Date != ATD.Date");
@@ -387,17 +385,17 @@ namespace CostToInvoiceButton
                                             extension = 0;
                                         }
                                     }*/
-                                    global.LogMessage("Después de validar día.\nExtensión: " + extension.ToString());
+                                    //global.LogMessage("Después de validar día.\nExtensión: " + extension.ToString());
                                     if (extension > 0)
                                     {
                                         minover = extension < 0 ? 0 : extension;
                                     }
-                                    global.LogMessage("Extensión mayor a 0.\nExtensión: " + extension.ToString() + "\nMinutos de overtime: " + minover.ToString());
+                                    //global.LogMessage("Extensión mayor a 0.\nExtensión: " + extension.ToString() + "\nMinutos de overtime: " + minover.ToString());
                                     if (ATA.DayOfYear.ToString() != ATD.DayOfYear.ToString())
                                     {
                                         minover = (antelacion < 0 ? 0 : antelacion) + (extension < 0 ? 0 : extension);
                                     }
-                                    global.LogMessage("Días distintos.\nExtensión: " + extension.ToString() + "\nMinutos de overtime: " + minover.ToString());
+                                    //global.LogMessage("Días distintos.\nExtensión: " + extension.ToString() + "\nMinutos de overtime: " + minover.ToString());
                                     if (minover != 0)
                                     {
                                         if (antelacion > 0 && extension == 0)
@@ -422,8 +420,8 @@ namespace CostToInvoiceButton
                                 }
                             }
                             watchovertime.Stop();
-                            var elapsedMsovertime = watchovertime.Elapsed;
-                            global.LogMessage("Calculo Overtimes: " + elapsedMsovertime.Seconds.ToString() + " Secs");
+                            var elapseddatos = watchovertime.Elapsed;
+                            global.LogMessage("Calculo Overtimes: " + elapseddatos.TotalMilliseconds + " MiliSecs");
                             // OVERPARKING Message
                             double minutesleg = GetMinutesLeg(Convert.ToInt32(item.Itinerary));
 
@@ -438,7 +436,6 @@ namespace CostToInvoiceButton
                                 overnight = true;
                                 //MessageBox.Show("OVERNIGHT detected.");
                             }
-
 
                             // OVERPARKING
                             /*
@@ -504,7 +501,6 @@ namespace CostToInvoiceButton
                     }
 
                     var watchcargapantalla = Stopwatch.StartNew();
-
                     doubleScreen = new DoubleScreen(global, recordContext);
                     DgvInvoice = ((DataGridView)doubleScreen.Controls["dataGridInvoice"]);
                     DgvServicios = ((DataGridView)doubleScreen.Controls["dataGridServicios"]);
@@ -567,11 +563,11 @@ namespace CostToInvoiceButton
                     ((ComboBox)doubleScreen.Controls["cboCurrency"]).Text = SRType == "FUEL" ? "MXN" : cur;
                     watchcargapantalla.Stop();
                     var elapsedMswatchcargapantalla = watchcargapantalla.Elapsed;
-                    global.LogMessage("CargaPantallaDoble: " + elapsedMswatchcargapantalla.Seconds.ToString() + " Secs");
+                    global.LogMessage("CargaPantallaDoble: " + elapsedMswatchcargapantalla.Seconds + " MiliSecs");
 
-                        watch.Stop();
-                        var elapsedMs = watch.Elapsed;
-                        global.LogMessage("Click: " + elapsedMs.TotalSeconds.ToString() + " Secs");
+                    watch.Stop();
+                    var elapsedMs = watch.Elapsed;
+                    global.LogMessage("Click: " + elapsedMs.TotalSeconds + " TSecs");
 
                     doubleScreen.ShowDialog();
                 }
@@ -610,7 +606,7 @@ namespace CostToInvoiceButton
                 }
                 watch.Stop();
                 var elapsedMs = watch.Elapsed;
-                global.LogMessage("Init: " + elapsedMs.TotalSeconds.ToString() + " Secs");
+                global.LogMessage("Init: " + elapsedMs.TotalMilliseconds + " MiliSecs");
                 return result;
             }
             catch (Exception ex)
@@ -640,7 +636,7 @@ namespace CostToInvoiceButton
                 }
                 watch.Stop();
                 var elapsedMs = watch.Elapsed;
-                global.LogMessage("GetReferenceNumber: " + elapsedMs.TotalSeconds.ToString() + " Secs");
+                global.LogMessage("GetReferenceNumber: " + elapsedMs.TotalMilliseconds + " MiliSecs");
                 return Reference;
             }
             catch (Exception ex)
@@ -662,7 +658,7 @@ namespace CostToInvoiceButton
                 //String queryString = "SELECT (Date_Diff(ATA_ZUTC,ATD_ZUTC)/60) FROM CO.Itinerary WHERE ID =" + Itinerarie + "";
                 String queryString = "SELECT ATA,ATATime,ATD,ATDTime  FROM CO.Itinerary WHERE ID =" + Itinerarie + "";
 
-                global.LogMessage(queryString);
+                //global.LogMessage(queryString);
                 clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 1, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
                 foreach (CSVTable table in queryCSV.CSVTables)
                 {
@@ -680,7 +676,7 @@ namespace CostToInvoiceButton
                 TimeSpan t = TimeSpan.FromMinutes(minutes);
                 watch.Stop();
                 var elapsedMs = watch.Elapsed;
-                global.LogMessage("GetMinutesLeg: " + elapsedMs.TotalSeconds.ToString() + " Secs");
+                global.LogMessage("GetMinutesLeg: " + elapsedMs.TotalMilliseconds + " MiliSecs");
                 return Math.Ceiling(t.TotalHours);
             }
             catch (Exception ex)
@@ -708,7 +704,7 @@ namespace CostToInvoiceButton
             }
             watch.Stop();
             var elapsedMs = watch.Elapsed;
-            global.LogMessage("GetCurrency: " + elapsedMs.TotalSeconds.ToString() + " Secs");
+            global.LogMessage("GetCurrency: " + elapsedMs.TotalMilliseconds + " MiliSecs");
             return cur;
         }
         public string GetFirstAirport()
@@ -732,7 +728,7 @@ namespace CostToInvoiceButton
                 }
                 watch.Stop();
                 var elapsedMs = watch.Elapsed;
-                global.LogMessage("GetFirstAirport: " + elapsedMs.TotalSeconds.ToString() + " Secs");
+                global.LogMessage("GetFirstAirport: " + elapsedMs.TotalMilliseconds + " MiliSecs");
                 return air;
             }
             catch (Exception ex)
@@ -763,7 +759,7 @@ namespace CostToInvoiceButton
                 }
                 watch.Stop();
                 var elapsedMs = watch.Elapsed;
-                global.LogMessage("getAirportById: " + elapsedMs.TotalSeconds.ToString() + " Secs");
+                global.LogMessage("getAirportById: " + elapsedMs.TotalMilliseconds + " MiliSecs");
                 return air;
             }
             catch (Exception ex)
@@ -889,7 +885,7 @@ namespace CostToInvoiceButton
                 APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
                 clientInfoHeader.AppID = "Query Example";
                 String queryString = "SELECT ArrivalAirport.HoursOpen24 FROM Co.Itinerary  WHERE ID =" + Itinerarie;
-                global.LogMessage("AirportOpen24: " + queryString);
+                //global.LogMessage("AirportOpen24: " + queryString);
                 clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 1, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
                 foreach (CSVTable table in queryCSV.CSVTables)
                 {
@@ -902,7 +898,7 @@ namespace CostToInvoiceButton
                 watch.Stop();
                 var elapsedMs = watch.Elapsed;
 
-                global.LogMessage("AirportOpen24: " + elapsedMs.Seconds.ToString() + " Secs");
+                global.LogMessage("AirportOpen24: " + elapsedMs.TotalMilliseconds + " MiliSecs");
                 return open;
             }
             catch (Exception ex)
@@ -923,7 +919,7 @@ namespace CostToInvoiceButton
                 APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
                 clientInfoHeader.AppID = "Query Example";
                 String queryString = "SELECT ArrivalAirport FROM Co.Itinerary  WHERE ID =" + Itinerarie;
-                global.LogMessage("getArrivalAirport query: " + queryString);
+                //global.LogMessage("getArrivalAirport query: " + queryString);
                 clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 1, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
                 foreach (CSVTable table in queryCSV.CSVTables)
                 {
@@ -935,7 +931,7 @@ namespace CostToInvoiceButton
                 }
                 watch.Stop();
                 var elapsedMs = watch.Elapsed;
-                global.LogMessage("getArrivalAirport: " + elapsedMs.Seconds.ToString() + " Secs");
+                global.LogMessage("getArrivalAirport: " + elapsedMs.TotalMilliseconds + " MiliSecs");
                 return arriv;
             }
             catch (Exception ex)
@@ -955,7 +951,7 @@ namespace CostToInvoiceButton
                 APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
                 clientInfoHeader.AppID = "Query Example";
                 String queryString = "SELECT OpensZuluTime FROM Co.Airport_WorkingHours  WHERE Airports =" + Arrival;
-                global.LogMessage("getOpenArrivalAirport query:" + queryString);
+                // global.LogMessage("getOpenArrivalAirport query:" + queryString);
                 clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 1, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
                 foreach (CSVTable table in queryCSV.CSVTables)
                 {
@@ -967,7 +963,7 @@ namespace CostToInvoiceButton
                 }
                 watch.Stop();
                 var elapsedMs = watch.Elapsed;
-                global.LogMessage("getOpenArrivalAirport: " + elapsedMs.Seconds.ToString() + " Secs");
+                global.LogMessage("getOpenArrivalAirport: " + elapsedMs.TotalMilliseconds + " MiliSecs");
                 return opens;
             }
             catch (Exception ex)
@@ -986,7 +982,7 @@ namespace CostToInvoiceButton
                 APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
                 clientInfoHeader.AppID = "Query Example";
                 String queryString = "SELECT ClosesZuluTime  FROM Co.Airport_WorkingHours  WHERE Airports =" + Arrival;
-                global.LogMessage("getCloseArrivalAirport query:" + queryString);
+                //global.LogMessage("getCloseArrivalAirport query:" + queryString);
                 clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 1, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
                 foreach (CSVTable table in queryCSV.CSVTables)
                 {
@@ -998,7 +994,7 @@ namespace CostToInvoiceButton
                 }
                 watch.Stop();
                 var elapsedMs = watch.Elapsed;
-                global.LogMessage("getCloseArrivalAirport: " + elapsedMs.Seconds.ToString() + " Secs");
+                global.LogMessage("getCloseArrivalAirport: " + elapsedMs.TotalMilliseconds + " MiliSecs");
                 return closes;
             }
             catch (Exception ex)
@@ -1017,7 +1013,7 @@ namespace CostToInvoiceButton
                 APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
                 clientInfoHeader.AppID = "Query Example";
                 String queryString = "SELECT ATA,ATATime FROM Co.Itinerary WHERE ID = " + Itinerarie;
-                global.LogMessage("getATAItinerary query:" + queryString);
+                //global.LogMessage("getATAItinerary query:" + queryString);
                 clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 1, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
                 foreach (CSVTable table in queryCSV.CSVTables)
                 {
@@ -1031,7 +1027,7 @@ namespace CostToInvoiceButton
                 }
                 watch.Stop();
                 var elapsedMs = watch.Elapsed;
-                global.LogMessage("getATAItinerary: " + elapsedMs.Seconds.ToString() + " Secs");
+                global.LogMessage("getATAItinerary: " + elapsedMs.TotalMilliseconds + " MiliSecs");
                 return DateTime.Parse(ATA);
             }
             catch (Exception ex)
@@ -1050,7 +1046,7 @@ namespace CostToInvoiceButton
                 APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
                 clientInfoHeader.AppID = "Query Example";
                 String queryString = "SELECT ATD,ATDTime FROM Co.Itinerary WHERE ID = " + Itinerarie;
-                global.LogMessage("getATDItinerary query:" + queryString);
+                //global.LogMessage("getATDItinerary query:" + queryString);
                 clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 1, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
                 foreach (CSVTable table in queryCSV.CSVTables)
                 {
@@ -1064,7 +1060,7 @@ namespace CostToInvoiceButton
                 }
                 watch.Stop();
                 var elapsedMs = watch.Elapsed;
-                global.LogMessage("getATDItinerary: " + elapsedMs.Seconds.ToString() + " Secs");
+                global.LogMessage("getATDItinerary: " + elapsedMs.TotalMilliseconds + " MiliSecs");
                 return DateTime.Parse(ATD);
             }
             catch (Exception ex)
@@ -1110,7 +1106,7 @@ namespace CostToInvoiceButton
                 }
                 watch.Stop();
                 var elapsedMs = watch.Elapsed;
-                global.LogMessage("CreateAirNavFee: " + elapsedMs.Seconds.ToString() + " Secs");
+                global.LogMessage("CreateAirNavFee: " + elapsedMs.TotalMilliseconds + " MiliSecs");
             }
             catch (Exception ex)
             {
@@ -1155,7 +1151,7 @@ namespace CostToInvoiceButton
                 }
                 watch.Stop();
                 var elapsedMs = watch.Elapsed;
-                global.LogMessage("CreateAirNavICCS: " + elapsedMs.Seconds.ToString() + " Secs");
+                global.LogMessage("CreateAirNavICCS: " + elapsedMs.TotalMilliseconds + " MiliSecs");
             }
             catch (Exception ex)
             {
@@ -1201,7 +1197,7 @@ namespace CostToInvoiceButton
                 }
                 watch.Stop();
                 var elapsedMs = watch.Elapsed;
-                global.LogMessage("CreateDeposit: " + elapsedMs.Seconds.ToString() + " Secs");
+                global.LogMessage("CreateDeposit: " + elapsedMs.TotalMilliseconds + " MiliSecs");
 
             }
             catch (Exception ex)
@@ -1459,7 +1455,7 @@ namespace CostToInvoiceButton
                 }
                 watch.Stop();
                 var elapsedMs = watch.Elapsed;
-                global.LogMessage("CreateOvers: " + elapsedMs.Seconds.ToString() + " Secs");
+                global.LogMessage("CreateOvers: " + elapsedMs.TotalMilliseconds + " MiliSecs");
             }
             catch (Exception ex)
             {
@@ -1539,7 +1535,7 @@ namespace CostToInvoiceButton
                 }
                 watch.Stop();
                 var elapsedMs = watch.Elapsed;
-                global.LogMessage("CreateSENEAMFee: " + elapsedMs.Seconds.ToString() + " Secs");
+                global.LogMessage("CreateSENEAMFee: " + elapsedMs.TotalMilliseconds + " MiliSecs");
             }
             catch (Exception ex)
             {
@@ -1591,7 +1587,7 @@ namespace CostToInvoiceButton
                 /*if (ClientName.Contains("NETJET")) {
                     queryString = "SELECT ID,ItemNumber,ItemDescription,Airport,IDProveedor,Costo,Precio,InternalInvoice,Itinerary,Paquete,Componente,Informativo,ParentPaxID,Categories,fuel_id,CobroParticipacionNj,ParticipacionCobro,Site,IVA FROM CO.Services WHERE Incident =" + IncidentID + " AND Informativo = '0' ORDER BY ID ASC, Itinerary ASC, ParentPaxId ASC";
                 }*/
-                global.LogMessage("GetListServices: " + queryString);
+                //global.LogMessage("GetListServices: " + queryString);
                 clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 10000, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
                 foreach (CSVTable table in queryCSV.CSVTables)
                 {
@@ -1637,7 +1633,7 @@ namespace CostToInvoiceButton
                 }
                 watch.Stop();
                 var elapsedMs = watch.Elapsed;
-                global.LogMessage("GetListServices: " + elapsedMs.Seconds.ToString() + " Secs");
+                global.LogMessage("GetListServices: " + elapsedMs.TotalMilliseconds + " MiliSecs");
                 return services;
             }
             catch (Exception ex)
@@ -1698,7 +1694,7 @@ namespace CostToInvoiceButton
                 }
                 watch.Stop();
                 var elapsedMs = watch.Elapsed;
-                global.LogMessage("GetDeleteFuelItems: " + elapsedMs.Seconds.ToString() + " Secs");
+                global.LogMessage("GetDeleteFuelItems: " + elapsedMs.TotalMilliseconds + " MiliSecs");
             }
             catch (Exception ex)
             {
@@ -1728,7 +1724,7 @@ namespace CostToInvoiceButton
                 }
                 watch.Stop();
                 var elapsedMs = watch.Elapsed;
-                global.LogMessage("GetDeleteMCreated: " + elapsedMs.Seconds.ToString() + " Secs");
+                global.LogMessage("GetDeleteMCreated: " + elapsedMs.TotalMilliseconds + " MiliSecs");
             }
             catch (Exception ex)
             {
@@ -1759,7 +1755,7 @@ namespace CostToInvoiceButton
                 }
                 watch.Stop();
                 var elapsedMs = watch.Elapsed;
-                global.LogMessage("GetDeleteGF_PF: " + elapsedMs.Seconds.ToString() + " Secs");
+                global.LogMessage("GetDeleteGF_PF: " + elapsedMs.TotalMilliseconds + " MiliSecs");
             }
             catch (Exception ex)
             {
@@ -1955,6 +1951,7 @@ namespace CostToInvoiceButton
         {
             try
             {
+                var wath = Stopwatch.StartNew();
                 string envelope = "<soapenv:Envelope" +
                                           "   xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\"" +
                                           "   xmlns:typ=\"http://xmlns.oracle.com/apps/scm/productModel/items/itemServiceV2/types/\"" +
@@ -2016,7 +2013,7 @@ namespace CostToInvoiceButton
                                           "</typ:findItem>" +
                                           "</soapenv:Body>" +
                                           "</soapenv:Envelope>";
-                global.LogMessage(envelope);
+                //global.LogMessage(envelope);
 
                 byte[] byteArray = Encoding.UTF8.GetBytes(envelope);
                 byte[] toEncodeAsBytes = System.Text.ASCIIEncoding.ASCII.GetBytes("itotal" + ":" + "Oracle123");
@@ -2115,6 +2112,9 @@ namespace CostToInvoiceButton
                     }
                     responseComponentGet.Close();
                 }
+                wath.Stop();
+                var elapsed = wath.Elapsed;
+                global.LogMessage("GetComponentsData: " + elapsed.TotalMilliseconds + " MiliSecs");
                 return component;
             }
             catch (Exception ex)
@@ -2237,7 +2237,7 @@ namespace CostToInvoiceButton
                     body += "\"Precio\":\"" + component.Precio + "\"";
                 }
                 body += "}";
-                global.LogMessage(body);
+                //global.LogMessage(body);
                 request.AddParameter("application/json", body, ParameterType.RequestBody);
                 request.AddHeader("Authorization", "Basic ZW9saXZhczpTaW5lcmd5KjIwMTg=");
                 request.AddHeader("X-HTTP-Method-Override", "POST");
@@ -2259,7 +2259,7 @@ namespace CostToInvoiceButton
                 }
                 watch.Stop();
                 var elapsed = watch.Elapsed;
-                global.LogMessage("InsertComponent: " + elapsed.TotalSeconds + " Secs");
+                global.LogMessage("InsertComponent: " + elapsed.TotalMilliseconds + " MiliSecs");
             }
             catch (Exception ex)
             {
@@ -2316,7 +2316,7 @@ namespace CostToInvoiceButton
                 }
                 watch.Stop();
                 var elapsedMs = watch.Elapsed;
-                global.LogMessage("GetSRType: " + elapsedMs.Seconds.ToString() + " Secs");
+                global.LogMessage("GetSRType: " + elapsedMs.TotalMilliseconds + " MiliSecs");
                 return SRTYPE;
             }
             catch (Exception ex)
@@ -2329,6 +2329,7 @@ namespace CostToInvoiceButton
         {
             try
             {
+                var watch = Stopwatch.StartNew();
                 string ClientType = "Nacional";
                 if (IncidentID != 0)
                 {
@@ -2350,7 +2351,9 @@ namespace CostToInvoiceButton
                 {
                     ClientType = "Internacional";
                 }
-
+                watch.Stop();
+                var elapsedMs = watch.Elapsed;
+                global.LogMessage("GetClientType: " + elapsedMs.TotalMilliseconds + " MiliSecs");
                 return ClientType;
             }
             catch (Exception ex)
@@ -2381,7 +2384,7 @@ namespace CostToInvoiceButton
                 }
                 watch.Stop();
                 var elapsedMs = watch.Elapsed;
-                global.LogMessage("GetArrivalAirportIncident: " + elapsedMs.Seconds.ToString() + " Secs");
+                global.LogMessage("GetArrivalAirportIncident: " + elapsedMs.TotalMilliseconds + " MiliSecs");
 
                 return Arrival;
             }
@@ -2413,7 +2416,7 @@ namespace CostToInvoiceButton
                 }
                 watch.Stop();
                 var elapsedMs = watch.Elapsed;
-                global.LogMessage("GetDepartureAirportIncident: " + elapsedMs.Seconds.ToString() + " Secs");
+                global.LogMessage("GetDepartureAirportIncident: " + elapsedMs.TotalMilliseconds + " MiliSecs");
                 return Departure;
             }
             catch (Exception ex)
@@ -2444,7 +2447,7 @@ namespace CostToInvoiceButton
                 }
                 watch.Stop();
                 var elapsedMs = watch.Elapsed;
-                global.LogMessage("getCustomerClass: " + elapsedMs.Seconds.ToString() + " Secs");
+                global.LogMessage("getCustomerClass: " + elapsedMs.TotalMilliseconds + " MiliSecs");
                 return clase;
             }
             catch (Exception ex)
@@ -2474,7 +2477,7 @@ namespace CostToInvoiceButton
                 }
                 watch.Stop();
                 var elapsedMs = watch.Elapsed;
-                global.LogMessage("getICAODesi: " + elapsedMs.Seconds.ToString() + " Secs");
+                global.LogMessage("getICAODesi: " + elapsedMs.TotalMilliseconds + " MiliSecs");
 
                 return Icao;
             }
@@ -2506,7 +2509,7 @@ namespace CostToInvoiceButton
                 }
                 watch.Stop();
                 var elapsedMs = watch.Elapsed;
-                global.LogMessage("GetFuelType: " + elapsedMs.Seconds.ToString() + " Secs");
+                global.LogMessage("GetFuelType: " + elapsedMs.TotalMilliseconds + " MiliSecs");
                 return Type;
             }
             catch (Exception ex)
@@ -2624,7 +2627,7 @@ namespace CostToInvoiceButton
                 }
                 watch.Stop();
                 var elapsedMs = watch.Elapsed;
-                global.LogMessage("GetFuelData: " + elapsedMs.Seconds.ToString() + " Secs");
+                global.LogMessage("GetFuelData: " + elapsedMs.TotalMilliseconds + " MiliSecs");
             }
             catch (Exception ex)
             {
@@ -2696,7 +2699,7 @@ namespace CostToInvoiceButton
                 }
                 watch.Stop();
                 var elapsedMs = watch.Elapsed;
-                global.LogMessage("CreateFuelMinimun: " + elapsedMs.Seconds.ToString() + " Secs");
+                global.LogMessage("CreateFuelMinimun: " + elapsedMs.TotalMilliseconds + " MiliSecs");
             }
             catch (Exception ex)
             {
@@ -2763,6 +2766,7 @@ namespace CostToInvoiceButton
         {
             try
             {
+                var watch = Stopwatch.StartNew();
                 string cats = "";
                 string envelope = "<soapenv:Envelope" +
                                 "   xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\"" +
@@ -2861,6 +2865,9 @@ namespace CostToInvoiceButton
                     }
                 }
 
+                watch.Stop();
+                var elapsedMs = watch.Elapsed;
+                global.LogMessage("CreateFuelMinimun: " + elapsedMs.TotalMilliseconds + " MiliSecs");
                 return cats;
             }
             catch (Exception ex)
@@ -2891,7 +2898,7 @@ namespace CostToInvoiceButton
                 }
                 watch.Stop();
                 var elapsedMs = watch.Elapsed;
-                global.LogMessage("GetCargoGroup: " + elapsedMs.Seconds.ToString() + " Secs");
+                global.LogMessage("GetCargoGroup: " + elapsedMs.TotalMilliseconds + " MiliSecs");
                 return cGroup;
             }
             catch (Exception ex)
@@ -2922,7 +2929,7 @@ namespace CostToInvoiceButton
                 }
                 watch.Stop();
                 var elapsedMs = watch.Elapsed;
-                global.LogMessage("GetPaxGroup: " + elapsedMs.Seconds.ToString() + " Secs");
+                global.LogMessage("GetPaxGroup: " + elapsedMs.TotalMilliseconds + " MiliSecs");
                 return pGroup;
 
             }
@@ -2985,7 +2992,7 @@ namespace CostToInvoiceButton
                 }
                 watch.Stop();
                 var elapsedMs = watch.Elapsed;
-                global.LogMessage("UpdatePackageCost: " + elapsedMs.Seconds.ToString() + " Secs");
+                global.LogMessage("UpdatePackageCost: " + elapsedMs.TotalMilliseconds + " MiliSecs");
             }
             catch (Exception ex)
             {
@@ -3017,7 +3024,7 @@ namespace CostToInvoiceButton
                 }
 
                 body += "}";
-                global.LogMessage(body);
+                //global.LogMessage(body);
                 request.AddParameter("application/json", body, ParameterType.RequestBody);
                 // easily add HTTP Headers
 
@@ -3095,7 +3102,7 @@ namespace CostToInvoiceButton
                     }
                 }
 
-                global.LogMessage("getPaxPrice: " + queryString + " MonedaBack: " + totcur[1]);
+                //global.LogMessage("getPaxPrice: " + queryString + " MonedaBack: " + totcur[1]);
                 currency = totcur[1];
                 return price;
             }
@@ -3114,7 +3121,7 @@ namespace CostToInvoiceButton
             APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
             clientInfoHeader.AppID = "Query Example";
             String queryString = "SELECT Currency FROM CO.Payables WHERE Services.Incident =" + IncidentID + "  AND Services.Services = " + PaxId + " GROUP BY Currency";
-            global.LogMessage(queryString);
+            //global.LogMessage(queryString);
             clientORN.QueryCSV(clientInfoHeader, aPIAccessRequest, queryString, 200, "|", false, false, out CSVTableSet queryCSV, out byte[] FileData);
             foreach (CSVTable table in queryCSV.CSVTables)
             {
@@ -3140,7 +3147,7 @@ namespace CostToInvoiceButton
                         }
                     }
                 }
-                global.LogMessage("TotalMonedasPorSe:" + i + " Moneda: " + TotCur);
+                //global.LogMessage("TotalMonedasPorSe:" + i + " Moneda: " + TotCur);
             }
             return i + "|" + TotCur;
         }
@@ -3432,6 +3439,7 @@ namespace CostToInvoiceButton
         }
         public string getPassword(string application)
         {
+            var watch = Stopwatch.StartNew();
             string password = "";
             ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
             APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
@@ -3443,9 +3451,16 @@ namespace CostToInvoiceButton
                 String[] rowData = table.Rows;
                 foreach (String data in rowData)
                 {
-                    password = String.IsNullOrEmpty(data) ? "" : data;
+                    password = data;
                 }
             }
+
+            watch.Stop();
+            var elapsedMs = watch.Elapsed;
+            global.LogMessage("getPassword: " + elapsedMs.TotalMilliseconds + " MiliSecs");
+            global.LogMessage("getPassword: " + elapsedMs.TotalSeconds + " Secs");
+
+
             return password;
         }
     }

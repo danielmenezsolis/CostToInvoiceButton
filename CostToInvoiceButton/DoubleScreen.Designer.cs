@@ -1083,7 +1083,6 @@
             this.lblExchangeRate.Size = new System.Drawing.Size(81, 13);
             this.lblExchangeRate.TabIndex = 95;
             this.lblExchangeRate.Text = "Exchange Rate";
-            this.lblExchangeRate.Visible = false;
             // 
             // txtExchangeRate
             // 
@@ -1093,7 +1092,6 @@
             this.txtExchangeRate.Size = new System.Drawing.Size(92, 20);
             this.txtExchangeRate.TabIndex = 94;
             this.txtExchangeRate.TabStop = false;
-            this.txtExchangeRate.Visible = false;
             // 
             // txtPackage
             // 

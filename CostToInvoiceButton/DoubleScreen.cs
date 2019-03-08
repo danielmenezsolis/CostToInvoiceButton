@@ -128,6 +128,12 @@ namespace CostToInvoiceButton
                     }
                     string supp = dataGridServicios.Rows[e.RowIndex].Cells["Supplier"].Value.ToString();
 
+                    /*
+                    if (txtPackage.Text == "Yes")
+                    {
+                        supp = GetPaxSupplier(txtIdService.Text);
+                    }
+                    */
                     GetSuppliers();
                     if (!string.IsNullOrEmpty(supp))
                     {
@@ -730,6 +736,19 @@ namespace CostToInvoiceButton
         } */
         // Functions
         // IS COMPONENT - EO
+
+        private string GetPaxSupplier(string idservice)
+        {
+            string sup = "NO SUPPLIER";
+
+            if (hasPayables(idservice))
+            {
+
+            }
+
+            return sup;
+        }
+
         private bool isComponent()
         {
             try

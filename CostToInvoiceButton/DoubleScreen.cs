@@ -290,12 +290,31 @@ namespace CostToInvoiceButton
                     if ((lblSrType.Text == "FBO" && (txtItemNumber.Text == "ASFIEAP357" || txtItemNumber.Text == "AFREISP0179")) || (lblSrType.Text == "FCC" && txtItemNumber.Text == "AFREISP0179"))
                     {
                         double pricesum = 0;
+                        var dictFee = new Dictionary<string, string>();
+                    
+                        foreach (DataGridViewRow dgvServicios in dataGridServicios.Rows)
+                        {
+                            if (dgvServicios.Cells["InvoiceReady"].Value.ToString() == "Yes")
+                            {
+                                dictFee[dgvServicios.Cells["ID"].Value.ToString()] = dgvServicios.Cells["Fee"].Value.ToString();
+                            }
+                        }
+
                         foreach (DataGridViewRow dgvRenglon in dataGridInvoice.Rows)
                         {
-                            pricesum = pricesum + Convert.ToDouble(dgvRenglon.Cells["Fee"].Value);
+                            if (Convert.ToBoolean(dgvRenglon.Cells["InvoiceReady"].Value) == true)
+                            {
+                                dictFee[dgvRenglon.Cells["IdService"].Value.ToString()] = dgvRenglon.Cells["Fee"].Value.ToString();
+                            }
                         }
+
+                        foreach(KeyValuePair<string, string> id_Fee in dictFee)
+                        {
+                            pricesum = pricesum + Convert.ToDouble(id_Fee.Value);
+                        }
+
                         global.LogMessage("Total Fee: " + pricesum.ToString());
-                        txtPrice.Text = Math.Round((pricesum), 4).ToString();
+                        txtPrice.Text = Math.Round((pricesum), 2).ToString();
                         txtPrice.Enabled = false;
                         txtCost.Enabled = false;
                     }

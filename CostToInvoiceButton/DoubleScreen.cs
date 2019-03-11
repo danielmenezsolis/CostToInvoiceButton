@@ -286,9 +286,7 @@ namespace CostToInvoiceButton
 
                         return;
                     }
-
-
-
+                                       
                     if ((lblSrType.Text == "FBO" && (txtItemNumber.Text == "ASFIEAP357" || txtItemNumber.Text == "AFREISP0179")) || (lblSrType.Text == "FCC" && txtItemNumber.Text == "AFREISP0179"))
                     {
                         double pricesum = 0;
@@ -3560,7 +3558,7 @@ namespace CostToInvoiceButton
                 ClientInfoHeader clientInfoHeader = new ClientInfoHeader();
                 APIAccessRequestHeader aPIAccessRequest = new APIAccessRequestHeader();
                 clientInfoHeader.AppID = "Query Example";
-                String queryString = "SELECT ID,ItemNumber,ItemDescription,Airport,IDProveedor,Costo,Precio,InternalInvoice,Itinerary,Paquete,Componente,Informativo,ParentPaxID,Categories,fuel_id,CobroParticipacionNj,ParticipacionCobro,Site,IVA,ListoFactura,Cantidad,CostCurrency,TotalCost,PriceCurrency,TotalPrice,Fee FROM CO.Services WHERE Incident =" + lblIdIncident.Text + " AND Informativo = '0' AND (Componente IS NULL OR Componente  = '0') ORDER BY ID ASC, Itinerary ASC, ParentPaxId ASC";
+                String queryString = "SELECT ID,ItemNumber,ItemDescription,Airport,IDProveedor,Costo,Precio,InternalInvoice,Itinerary,Paquete,Componente,Informativo,ParentPaxID,Categories,fuel_id,CobroParticipacionNj,ParticipacionCobro,Site,IVA,ListoFactura,Cantidad,CostCurrency,TotalCost,PriceCurrency,TotalPrice,Fee FROM CO.Services WHERE Incident =" + lblIdIncident.Text + " AND Informativo = '0' AND (Componente IS NULL OR Componente  = '0') AND Facturado = 0 ORDER BY ID ASC, Itinerary ASC, ParentPaxId ASC";
                 /*if (ClientName.Contains("NETJET")) {
                     queryString = "SELECT ID,ItemNumber,ItemDescription,Airport,IDProveedor,Costo,Precio,InternalInvoice,Itinerary,Paquete,Componente,Informativo,ParentPaxID,Categories,fuel_id,CobroParticipacionNj,ParticipacionCobro,Site,IVA FROM CO.Services WHERE Incident =" + IncidentID + " AND Informativo = '0' ORDER BY ID ASC, Itinerary ASC, ParentPaxId ASC";
                 }*/
